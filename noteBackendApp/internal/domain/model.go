@@ -16,3 +16,11 @@ type NoteResponse struct {
 	Name string `json:"name"`
 	Link string `json:"link,optional"`
 }
+
+type ResponseError struct {
+	Timestamp    string `json:"timestamp"`
+	Status       int    `json:"status"`
+	BusinessCode string `json:"businessCode,omitempty"`
+	Error        string `json:"error"`
+	Path         string `json:"path"`
+}

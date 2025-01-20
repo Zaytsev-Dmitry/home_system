@@ -2,40 +2,49 @@ package noteApi
 
 import (
 	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/julienschmidt/httprouter"
 	"net/http"
 	noteDao "noteBackendApp/internal/dao"
 	noteDomain "noteBackendApp/internal/domain"
+	"time"
 )
 
-// TODO добавить валидацию
-func getById(w http.ResponseWriter, _ *http.Request, p httprouter.Params) {
-	id := p.ByName("id")
+func getById(context *gin.Context) {
+	context.Header("Content-Type", "application/json")
+	id := context.Params.ByName("id")
 	obj, err := noteDao.GetById(id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		var responseError = noteDomain.ResponseError{
+			Timestamp:    time.Now().String(),
+			Status:       http.StatusNotFound,
+			BusinessCode: "-",
+			Error:        err.Error(),
+			Path:         context.Request.URL.Path,
+		}
+		json.NewEncoder(context.Writer).Encode(responseError)
 	} else {
 		var response = noteDomain.NoteResponse{Id: obj.Id, Name: obj.Name, Link: obj.Link}
-		json.NewEncoder(w).Encode(response)
+		json.NewEncoder(context.Writer).Encode(response)
 	}
 }
 
-func save(w http.ResponseWriter, req *http.Request, p httprouter.Params) {
-	decoder := json.NewDecoder(req.Body)
+func save(context *gin.Context) {
+	context.Header("Content-Type", "application/json")
+	decoder := json.NewDecoder(context.Request.Body)
 	var requestEntity noteDomain.CreateNoteRequest
 	err := decoder.Decode(&requestEntity)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(context.Writer, err.Error(), http.StatusBadRequest)
 	}
 	entity := noteDao.Save(noteDomain.NoteEntity{Id: uuid.New().String(), Name: requestEntity.Name, Link: requestEntity.Link})
 	var response = noteDomain.NoteResponse{Id: entity.Id, Name: entity.Name, Link: entity.Link}
 
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(context.Writer).Encode(response)
 }
 
-func Init() *httprouter.Router {
-	router := httprouter.New()
+func Init() *gin.Engine {
+	router := gin.Default()
 	router.GET("/note/:id", getById)
 	router.POST("/note", save)
 	return router
