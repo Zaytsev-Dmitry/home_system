@@ -35,11 +35,17 @@ func save(context *gin.Context) {
 	var requestEntity noteDomain.CreateNoteRequest
 	err := decoder.Decode(&requestEntity)
 	if err != nil {
-		http.Error(context.Writer, err.Error(), http.StatusBadRequest)
+		var responseError = noteDomain.ResponseError{
+			Timestamp:    time.Now().String(),
+			Status:       http.StatusBadRequest,
+			BusinessCode: "-",
+			Error:        err.Error(),
+			Path:         context.Request.URL.Path,
+		}
+		json.NewEncoder(context.Writer).Encode(responseError)
 	}
 	entity := noteDao.Save(noteDomain.NoteEntity{Id: uuid.New().String(), Name: requestEntity.Name, Link: requestEntity.Link})
 	var response = noteDomain.NoteResponse{Id: entity.Id, Name: entity.Name, Link: entity.Link}
-
 	json.NewEncoder(context.Writer).Encode(response)
 }
 
