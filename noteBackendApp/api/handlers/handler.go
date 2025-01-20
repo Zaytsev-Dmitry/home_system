@@ -27,6 +27,7 @@ func (api *NoteApi) SaveNote(context *gin.Context) {
 			Error:        err.Error(),
 			Path:         context.Request.URL.Path,
 		}
+		context.Status(http.StatusBadRequest)
 		json.NewEncoder(context.Writer).Encode(responseError)
 	}
 	entity := api.db.Save(noteDomain.NoteEntity{Id: uuid.New().String(), Name: requestEntity.Name, Link: requestEntity.Link})
@@ -45,6 +46,7 @@ func (api *NoteApi) GetNoteById(context *gin.Context, id string) {
 			Error:        err.Error(),
 			Path:         context.Request.URL.Path,
 		}
+		context.Status(http.StatusNotFound)
 		json.NewEncoder(context.Writer).Encode(responseError)
 	} else {
 		var response = noteDomain.NoteResponse{Id: obj.Id, Name: obj.Name, Link: obj.Link}
