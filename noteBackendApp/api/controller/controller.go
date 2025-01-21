@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
-	noteApiDTO "noteBackendApp/api/openapi"
+	noteApiDTO "noteBackendApp/api/docs"
 	noteDao "noteBackendApp/internal/dao"
 	noteDomain "noteBackendApp/internal/domain"
 	"time"

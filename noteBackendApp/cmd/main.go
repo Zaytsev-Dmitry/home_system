@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
+	api "noteBackendApp/api/docs"
 	noteHandler "noteBackendApp/api/handlers"
-	api "noteBackendApp/api/openapi"
 	noteDao "noteBackendApp/internal/dao"
 )
 
