@@ -2,7 +2,9 @@ package noteDao
 
 import (
 	"fmt"
+	"maps"
 	noteDomain "noteBackendApp/internal/domain"
+	"slices"
 )
 
 type InMemoryNoteRepository struct {
@@ -35,4 +37,17 @@ func (db *InMemoryNoteRepository) GetById(id string) (noteDomain.NoteEntity, err
 		err := fmt.Errorf(errorFormatStr, id)
 		return noteDomain.NoteEntity{}, err
 	}
+}
+
+// TODO добавить логирование
+func (db *InMemoryNoteRepository) DeleteById(id string) {
+	notes := db.Notes
+	if obj, found := notes[id]; found {
+		delete(notes, obj.Id)
+	}
+}
+
+// TODO добавить логирование
+func (db *InMemoryNoteRepository) GetAll() []noteDomain.NoteEntity {
+	return slices.Collect(maps.Values(db.Notes))
 }

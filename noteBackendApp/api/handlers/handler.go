@@ -42,6 +42,12 @@ func (api *NoteApi) SaveNote(context *gin.Context) {
 	json.NewEncoder(context.Writer).Encode(response)
 }
 
+func (api *NoteApi) DeleteNoteById(context *gin.Context, id string) {
+	context.Header("Content-Type", "application/json")
+	api.db.DeleteById(id)
+	context.Status(http.StatusNoContent)
+}
+
 func (api *NoteApi) GetNoteById(context *gin.Context, id string) {
 	context.Header("Content-Type", "application/json")
 	obj, err := api.db.GetById(id)
@@ -61,6 +67,21 @@ func (api *NoteApi) GetNoteById(context *gin.Context, id string) {
 		var response = noteApiDTO.NoteResponse{Id: &obj.Id, Name: &obj.Name, Link: &obj.Link}
 		json.NewEncoder(context.Writer).Encode(response)
 	}
+}
+
+func (api *NoteApi) GetAllNotes(context *gin.Context) {
+	context.Header("Content-Type", "application/json")
+	allNotes := api.db.GetAll()
+	var result = make([]noteApiDTO.NoteResponse, len(allNotes))
+	for i, value := range allNotes {
+		var response = noteApiDTO.NoteResponse{
+			Id:   &value.Id,
+			Link: &value.Link,
+			Name: &value.Name,
+		}
+		result[i] = response
+	}
+	json.NewEncoder(context.Writer).Encode(result)
 }
 
 func NewNoteApi(db *noteDao.InMemoryNoteRepository) *NoteApi {
