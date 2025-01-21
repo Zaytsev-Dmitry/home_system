@@ -14,7 +14,7 @@ func main() {
 	fmt.Printf("%s!\n", startMessage)
 	noteRepository := noteDao.NewInMemoryNoteRepository()
 	router := gin.Default()
-	noteApi := noteHandler.NewNoteApi(noteRepository)
+	noteApi := noteHandler.NewNoteBackendApi(noteRepository)
 	api.RegisterHandlers(router, noteApi)
 
 	log.Println("Starting server on :8080")
