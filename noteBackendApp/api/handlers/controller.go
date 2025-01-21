@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-type NoteBackendApi struct {
+type NoteController struct {
 	db *noteDao.InMemoryNoteRepository
 }
 
@@ -25,7 +25,7 @@ func getErrorDto(err string, status int, context *gin.Context) noteApiDTO.ErrorR
 	}
 }
 
-func (api *NoteBackendApi) SaveNote(context *gin.Context) {
+func (controller *NoteController) SaveNote(context *gin.Context) {
 	context.Header("Content-Type", "application/json")
 	decoder := json.NewDecoder(context.Request.Body)
 	var requestEntity noteApiDTO.CreateNoteRequest
@@ -35,7 +35,7 @@ func (api *NoteBackendApi) SaveNote(context *gin.Context) {
 		context.Status(http.StatusBadRequest)
 		json.NewEncoder(context.Writer).Encode(responseError)
 	}
-	entity := api.db.Save(noteDomain.NoteEntity{
+	entity := controller.db.Save(noteDomain.NoteEntity{
 		Id:   uuid.New().String(),
 		Name: *requestEntity.Name,
 		Link: *requestEntity.Link,
@@ -44,15 +44,15 @@ func (api *NoteBackendApi) SaveNote(context *gin.Context) {
 	json.NewEncoder(context.Writer).Encode(response)
 }
 
-func (api *NoteBackendApi) DeleteNoteById(context *gin.Context, id string) {
+func (controller *NoteController) DeleteNoteById(context *gin.Context, id string) {
 	context.Header("Content-Type", "application/json")
-	api.db.DeleteById(id)
+	controller.db.DeleteById(id)
 	context.Status(http.StatusNoContent)
 }
 
-func (api *NoteBackendApi) GetNoteById(context *gin.Context, id string) {
+func (controller *NoteController) GetNoteById(context *gin.Context, id string) {
 	context.Header("Content-Type", "application/json")
-	obj, err := api.db.GetById(id)
+	obj, err := controller.db.GetById(id)
 	if err != nil {
 		var responseError = getErrorDto(err.Error(), http.StatusNotFound, context)
 		context.Status(http.StatusNotFound)
@@ -63,9 +63,9 @@ func (api *NoteBackendApi) GetNoteById(context *gin.Context, id string) {
 	}
 }
 
-func (api *NoteBackendApi) GetAllNotes(context *gin.Context) {
+func (controller *NoteController) GetAllNotes(context *gin.Context) {
 	context.Header("Content-Type", "application/json")
-	allNotes := api.db.GetAll()
+	allNotes := controller.db.GetAll()
 	var result = make([]noteApiDTO.NoteResponse, len(allNotes))
 	for i, value := range allNotes {
 		var response = noteApiDTO.NoteResponse{
@@ -76,8 +76,4 @@ func (api *NoteBackendApi) GetAllNotes(context *gin.Context) {
 		result[i] = response
 	}
 	json.NewEncoder(context.Writer).Encode(result)
-}
-
-func NewNoteBackendApi(db *noteDao.InMemoryNoteRepository) *NoteBackendApi {
-	return &NoteBackendApi{db: db}
 }
