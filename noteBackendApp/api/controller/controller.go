@@ -1,4 +1,4 @@
-package noteHandlers
+package noteControllers
 
 import (
 	"encoding/json"
@@ -12,7 +12,7 @@ import (
 )
 
 type NoteController struct {
-	db *noteDao.InMemoryNoteRepository
+	Db *noteDao.InMemoryNoteRepository
 }
 
 func getErrorDto(err string, status int, context *gin.Context) noteApiDTO.ErrorResponse {
@@ -35,7 +35,8 @@ func (controller *NoteController) SaveNote(context *gin.Context) {
 		context.Status(http.StatusBadRequest)
 		json.NewEncoder(context.Writer).Encode(responseError)
 	}
-	entity := controller.db.Save(noteDomain.NoteEntity{
+
+	entity := controller.Db.Save(noteDomain.NoteEntity{
 		Id:   uuid.New().String(),
 		Name: *requestEntity.Name,
 		Link: *requestEntity.Link,
@@ -46,13 +47,13 @@ func (controller *NoteController) SaveNote(context *gin.Context) {
 
 func (controller *NoteController) DeleteNoteById(context *gin.Context, id string) {
 	context.Header("Content-Type", "application/json")
-	controller.db.DeleteById(id)
+	controller.Db.DeleteById(id)
 	context.Status(http.StatusNoContent)
 }
 
 func (controller *NoteController) GetNoteById(context *gin.Context, id string) {
 	context.Header("Content-Type", "application/json")
-	obj, err := controller.db.GetById(id)
+	obj, err := controller.Db.GetById(id)
 	if err != nil {
 		var responseError = getErrorDto(err.Error(), http.StatusNotFound, context)
 		context.Status(http.StatusNotFound)
@@ -65,7 +66,7 @@ func (controller *NoteController) GetNoteById(context *gin.Context, id string) {
 
 func (controller *NoteController) GetAllNotes(context *gin.Context) {
 	context.Header("Content-Type", "application/json")
-	allNotes := controller.db.GetAll()
+	allNotes := controller.Db.GetAll()
 	var result = make([]noteApiDTO.NoteResponse, len(allNotes))
 	for i, value := range allNotes {
 		var response = noteApiDTO.NoteResponse{
