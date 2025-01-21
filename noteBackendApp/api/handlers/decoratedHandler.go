@@ -27,5 +27,5 @@ func (api *NoteBackendApi) GetAllNotes(context *gin.Context) {
 }
 
 func NewNoteBackendApi(db *noteDao.InMemoryNoteRepository) *NoteBackendApi {
-	return &NoteBackendApi{controller: &noteController.NoteController{Db: db}}
+	return &NoteBackendApi{controller: noteController.Create(db)}
 }

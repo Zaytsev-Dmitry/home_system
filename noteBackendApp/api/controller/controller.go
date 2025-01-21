@@ -1,80 +1,60 @@
 package noteControllers
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"net/http"
 	noteApiDTO "noteBackendApp/api/docs"
+	notePresenter "noteBackendApp/api/presenter"
 	noteDao "noteBackendApp/internal/dao"
-	noteDomain "noteBackendApp/internal/domain"
-	"time"
+	noteUseCase "noteBackendApp/internal/usecases"
+	noteUtilities "noteBackendApp/pkg/utilities"
 )
 
 type NoteController struct {
-	Db *noteDao.InMemoryNoteRepository
-}
-
-func getErrorDto(err string, status int, context *gin.Context) noteApiDTO.ErrorResponse {
-	nowString := time.Now().String()
-	return noteApiDTO.ErrorResponse{
-		Timestamp: &nowString,
-		Status:    &status,
-		Error:     &err,
-		Path:      &context.Request.URL.Path,
-	}
+	SaveUseCase   *noteUseCase.SaveNoteUseCase
+	DeleteUseCase *noteUseCase.DeleteNoteUseCase
+	GetUseCase    *noteUseCase.GetNoteUseCase
+	presenter     *notePresenter.Presenter
 }
 
 func (controller *NoteController) SaveNote(context *gin.Context) {
-	context.Header("Content-Type", "application/json")
-	decoder := json.NewDecoder(context.Request.Body)
 	var requestEntity noteApiDTO.CreateNoteRequest
-	err := decoder.Decode(&requestEntity)
-	if err != nil {
-		var responseError = getErrorDto(err.Error(), http.StatusBadRequest, context)
-		context.Status(http.StatusBadRequest)
-		json.NewEncoder(context.Writer).Encode(responseError)
-	}
-
-	entity := controller.Db.Save(noteDomain.NoteEntity{
-		Id:   uuid.New().String(),
-		Name: *requestEntity.Name,
-		Link: *requestEntity.Link,
-	})
-	var response = noteApiDTO.NoteResponse{Id: &entity.Id, Name: &entity.Name, Link: &entity.Link}
-	json.NewEncoder(context.Writer).Encode(response)
+	noteUtilities.CatchMarshallErr(context.BindJSON(&requestEntity), context)
+	entity := controller.SaveUseCase.Save(controller.presenter.ToEntity(&requestEntity))
+	noteUtilities.SetResponse(
+		controller.presenter.ToNoteResponse(entity),
+		context,
+	)
 }
 
 func (controller *NoteController) DeleteNoteById(context *gin.Context, id string) {
-	context.Header("Content-Type", "application/json")
-	controller.Db.DeleteById(id)
+	controller.DeleteUseCase.DeleteById(id)
 	context.Status(http.StatusNoContent)
 }
 
 func (controller *NoteController) GetNoteById(context *gin.Context, id string) {
-	context.Header("Content-Type", "application/json")
-	obj, err := controller.Db.GetById(id)
+	obj, err := controller.GetUseCase.GetById(id)
 	if err != nil {
-		var responseError = getErrorDto(err.Error(), http.StatusNotFound, context)
-		context.Status(http.StatusNotFound)
-		json.NewEncoder(context.Writer).Encode(responseError)
+		noteUtilities.SetResponseError(err, context, http.StatusNotFound)
 	} else {
-		var response = noteApiDTO.NoteResponse{Id: &obj.Id, Name: &obj.Name, Link: &obj.Link}
-		json.NewEncoder(context.Writer).Encode(response)
+		noteUtilities.SetResponse(
+			noteApiDTO.NoteResponse{Id: &obj.Id, Name: &obj.Name, Link: &obj.Link},
+			context,
+		)
 	}
 }
 
 func (controller *NoteController) GetAllNotes(context *gin.Context) {
-	context.Header("Content-Type", "application/json")
-	allNotes := controller.Db.GetAll()
-	var result = make([]noteApiDTO.NoteResponse, len(allNotes))
-	for i, value := range allNotes {
-		var response = noteApiDTO.NoteResponse{
-			Id:   &value.Id,
-			Link: &value.Link,
-			Name: &value.Name,
-		}
-		result[i] = response
+	allNotes := controller.GetUseCase.GetAll()
+	var result = controller.presenter.ToListNoteResponse(allNotes)
+	noteUtilities.SetResponse(result, context)
+}
+
+func Create(db *noteDao.InMemoryNoteRepository) *NoteController {
+	return &NoteController{
+		SaveUseCase:   &noteUseCase.SaveNoteUseCase{Db: db},
+		DeleteUseCase: &noteUseCase.DeleteNoteUseCase{Db: db},
+		GetUseCase:    &noteUseCase.GetNoteUseCase{Db: db},
+		presenter:     &notePresenter.Presenter{},
 	}
-	json.NewEncoder(context.Writer).Encode(result)
 }
