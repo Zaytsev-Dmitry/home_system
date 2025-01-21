@@ -6,7 +6,7 @@ RUN go mod download
 COPY . .
 
 RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
-RUN oapi-codegen -package=generatedApi -generate "types,spec,gin" /app/api/openapi/note-api.yml > api/openapi/api.gen.go
+RUN oapi-codegen -package=generatedApi -generate "types,spec,gin" /app/api/docs/note-api.yml > api/docs/api.gen.go
 RUN go build -o /app/cmd/main.go
 EXPOSE 8080
 # Set environment variable for Gin mode

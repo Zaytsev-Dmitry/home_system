@@ -1,0 +1,139 @@
+openapi: 3.0.1
+info:
+  title: Note application API
+  version: '1.0.0'
+servers:
+  - url: 'http://localhost:8080'
+    description: local
+
+paths:
+  /note:
+    post:
+      tags:
+        - Note
+      operationId: saveNote
+      description: 'Сохранить записку'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNoteRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - Note
+      operationId: getAllNotes
+      description: 'Получить все записки'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NoteResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+#--------------------------------------------------------------------------------------------------------#
+  /note/{id}:
+    get:
+      tags:
+        - Note
+      operationId: getNoteById
+      description: 'Взять записку по Id'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Note
+      operationId: deleteNoteById
+      description: 'Удалить записку по id'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No content
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+#--------------------------------------------------------------------------------------------------------#
+components:
+  schemas:
+    CreateNoteRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        link:
+          type: string
+#--------------------------------------------------------------------------------------------------------#
+    NoteResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        link:
+          type: string
+#--------------------------------------------------------------------------------------------------------#
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+        status:
+          type: integer
+        businessCode:
+          type: integer
+        error:
+          type: string
+        path:
+          type: string
