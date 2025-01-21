@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	startMessage := "Home system ver 1.0"
+	startMessage := "Note backend ver 1.0"
 	fmt.Printf("%s!\n", startMessage)
 	noteRepository := noteDao.NewInMemoryNoteRepository()
 	router := gin.Default()
