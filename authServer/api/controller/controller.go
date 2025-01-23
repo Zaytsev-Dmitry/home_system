@@ -3,6 +3,7 @@ package noteControllers
 import (
 	apiDTO "authServer/api/docs"
 	presenter "authServer/api/presenter"
+	"authServer/external"
 	useCases "authServer/internal/usecases"
 	utilities "authServer/pkg/utilities"
 	"github.com/gin-gonic/gin"
@@ -27,9 +28,9 @@ func (controller *AccountController) RegisterAccount(context *gin.Context) {
 	)
 }
 
-func Create() *AccountController {
+func Create(keycloakClient external.KeycloakClient) *AccountController {
 	return &AccountController{
-		RegisterUseCase: &useCases.RegisterAccountUseCase{},
+		RegisterUseCase: &useCases.RegisterAccountUseCase{Keycloak: &keycloakClient},
 		presenter:       &presenter.Presenter{},
 	}
 }
