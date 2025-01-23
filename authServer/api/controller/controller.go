@@ -5,7 +5,7 @@ import (
 	presenter "authServer/api/presenter"
 	"authServer/external"
 	useCases "authServer/internal/usecases"
-	utilities "authServer/pkg/utilities"
+	"authServer/pkg/utilities"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
