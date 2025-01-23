@@ -1,3 +1,4 @@
 * сгенерировать сущности апи из файла open api
- - cd .. to noteBackendApp
- - oapi-codegen -package=generatedApi -generate "types,spec,gin" api/docs/note-api.yml > api/docs/api.gen.go 
+ - выполнять из goHomeSystem(root)
+ - oapi-codegen -package=generatedApi -generate "types,spec,gin" noteBackendApp/api/docs/note-api.yml > api/docs/note-backend-api.gen.go
+ - oapi-codegen -package=generatedApi -generate "types,spec,gin" authServer/api/docs/auth-server-api.yml > authServer/api/docs/auth-server-api.gen.go

@@ -1,6 +1,18 @@
 version: '3'
 services:
-  notebackendapp:
+  auth-server:
+    build:
+      context: ./authServer
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+    depends_on:
+      - keycloak
+      - note-backend-app
+    networks:
+      - skynet
+  note-backend-app:
     build:
       context: ./noteBackendApp
       dockerfile: Dockerfile
@@ -9,9 +21,10 @@ services:
     restart: unless-stopped
     networks:
       - skynet
-  my-keycloak:
+  keycloak:
     image: quay.io/keycloak/keycloak:24.0
     environment:
+      KEYCLOAK_IMPORT: /opt/keycloak/data/import/create-realm.json
       KC_HOSTNAME: localhost
       KC_HOSTNAME_PORT: 7080
       KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
@@ -24,11 +37,14 @@ services:
       interval: 15s
       timeout: 2s
       retries: 15
-    command: [ "start-dev", "--http-port", "7080", "--https-port", "7443" ]
+    command: [ "start-dev", "--import-realm", "--http-port", "7080", "--https-port", "7443" ]
     ports:
       - "7080:7080"
       - "7443:7443"
+    volumes:
+      - ./data/keycloak/create-realm.json:/opt/keycloak/data/import/create-realm.json
     networks:
       - skynet
+
 networks:
   skynet:
