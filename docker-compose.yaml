@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8081:8081"
+    environment:
+      MODE: dev
     restart: unless-stopped
     depends_on:
       - keycloak
@@ -18,7 +20,25 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    environment:
+      MODE: dev
     restart: unless-stopped
+    networks:
+      - skynet
+  postgres_server:
+    restart: always
+    image: postgres:14
+    environment:
+      PGUSER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: auth
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 1s
+      timeout: 5s
+      retries: 10
     networks:
       - skynet
   keycloak:
