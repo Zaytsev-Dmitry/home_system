@@ -3,7 +3,7 @@ package noteHandlers
 import (
 	"github.com/gin-gonic/gin"
 	noteController "noteBackendApp/api/controller"
-	noteDao "noteBackendApp/internal/dao/impl"
+	noteInterface "noteBackendApp/internal/dao/interface"
 )
 
 type NoteBackendApi struct {
@@ -22,6 +22,6 @@ func (api *NoteBackendApi) GetNotesByAccountId(c *gin.Context, accountId int) {
 	api.controller.GetNotesByAccountId(c, accountId)
 }
 
-func NewNoteBackendApi(db *noteDao.InMemoryNoteRepository) *NoteBackendApi {
-	return &NoteBackendApi{controller: noteController.Create(db)}
+func NewNoteBackendApi(dao noteInterface.NoteDao) *NoteBackendApi {
+	return &NoteBackendApi{controller: noteController.Create(dao)}
 }

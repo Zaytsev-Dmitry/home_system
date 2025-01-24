@@ -9,13 +9,20 @@ type Presenter struct {
 }
 
 func (presenter *Presenter) ToNoteResponse(entity noteDomain.TelegramAccount) noteApiDTO.NoteResponse {
-	return noteApiDTO.NoteResponse{Name: &entity.Name, Link: entity.Link}
+	return noteApiDTO.NoteResponse{
+		Name:        &entity.Name,
+		Link:        entity.Link,
+		Description: entity.Description,
+		AccountId:   &entity.AccountId,
+	}
 }
 
 func (presenter *Presenter) ToEntity(requestEntity *noteApiDTO.CreateNoteRequest) noteDomain.TelegramAccount {
 	return noteDomain.TelegramAccount{
 		Name:        *requestEntity.Name,
+		AccountId:   *requestEntity.AccountId,
 		Description: requestEntity.Description,
+		Link:        requestEntity.Link,
 	}
 }
 

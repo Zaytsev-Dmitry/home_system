@@ -1,14 +1,14 @@
 package usecases
 
 import (
-	noteDao "noteBackendApp/internal/dao/impl"
+	noteInterface "noteBackendApp/internal/dao/interface"
 	noteDomain "noteBackendApp/internal/domain"
 )
 
 type GetNoteUseCase struct {
-	Db *noteDao.InMemoryNoteRepository
+	DAO noteInterface.NoteDao
 }
 
-func (byId *GetNoteUseCase) GetNoteByAccountId(id int) (noteDomain.TelegramAccount, error) {
-	return byId.Db.GetNoteByAccountId(id)
+func (byId *GetNoteUseCase) GetNoteByAccountId(id int) []noteDomain.TelegramAccount {
+	return byId.DAO.GetNotesByAccountId(id)
 }

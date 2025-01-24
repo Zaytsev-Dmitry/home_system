@@ -8,11 +8,14 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
 	"gopkg.in/yaml.v3"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"log"
 	api "noteBackendApp/api/docs"
 	noteHandler "noteBackendApp/api/handlers"
 	noteConfig "noteBackendApp/configs"
-	noteDao "noteBackendApp/internal/dao/impl"
+	noteDaoPorts "noteBackendApp/internal/dao/impl"
+	noteInterface "noteBackendApp/internal/dao/interface"
 	"os"
 )
 
@@ -45,7 +48,7 @@ func main() {
 	migrateDB(config)
 	startMessage := "Note backend ver 1.0"
 	fmt.Printf("%s!\n", startMessage)
-	router, apiInterface := initAPI()
+	router, apiInterface := initAPI(createDAO(config))
 	router.Use(commonMiddleware)
 	api.RegisterHandlers(router, apiInterface)
 	log.Println(fmt.Sprintf("Starting server on : %s", config.Server.Port))
@@ -82,7 +85,28 @@ func migrateDB(config *noteConfig.AppConfig) {
 	}
 }
 
-func initAPI() (router *gin.Engine, serverInterface api.ServerInterface) {
-	noteRepository := noteDao.NewInMemoryNoteRepository()
-	return gin.Default(), noteHandler.NewNoteBackendApi(noteRepository)
+func initAPI(dao noteInterface.NoteDao) (router *gin.Engine, serverInterface api.ServerInterface) {
+	return gin.Default(), noteHandler.NewNoteBackendApi(dao)
+}
+
+func initPostgresPort(config *noteConfig.AppConfig) *noteDaoPorts.PostgresNotePort {
+	dbURL := fmt.Sprintf(
+		"postgres://%s:%s@%s:5432/%s",
+		config.Database.Username,
+		config.Database.Password,
+		config.Database.Host,
+		config.Database.DataBaseName,
+	)
+	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+	return noteDaoPorts.CreatePostgresNotePort(db)
+}
+
+func createDAO(config *noteConfig.AppConfig) noteInterface.NoteDao {
+	port := initPostgresPort(config)
+	var dao noteInterface.NoteDao
+	dao = port
+	return dao
 }

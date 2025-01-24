@@ -107,6 +107,10 @@ components:
           type: string
         link:
           type: string
+        description:
+          type: string
+        accountId:
+          type: integer
     #--------------------------------------------------------------------------------------------------------#
     NoteResponseList:
       type: object

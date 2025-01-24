@@ -5,7 +5,7 @@ import (
 	"net/http"
 	noteApiDTO "noteBackendApp/api/docs"
 	notePresenter "noteBackendApp/api/presenter"
-	noteDao "noteBackendApp/internal/dao/impl"
+	noteInterface "noteBackendApp/internal/dao/interface"
 	noteUseCase "noteBackendApp/internal/usecases"
 	noteUtilities "noteBackendApp/pkg/utilities"
 )
@@ -33,22 +33,18 @@ func (controller *NoteController) DeleteNotesByAccountId(context *gin.Context, a
 }
 
 func (controller *NoteController) GetNotesByAccountId(context *gin.Context, accountId int) {
-	obj, err := controller.GetUseCase.GetNoteByAccountId(accountId)
-	if err != nil {
-		noteUtilities.SetResponseError(err, context, http.StatusNotFound)
-	} else {
-		noteUtilities.SetResponse(
-			noteApiDTO.NoteResponse{Name: &obj.Name, Link: obj.Link},
-			context,
-		)
-	}
+	obj := controller.GetUseCase.GetNoteByAccountId(accountId)
+	noteUtilities.SetResponse(
+		controller.presenter.ToListNoteResponse(obj),
+		context,
+	)
 }
 
-func Create(db *noteDao.InMemoryNoteRepository) *NoteController {
+func Create(dao noteInterface.NoteDao) *NoteController {
 	return &NoteController{
-		SaveUseCase:   &noteUseCase.SaveNoteUseCase{Db: db},
-		DeleteUseCase: &noteUseCase.DeleteNoteUseCase{Db: db},
-		GetUseCase:    &noteUseCase.GetNoteUseCase{Db: db},
+		SaveUseCase:   &noteUseCase.SaveNoteUseCase{DAO: dao},
+		DeleteUseCase: &noteUseCase.DeleteNoteUseCase{DAO: dao},
+		GetUseCase:    &noteUseCase.GetNoteUseCase{DAO: dao},
 		presenter:     &notePresenter.Presenter{},
 	}
 }

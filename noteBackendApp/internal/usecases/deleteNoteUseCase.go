@@ -1,13 +1,13 @@
 package usecases
 
 import (
-	noteDao "noteBackendApp/internal/dao/impl"
+	noteInterface "noteBackendApp/internal/dao/interface"
 )
 
 type DeleteNoteUseCase struct {
-	Db *noteDao.InMemoryNoteRepository
+	DAO noteInterface.NoteDao
 }
 
 func (deleteUse *DeleteNoteUseCase) DeleteNoteByAccountId(id int) {
-	deleteUse.Db.DeleteNoteByAccountId(id)
+	deleteUse.DAO.DeleteNotesByAccountId(id)
 }

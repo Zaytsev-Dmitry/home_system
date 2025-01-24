@@ -1,19 +1,19 @@
 package usecases
 
 import (
-	noteDao "noteBackendApp/internal/dao/impl"
+	noteInterface "noteBackendApp/internal/dao/interface"
 	noteDomain "noteBackendApp/internal/domain"
 )
 
 type SaveNoteUseCase struct {
-	Db *noteDao.InMemoryNoteRepository
+	DAO noteInterface.NoteDao
 }
 
 func (saveUse *SaveNoteUseCase) Save(toSave noteDomain.TelegramAccount) noteDomain.TelegramAccount {
-	found, err := saveUse.Db.GetNoteByAccountId(toSave.AccountId)
-	if err != nil {
-		return saveUse.Db.Save(toSave)
+	found := saveUse.DAO.ExistByName(toSave.Name)
+	if found {
+		return saveUse.DAO.GetByName(toSave.Name)
 	} else {
-		return found
+		return saveUse.DAO.Save(toSave)
 	}
 }
