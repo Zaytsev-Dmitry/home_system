@@ -1,4 +1,4 @@
-package noteDao
+package noteDaoPorts
 
 import (
 	"fmt"
@@ -6,16 +6,16 @@ import (
 )
 
 type InMemoryNoteRepository struct {
-	Notes map[int]noteDomain.NoteEntity
+	Notes map[int]noteDomain.TelegramAccount
 }
 
 func NewInMemoryNoteRepository() *InMemoryNoteRepository {
 	return &InMemoryNoteRepository{
-		Notes: make(map[int]noteDomain.NoteEntity),
+		Notes: make(map[int]noteDomain.TelegramAccount),
 	}
 }
 
-func (db *InMemoryNoteRepository) Save(toSave noteDomain.NoteEntity) noteDomain.NoteEntity {
+func (db *InMemoryNoteRepository) Save(toSave noteDomain.TelegramAccount) noteDomain.TelegramAccount {
 	notes := db.Notes
 	if _, found := db.Notes[toSave.AccountId]; !found {
 		notes[toSave.AccountId] = toSave
@@ -26,14 +26,14 @@ func (db *InMemoryNoteRepository) Save(toSave noteDomain.NoteEntity) noteDomain.
 }
 
 // TODO добавить логирование
-func (db *InMemoryNoteRepository) GetNoteByAccountId(id int) (noteDomain.NoteEntity, error) {
+func (db *InMemoryNoteRepository) GetNoteByAccountId(id int) (noteDomain.TelegramAccount, error) {
 	notes := db.Notes
 	if obj, found := notes[id]; found {
 		return obj, nil
 	} else {
 		errorFormatStr := "объект с id: %s не найден"
 		err := fmt.Errorf(errorFormatStr, id)
-		return noteDomain.NoteEntity{}, err
+		return noteDomain.TelegramAccount{}, err
 	}
 }
 

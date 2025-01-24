@@ -12,7 +12,7 @@ import (
 	api "noteBackendApp/api/docs"
 	noteHandler "noteBackendApp/api/handlers"
 	noteConfig "noteBackendApp/configs"
-	noteDao "noteBackendApp/internal/dao"
+	noteDao "noteBackendApp/internal/dao/impl"
 	"os"
 )
 

@@ -1,6 +1,6 @@
 package noteDomain
 
-type NoteEntity struct {
+type TelegramAccount struct {
 	Id        string
 	AccountId int
 	Name      string

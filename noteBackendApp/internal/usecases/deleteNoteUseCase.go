@@ -1,7 +1,7 @@
 package usecases
 
 import (
-	noteDao "noteBackendApp/internal/dao"
+	noteDao "noteBackendApp/internal/dao/impl"
 )
 
 type DeleteNoteUseCase struct {

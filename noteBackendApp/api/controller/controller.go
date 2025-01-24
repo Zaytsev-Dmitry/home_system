@@ -5,7 +5,7 @@ import (
 	"net/http"
 	noteApiDTO "noteBackendApp/api/docs"
 	notePresenter "noteBackendApp/api/presenter"
-	noteDao "noteBackendApp/internal/dao"
+	noteDao "noteBackendApp/internal/dao/impl"
 	noteUseCase "noteBackendApp/internal/usecases"
 	noteUtilities "noteBackendApp/pkg/utilities"
 )

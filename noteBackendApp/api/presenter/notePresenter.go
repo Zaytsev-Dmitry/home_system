@@ -9,19 +9,19 @@ import (
 type Presenter struct {
 }
 
-func (presenter *Presenter) ToNoteResponse(entity noteDomain.NoteEntity) noteApiDTO.NoteResponse {
+func (presenter *Presenter) ToNoteResponse(entity noteDomain.TelegramAccount) noteApiDTO.NoteResponse {
 	return noteApiDTO.NoteResponse{Id: &entity.Id, Name: &entity.Name, Link: &entity.Link}
 }
 
-func (presenter *Presenter) ToEntity(requestEntity *noteApiDTO.CreateNoteRequest) noteDomain.NoteEntity {
-	return noteDomain.NoteEntity{
+func (presenter *Presenter) ToEntity(requestEntity *noteApiDTO.CreateNoteRequest) noteDomain.TelegramAccount {
+	return noteDomain.TelegramAccount{
 		Id:   uuid.New().String(),
 		Name: *requestEntity.Name,
 		Link: *requestEntity.Link,
 	}
 }
 
-func (presenter *Presenter) ToListNoteResponse(entities []noteDomain.NoteEntity) []noteApiDTO.NoteResponse {
+func (presenter *Presenter) ToListNoteResponse(entities []noteDomain.TelegramAccount) []noteApiDTO.NoteResponse {
 	var result = make([]noteApiDTO.NoteResponse, len(entities))
 	for i, value := range entities {
 		var response = noteApiDTO.NoteResponse{

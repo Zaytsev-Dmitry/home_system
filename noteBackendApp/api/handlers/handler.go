@@ -3,7 +3,7 @@ package noteHandlers
 import (
 	"github.com/gin-gonic/gin"
 	noteController "noteBackendApp/api/controller"
-	noteDao "noteBackendApp/internal/dao"
+	noteDao "noteBackendApp/internal/dao/impl"
 )
 
 type NoteBackendApi struct {
