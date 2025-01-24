@@ -1,8 +1,9 @@
 package noteDomain
 
 type TelegramAccount struct {
-	Id        string
-	AccountId int
-	Name      string
-	Link      string
+	ID          uint    `gorm:"primaryKey"`
+	AccountId   int     `gorm:"column:account_id"`
+	Name        string  `gorm:"column:name"`
+	Link        *string `gorm:"column:link"`
+	Description *string `gorm:"column:description"`
 }
