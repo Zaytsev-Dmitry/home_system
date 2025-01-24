@@ -5,6 +5,8 @@ import (
 	authServerHandler "authServer/api/handlers"
 	authConfig "authServer/configs"
 	"authServer/external"
+	authDaoPorts "authServer/internal/dao/impl"
+	authDaoInterface "authServer/internal/dao/interface"
 	"database/sql"
 	"embed"
 	"fmt"
@@ -12,6 +14,8 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
 	"gopkg.in/yaml.v3"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"log"
 	"os"
 )
@@ -64,12 +68,34 @@ func migrateDB(config *authConfig.AppConfig) {
 	}
 }
 
+func initPostgresPort(config *authConfig.AppConfig) *authDaoPorts.PostgresAuthPort {
+	dbURL := fmt.Sprintf(
+		"postgres://%s:%s@%s:5432/%s",
+		config.Database.Username,
+		config.Database.Password,
+		config.Database.Host,
+		config.Database.DataBaseName,
+	)
+	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+	return authDaoPorts.CreatePostgresAuthPort(db)
+}
+
+func createDAO(config *authConfig.AppConfig) authDaoInterface.AuthDao {
+	port := initPostgresPort(config)
+	var dao authDaoInterface.AuthDao
+	dao = port
+	return dao
+}
+
 func main() {
 	startMessage := "AuthServer ver 1.0"
 	fmt.Printf("%s!\n", startMessage)
 	appConfig := loadConfig("MODE")
-	router, apiInterface := initAPI(appConfig)
 	migrateDB(appConfig)
+	router, apiInterface := initAPI(appConfig, createDAO(appConfig))
 	api.RegisterHandlers(router, apiInterface)
 	log.Println("Starting server on :8081")
 	if err := router.Run(":8081"); err != nil {
@@ -77,9 +103,9 @@ func main() {
 	}
 }
 
-func initAPI(config *authConfig.AppConfig) (router *gin.Engine, serverInterface api.ServerInterface) {
+func initAPI(config *authConfig.AppConfig, dao authDaoInterface.AuthDao) (router *gin.Engine, serverInterface api.ServerInterface) {
 	client := getKeycloakClient(config)
-	return gin.Default(), authServerHandler.NewAuthServerApi(client)
+	return gin.Default(), authServerHandler.NewAuthServerApi(client, dao)
 }
 
 func getKeycloakClient(config *authConfig.AppConfig) external.KeycloakClient {

@@ -4,6 +4,7 @@ import (
 	apiDTO "authServer/api/docs"
 	presenter "authServer/api/presenter"
 	"authServer/external"
+	authDaoInterface "authServer/internal/dao/interface"
 	useCases "authServer/internal/usecases"
 	"authServer/pkg/utilities"
 	"github.com/gin-gonic/gin"
@@ -28,9 +29,12 @@ func (controller *AccountController) RegisterAccount(context *gin.Context) {
 	)
 }
 
-func Create(keycloakClient external.KeycloakClient) *AccountController {
+func Create(keycloakClient external.KeycloakClient, dao authDaoInterface.AuthDao) *AccountController {
 	return &AccountController{
-		RegisterUseCase: &useCases.RegisterAccountUseCase{Keycloak: &keycloakClient},
-		presenter:       &presenter.Presenter{},
+		RegisterUseCase: &useCases.RegisterAccountUseCase{
+			Keycloak: &keycloakClient,
+			Dao:      dao,
+		},
+		presenter: &presenter.Presenter{},
 	}
 }
