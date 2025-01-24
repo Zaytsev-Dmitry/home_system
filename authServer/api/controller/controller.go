@@ -16,6 +16,7 @@ type AccountController struct {
 	presenter       *presenter.Presenter
 }
 
+// TODO надо отловить все кейсы keycloak
 func (controller *AccountController) RegisterAccount(context *gin.Context) {
 	var requestEntity apiDTO.CreateAccountRequest
 	utilities.CatchMarshallErr(context.BindJSON(&requestEntity), context)
