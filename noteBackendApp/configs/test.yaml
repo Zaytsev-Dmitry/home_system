@@ -6,5 +6,5 @@ database:
   host: "localhost"
   user: "postgres"
   password: "root"
-  dataBaseName: "auth"
+  dataBaseName: "notes"
   dialect: "postgres"
