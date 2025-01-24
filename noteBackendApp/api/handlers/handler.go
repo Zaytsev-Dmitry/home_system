@@ -10,20 +10,16 @@ type NoteBackendApi struct {
 	controller *noteController.NoteController
 }
 
-func (api *NoteBackendApi) SaveNote(context *gin.Context) {
-	api.controller.SaveNote(context)
+func (api *NoteBackendApi) SaveNote(c *gin.Context) {
+	api.controller.SaveNote(c)
 }
 
-func (api *NoteBackendApi) DeleteNoteById(context *gin.Context, id string) {
-	api.controller.DeleteNoteById(context, id)
+func (api *NoteBackendApi) DeleteNoteByAccountId(c *gin.Context, accountId int) {
+	api.controller.DeleteNoteByAccountId(c, accountId)
 }
 
-func (api *NoteBackendApi) GetNoteById(context *gin.Context, id string) {
-	api.controller.GetNoteById(context, id)
-}
-
-func (api *NoteBackendApi) GetAllNotes(context *gin.Context) {
-	api.controller.GetAllNotes(context)
+func (api *NoteBackendApi) GetNoteByAccountId(c *gin.Context, accountId int) {
+	api.controller.GetNoteByAccountId(c, accountId)
 }
 
 func NewNoteBackendApi(db *noteDao.InMemoryNoteRepository) *NoteBackendApi {

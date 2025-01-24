@@ -9,10 +9,6 @@ type GetNoteUseCase struct {
 	Db *noteDao.InMemoryNoteRepository
 }
 
-func (byId *GetNoteUseCase) GetById(id string) (noteDomain.NoteEntity, error) {
-	return byId.Db.GetById(id)
-}
-
-func (all *GetNoteUseCase) GetAll() []noteDomain.NoteEntity {
-	return all.GetAll()
+func (byId *GetNoteUseCase) GetNoteByAccountId(id int) (noteDomain.NoteEntity, error) {
+	return byId.Db.GetNoteByAccountId(id)
 }

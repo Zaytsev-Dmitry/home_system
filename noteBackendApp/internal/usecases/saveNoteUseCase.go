@@ -10,7 +10,7 @@ type SaveNoteUseCase struct {
 }
 
 func (saveUse *SaveNoteUseCase) Save(toSave noteDomain.NoteEntity) noteDomain.NoteEntity {
-	found, err := saveUse.Db.GetById(toSave.Id)
+	found, err := saveUse.Db.GetNoteByAccountId(toSave.AccountId)
 	if err != nil {
 		return saveUse.Db.Save(toSave)
 	} else {

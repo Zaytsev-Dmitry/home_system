@@ -1,7 +1,8 @@
 package noteDomain
 
 type NoteEntity struct {
-	Id   string
-	Name string
-	Link string
+	Id        string
+	AccountId int
+	Name      string
+	Link      string
 }

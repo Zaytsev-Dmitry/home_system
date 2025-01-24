@@ -27,13 +27,13 @@ func (controller *NoteController) SaveNote(context *gin.Context) {
 	)
 }
 
-func (controller *NoteController) DeleteNoteById(context *gin.Context, id string) {
-	controller.DeleteUseCase.DeleteById(id)
+func (controller *NoteController) DeleteNoteByAccountId(context *gin.Context, accountId int) {
+	controller.DeleteUseCase.DeleteNoteByAccountId(accountId)
 	context.Status(http.StatusNoContent)
 }
 
-func (controller *NoteController) GetNoteById(context *gin.Context, id string) {
-	obj, err := controller.GetUseCase.GetById(id)
+func (controller *NoteController) GetNoteByAccountId(context *gin.Context, accountId int) {
+	obj, err := controller.GetUseCase.GetNoteByAccountId(accountId)
 	if err != nil {
 		noteUtilities.SetResponseError(err, context, http.StatusNotFound)
 	} else {
@@ -42,12 +42,6 @@ func (controller *NoteController) GetNoteById(context *gin.Context, id string) {
 			context,
 		)
 	}
-}
-
-func (controller *NoteController) GetAllNotes(context *gin.Context) {
-	allNotes := controller.GetUseCase.GetAll()
-	var result = controller.presenter.ToListNoteResponse(allNotes)
-	noteUtilities.SetResponse(result, context)
 }
 
 func Create(db *noteDao.InMemoryNoteRepository) *NoteController {

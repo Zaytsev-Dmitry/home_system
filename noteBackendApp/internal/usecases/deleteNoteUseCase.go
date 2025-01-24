@@ -8,6 +8,6 @@ type DeleteNoteUseCase struct {
 	Db *noteDao.InMemoryNoteRepository
 }
 
-func (deleteUse *DeleteNoteUseCase) DeleteById(id string) {
-	deleteUse.Db.DeleteById(id)
+func (deleteUse *DeleteNoteUseCase) DeleteNoteByAccountId(id int) {
+	deleteUse.Db.DeleteNoteByAccountId(id)
 }

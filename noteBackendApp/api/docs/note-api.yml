@@ -31,39 +31,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-    get:
-      tags:
-        - Note
-      operationId: getAllNotes
-      description: 'Получить все записки'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/NoteResponse'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
   #--------------------------------------------------------------------------------------------------------#
-  /note/{id}:
+  /note/{accountId}:
     get:
       tags:
         - Note
-      operationId: getNoteById
-      description: 'Взять записку по Id'
+      operationId: getNoteByAccountId
+      description: 'Взять записку по accountId'
       parameters:
-        - name: id
+        - name: accountId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: OK
@@ -86,14 +66,14 @@ paths:
     delete:
       tags:
         - Note
-      operationId: deleteNoteById
-      description: 'Удалить записку по id'
+      operationId: deleteNoteByAccountId
+      description: 'Удалить записку по accountId'
       parameters:
-        - name: id
+        - name: accountId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '204':
           description: No content
@@ -109,6 +89,8 @@ components:
     CreateNoteRequest:
       type: object
       properties:
+        accountId:
+          type: integer
         name:
           type: string
         link:
