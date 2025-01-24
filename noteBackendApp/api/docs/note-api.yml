@@ -36,7 +36,7 @@ paths:
     get:
       tags:
         - Note
-      operationId: getNoteByAccountId
+      operationId: getNotesByAccountId
       description: 'Взять записку по accountId'
       parameters:
         - name: accountId
@@ -50,7 +50,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NoteResponse'
+                $ref: '#/components/schemas/NoteResponseList'
         '500':
           description: Internal Server Error
           content:
@@ -66,7 +66,7 @@ paths:
     delete:
       tags:
         - Note
-      operationId: deleteNoteByAccountId
+      operationId: deleteNotesByAccountId
       description: 'Удалить записку по accountId'
       parameters:
         - name: accountId
@@ -93,6 +93,8 @@ components:
           type: integer
         name:
           type: string
+        description:
+          type: string
         link:
           type: string
     #--------------------------------------------------------------------------------------------------------#
@@ -101,6 +103,16 @@ components:
       properties:
         id:
           type: string
+        name:
+          type: string
+        link:
+          type: string
+    #--------------------------------------------------------------------------------------------------------#
+    NoteResponseList:
+      type: object
+      properties:
+        objects:
+          $ref: '#/components/schemas/NoteResponse'
         name:
           type: string
         link:

@@ -1,7 +1,6 @@
 package notePresenter
 
 import (
-	"github.com/google/uuid"
 	noteApiDTO "noteBackendApp/api/docs"
 	noteDomain "noteBackendApp/internal/domain"
 )
@@ -10,14 +9,13 @@ type Presenter struct {
 }
 
 func (presenter *Presenter) ToNoteResponse(entity noteDomain.TelegramAccount) noteApiDTO.NoteResponse {
-	return noteApiDTO.NoteResponse{Id: &entity.Id, Name: &entity.Name, Link: &entity.Link}
+	return noteApiDTO.NoteResponse{Name: &entity.Name, Link: entity.Link}
 }
 
 func (presenter *Presenter) ToEntity(requestEntity *noteApiDTO.CreateNoteRequest) noteDomain.TelegramAccount {
 	return noteDomain.TelegramAccount{
-		Id:   uuid.New().String(),
-		Name: *requestEntity.Name,
-		Link: *requestEntity.Link,
+		Name:        *requestEntity.Name,
+		Description: requestEntity.Description,
 	}
 }
 
@@ -25,8 +23,7 @@ func (presenter *Presenter) ToListNoteResponse(entities []noteDomain.TelegramAcc
 	var result = make([]noteApiDTO.NoteResponse, len(entities))
 	for i, value := range entities {
 		var response = noteApiDTO.NoteResponse{
-			Id:   &value.Id,
-			Link: &value.Link,
+			Link: value.Link,
 			Name: &value.Name,
 		}
 		result[i] = response
