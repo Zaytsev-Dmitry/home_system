@@ -2,6 +2,7 @@ package utilities
 
 import (
 	apiDTO "authServer/api/docs"
+	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -11,6 +12,21 @@ import (
 )
 
 var client = &http.Client{}
+
+func ParseResponseToStruct(respBody *http.Response, response any) any {
+	defer respBody.Body.Close()
+	decoder := json.NewDecoder(respBody.Body)
+	decoder.Decode(response)
+	return response
+}
+
+func PostWithBearerAuthorization(token string, body any, url string) (*http.Response, error) {
+	marshal, _ := json.Marshal(body)
+	req, _ := http.NewRequest("POST", url, bytes.NewReader(marshal))
+	req.Header.Add("Authorization", "Bearer "+token)
+	req.Header.Add("Accept", "application/json")
+	return client.Do(req)
+}
 
 func UrlencodedRequest(httpMethod string, urlStr string, data url.Values) *http.Response {
 	uri, _ := url.ParseRequestURI(urlStr)

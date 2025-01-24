@@ -1,5 +1,7 @@
 keycloak:
   keycloakUrl: "http://localhost:7080/realms/home-system/protocol/openid-connect"
+  keycloakHost: "http://localhost:7080"
+  keycloakRealm: "home-system"
   tokenUrl: "/token"
   clientId: "d3f1202c-d7d6-4694-9a6c-6e1575321baf"
   clientSecret: "UdeFxiMnDY4ob7y7tFtTawrftwISXrV6"

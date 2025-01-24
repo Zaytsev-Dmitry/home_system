@@ -112,6 +112,8 @@ func getKeycloakClient(config *authConfig.AppConfig) external.KeycloakClient {
 	client := external.KeycloakClient{
 		KeycloakUrl:     config.Keycloak.KeycloakUrl,
 		TokenUrl:        config.Keycloak.TokenUrl,
+		KeycloakHost:    config.Keycloak.KeycloakHost,
+		KeycloakRealm:   config.Keycloak.KeycloakRealm,
 		ClientId:        config.Keycloak.ClientId,
 		ClientSecret:    config.Keycloak.ClientSecret,
 		ServerGrantType: config.Keycloak.ServerGrantType,
