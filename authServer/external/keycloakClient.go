@@ -19,16 +19,16 @@ type KeycloakClient struct {
 	ServerGrantType string
 }
 
-func (client KeycloakClient) RegisterAccount(request apiDto.CreateAccountRequest) int {
-	resp, err := utilities.PostWithBearerAuthorization(
+func (client KeycloakClient) RegisterAccount(request apiDto.CreateAccountRequest) error {
+	_, err := utilities.PostWithBearerAuthorization(
 		client.getToken().AccessToken,
 		externalDto.NewKeycloakUserCreateRequest(request),
 		client.KeycloakHost+"/admin/realms/"+client.KeycloakRealm+"/users",
 	)
 	if err != nil {
-		fmt.Println("Error registering account", err)
+		return err
 	}
-	return resp.StatusCode
+	return nil
 }
 
 func (client KeycloakClient) getToken() externalDto.KeycloakTokenResponse {

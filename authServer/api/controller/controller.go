@@ -21,7 +21,7 @@ func (controller *AccountController) RegisterAccount(context *gin.Context) {
 	utilities.CatchMarshallErr(context.BindJSON(&requestEntity), context)
 	entity, err := controller.RegisterUseCase.Register(requestEntity)
 	if err != nil {
-		utilities.SetResponseError(err, context, http.StatusNotFound)
+		utilities.SetResponseError(err, context, http.StatusInternalServerError)
 	}
 	utilities.SetResponse(
 		controller.presenter.ToAccountResponse(entity),
