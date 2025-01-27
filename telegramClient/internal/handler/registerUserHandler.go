@@ -71,7 +71,6 @@ func register(b *gotgbot.Bot, ctx *ext.Context) error {
 func registerCallbackYes(b *gotgbot.Bot, ctx *ext.Context) error {
 	cb := ctx.Update.CallbackQuery
 	user := users[cb.From.Id]
-
 	b.SendMessage(
 		cb.Message.GetChat().Id,
 		fmt.Sprintf("Добро пожаловать %s. \nТеперь тебе доступны следующие менюшки", user.Name),

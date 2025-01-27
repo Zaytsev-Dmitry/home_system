@@ -26,9 +26,6 @@ func CreateMenuKeyboard() *gotgbot.InlineKeyboardMarkup {
 			InlineKeyboardButton("Профиль", "profile"),
 		),
 		InlineKeyboardRow(
-			InlineKeyboardButton("Напоминалка", "reminders"),
-		),
-		InlineKeyboardRow(
 			InlineKeyboardButton("Совместный учет расходов", "accounting_of_expenses"),
 		),
 	)
