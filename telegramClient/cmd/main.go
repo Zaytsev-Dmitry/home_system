@@ -12,12 +12,7 @@ import (
 )
 
 func main() {
-	bot := getBot()
-	updates, _ := bot.UpdatesViaLongPolling(nil)
-	bh, _ := th.NewBotHandler(bot, updates)
-	defer bh.Stop()
-	defer bot.StopLongPolling()
-
+	bh := initNoteTGBot()
 	bh.HandleMessage(func(bot *telego.Bot, message telego.Message) {
 		_, _ = bot.SendMessage(tu.Messagef(
 			tu.ID(message.Chat.ID),
@@ -35,14 +30,19 @@ func main() {
 	bh.Start()
 }
 
-func getBot() *telego.Bot {
+func initNoteTGBot() *th.BotHandler {
 	appConfig := loadConfig("MODE")
 	bot, err := telego.NewBot(appConfig.BotToken, telego.WithDefaultDebugLogger())
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	return bot
+
+	updates, _ := bot.UpdatesViaLongPolling(nil)
+	bh, _ := th.NewBotHandler(bot, updates)
+	defer bh.Stop()
+	defer bot.StopLongPolling()
+	return bh
 }
 
 func loadConfig(env string) *config.AppConfig {
