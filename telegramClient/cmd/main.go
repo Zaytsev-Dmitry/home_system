@@ -4,45 +4,32 @@ import (
 	"fmt"
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
-	tu "github.com/mymmrac/telego/telegoutil"
 	"gopkg.in/yaml.v3"
 	"log"
 	"os"
 	"telegramCLient/config"
+	"telegramCLient/internal/handler"
 )
 
 func main() {
-	bh := initNoteTGBot()
-	bh.HandleMessage(func(bot *telego.Bot, message telego.Message) {
-		_, _ = bot.SendMessage(tu.Messagef(
-			tu.ID(message.Chat.ID),
-			"Привет %s!", message.From.Username+" "+"сначала тебе необходимо зарегистрироваться",
-		).WithReplyMarkup(tu.InlineKeyboard(
-			tu.InlineKeyboardRow(tu.InlineKeyboardButton("Go!").WithCallbackData("register"))),
-		))
-	}, th.CommandEqual("start"))
+	bh, bot := initNoteTGBot()
+	defer bh.Stop()
+	defer bot.StopLongPolling()
 
-	bh.HandleCallbackQuery(func(bot *telego.Bot, query telego.CallbackQuery) {
-		_, _ = bot.SendMessage(tu.Message(tu.ID(query.Message.GetChat().ID), "GO"))
-		_ = bot.AnswerCallbackQuery(tu.CallbackQuery(query.ID).WithText("Done"))
-	}, th.AnyCallbackQueryWithMessage(), th.CallbackDataEqual("register"))
-
+	handler.HandleStartCommand(bh)
 	bh.Start()
 }
 
-func initNoteTGBot() *th.BotHandler {
+func initNoteTGBot() (bh *th.BotHandler, bot *telego.Bot) {
 	appConfig := loadConfig("MODE")
 	bot, err := telego.NewBot(appConfig.BotToken, telego.WithDefaultDebugLogger())
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
 	updates, _ := bot.UpdatesViaLongPolling(nil)
-	bh, _ := th.NewBotHandler(bot, updates)
-	defer bh.Stop()
-	defer bot.StopLongPolling()
-	return bh
+	bh, _ = th.NewBotHandler(bot, updates)
+	return bh, bot
 }
 
 func loadConfig(env string) *config.AppConfig {
