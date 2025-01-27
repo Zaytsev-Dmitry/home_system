@@ -4,10 +4,10 @@
  - oapi-codegen -package=generatedApi -generate "types,spec,gin" authServer/api/docs/auth-server-api.yml > authServer/api/docs/auth-server-api.gen.go
 
 TODO:
-1) Регистрация пользака в [authServer](authServer) + сохранение пользака в базу
+1) Переделать на https://github.com/ogen-go/ogen
 2) Допилить клиент для свагера
-3) Клиент для БД (gorm) + сделать на интерфейсах
-4) Создание базы для notebackend (на миграциях)
+3) Убрать gorm и написать свой клиент используя (https://github.com/jackc/pgx)
+4) Создать проект для миграций и отдельно запускать его в докере
 5) Вынос общего кода в отдельную либу (возможно стоит вынести все yml файлы и кодогенерацию)
-6) Телеграмм бот для создания записок
-7) Валидация данных в handlers
+6) Валидация данных в handlers
+7) Продолжить пилить tg бот (сохранение телеграм пользака через authserver, регистрация client id telegram client в keycloak)
