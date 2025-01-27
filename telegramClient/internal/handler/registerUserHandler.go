@@ -8,6 +8,7 @@ import (
 	"github.com/PaulSonOfLars/gotgbot/v2/ext/handlers/filters/callbackquery"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext/handlers/filters/message"
 	"telegramCLient/internal/bot"
+	"telegramCLient/internal/util"
 )
 
 var users = make(map[int64]User)
@@ -70,18 +71,12 @@ func register(b *gotgbot.Bot, ctx *ext.Context) error {
 func registerCallbackYes(b *gotgbot.Bot, ctx *ext.Context) error {
 	cb := ctx.Update.CallbackQuery
 	user := users[cb.From.Id]
+
 	b.SendMessage(
 		cb.Message.GetChat().Id,
 		fmt.Sprintf("Добро пожаловать %s. \nТеперь тебе доступны следующие менюшки", user.Name),
 		&gotgbot.SendMessageOpts{
-			ReplyMarkup: gotgbot.InlineKeyboardMarkup{
-				InlineKeyboard: [][]gotgbot.InlineKeyboardButton{{
-					{Text: "Записки", CallbackData: "notes"},
-					{Text: "Профиль", CallbackData: "profile"},
-					{Text: "Напоминалка", CallbackData: "reminders"},
-					{Text: "Совместный учет расходов", CallbackData: "reminders"},
-				}},
-			},
+			ReplyMarkup: util.CreateMenuKeyboard(),
 		})
 	return nil
 }
