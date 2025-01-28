@@ -15,6 +15,11 @@ func (port *OrmAuthPort) Save(entity authServerDomain.Account) authServerDomain.
 	return entity
 }
 
+func (port *OrmAuthPort) CloseConnection() {
+	dbInstance, _ := port.Db.DB()
+	dbInstance.Close()
+}
+
 func CreateOrmAuthPort(db *gorm.DB) *OrmAuthPort {
 	return &OrmAuthPort{Db: db}
 }

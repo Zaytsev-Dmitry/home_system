@@ -108,19 +108,14 @@ func initPgxPort(config *authConfig.AppConfig) *authDaoPorts.PgxAuthPort {
 	return authDaoPorts.CreatePgxAuthPort(conn)
 }
 
-func createDAO(config *authConfig.AppConfig) (interf authDaoInterface.AuthDao, conn Connection) {
+func createDAO(config *authConfig.AppConfig) (resp authDaoInterface.AuthDao) {
 	var dao authDaoInterface.AuthDao
-	var connDto Connection
 	if config.Database.Impl == "pgx" {
-		port := initPgxPort(config)
-		connDto.pgxConn = port.Conn
-		dao = port
+		dao = initPgxPort(config)
 	} else {
-		port := initOrmPort(config)
-		connDto.gormDb = port.Db
-		dao = port
+		dao = initOrmPort(config)
 	}
-	return dao, connDto
+	return dao
 }
 
 func main() {
@@ -133,13 +128,8 @@ func main() {
 	migrateDB(appConfig)
 
 	//создаю нужный DAO на основе конфига
-	dao, connDTO := createDAO(appConfig)
-	if connDTO.pgxConn != nil {
-		defer connDTO.pgxConn.Close(context.Background())
-	} else {
-		dbInstance, _ := connDTO.gormDb.DB()
-		defer dbInstance.Close()
-	}
+	dao := createDAO(appConfig)
+	defer dao.CloseConnection()
 
 	//инициализирую апи
 	router, apiInterface := initAPI(appConfig, dao)
