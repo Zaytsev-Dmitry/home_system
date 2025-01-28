@@ -47,6 +47,9 @@ components:
           type: string
         password:
           type: string
+        accountType:
+          type: string
+          enum: [ "TG", "WEB" ]
     #--------------------------------------------------------------------------------------------------------#
     AccountResponse:
       type: object

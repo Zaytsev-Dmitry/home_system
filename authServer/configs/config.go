@@ -17,5 +17,6 @@ type AppConfig struct {
 		Password     string `yaml:"password"`
 		DataBaseName string `yaml:"dataBaseName"`
 		Dialect      string `yaml:"dialect"`
+		Impl         string `yaml:"impl"`
 	} `yaml:"database"`
 }

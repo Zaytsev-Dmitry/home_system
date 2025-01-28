@@ -7,10 +7,12 @@ import (
 	"authServer/external"
 	authDaoPorts "authServer/internal/dao/impl"
 	authDaoInterface "authServer/internal/dao/interface"
+	"context"
 	"database/sql"
 	"embed"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
 	"gopkg.in/yaml.v3"
@@ -19,6 +21,11 @@ import (
 	"log"
 	"os"
 )
+
+type Connection struct {
+	gormDb  *gorm.DB
+	pgxConn *pgx.Conn
+}
 
 func loadConfig(env string) *authConfig.AppConfig {
 	var appProfile = "configs/" + "%s" + ".yaml"
@@ -68,7 +75,7 @@ func migrateDB(config *authConfig.AppConfig) {
 	}
 }
 
-func initPostgresPort(config *authConfig.AppConfig) *authDaoPorts.PostgresAuthPort {
+func initOrmPort(config *authConfig.AppConfig) *authDaoPorts.OrmAuthPort {
 	dbURL := fmt.Sprintf(
 		"postgres://%s:%s@%s:5432/%s",
 		config.Database.Username,
@@ -77,25 +84,65 @@ func initPostgresPort(config *authConfig.AppConfig) *authDaoPorts.PostgresAuthPo
 		config.Database.DataBaseName,
 	)
 	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
+	dbInstance, _ := db.DB()
+	_ = dbInstance.Close()
 	if err != nil {
 		panic(err)
 	}
-	return authDaoPorts.CreatePostgresAuthPort(db)
+	return authDaoPorts.CreateOrmAuthPort(db)
 }
 
-func createDAO(config *authConfig.AppConfig) authDaoInterface.AuthDao {
-	port := initPostgresPort(config)
+func initPgxPort(config *authConfig.AppConfig) *authDaoPorts.PgxAuthPort {
+	dbURL := fmt.Sprintf(
+		"postgres://%s:%s@%s:5432/%s",
+		config.Database.Username,
+		config.Database.Password,
+		config.Database.Host,
+		config.Database.DataBaseName,
+	)
+	conn, err := pgx.Connect(context.Background(), dbURL)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
+	}
+	return authDaoPorts.CreatePgxAuthPort(conn)
+}
+
+func createDAO(config *authConfig.AppConfig) (interf authDaoInterface.AuthDao, conn Connection) {
 	var dao authDaoInterface.AuthDao
-	dao = port
-	return dao
+	var connDto Connection
+	if config.Database.Impl == "pgx" {
+		port := initPgxPort(config)
+		connDto.pgxConn = port.Conn
+		dao = port
+	} else {
+		port := initOrmPort(config)
+		connDto.gormDb = port.Db
+		dao = port
+	}
+	return dao, connDto
 }
 
 func main() {
 	startMessage := "AuthServer ver 1.0"
 	fmt.Printf("%s!\n", startMessage)
+	//гружу конфиг
 	appConfig := loadConfig("MODE")
+
+	//мигрирую базу
 	migrateDB(appConfig)
-	router, apiInterface := initAPI(appConfig, createDAO(appConfig))
+
+	//создаю нужный DAO на основе конфига
+	dao, connDTO := createDAO(appConfig)
+	if connDTO.pgxConn != nil {
+		defer connDTO.pgxConn.Close(context.Background())
+	} else {
+		dbInstance, _ := connDTO.gormDb.DB()
+		defer dbInstance.Close()
+	}
+
+	//инициализирую апи
+	router, apiInterface := initAPI(appConfig, dao)
 	api.RegisterHandlers(router, apiInterface)
 	log.Println("Starting server on :8081")
 	if err := router.Run(":8081"); err != nil {

@@ -14,3 +14,4 @@ database:
   password: "root"
   dataBaseName: "auth"
   dialect: "postgres"
+  impl: "pgx"
