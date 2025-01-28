@@ -7,12 +7,11 @@ import (
 	"authServer/external"
 	authDaoPorts "authServer/internal/dao/impl"
 	authDaoInterface "authServer/internal/dao/interface"
-	"context"
 	"database/sql"
 	"embed"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
 	"gopkg.in/yaml.v3"
@@ -21,11 +20,6 @@ import (
 	"log"
 	"os"
 )
-
-type Connection struct {
-	gormDb  *gorm.DB
-	pgxConn *pgx.Conn
-}
 
 func loadConfig(env string) *authConfig.AppConfig {
 	var appProfile = "configs/" + "%s" + ".yaml"
@@ -92,26 +86,27 @@ func initOrmPort(config *authConfig.AppConfig) *authDaoPorts.OrmAuthPort {
 	return authDaoPorts.CreateOrmAuthPort(db)
 }
 
-func initPgxPort(config *authConfig.AppConfig) *authDaoPorts.PgxAuthPort {
+func initSqlxPort(config *authConfig.AppConfig) *authDaoPorts.SqlxAuthPort {
 	dbURL := fmt.Sprintf(
-		"postgres://%s:%s@%s:5432/%s",
+		"postgres://%s:%s@%s:5432/%s?sslmode=disable",
 		config.Database.Username,
 		config.Database.Password,
 		config.Database.Host,
 		config.Database.DataBaseName,
 	)
-	conn, err := pgx.Connect(context.Background(), dbURL)
+
+	db, err := sqlx.Connect("postgres", dbURL)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
 	}
-	return authDaoPorts.CreatePgxAuthPort(conn)
+	return authDaoPorts.CreateSqlxAuthPort(db)
 }
 
 func createDAO(config *authConfig.AppConfig) (resp authDaoInterface.AuthDao) {
 	var dao authDaoInterface.AuthDao
-	if config.Database.Impl == "pgx" {
-		dao = initPgxPort(config)
+	if config.Database.Impl == "sqlx" {
+		dao = initSqlxPort(config)
 	} else {
 		dao = initOrmPort(config)
 	}

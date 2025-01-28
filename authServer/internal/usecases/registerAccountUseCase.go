@@ -13,10 +13,10 @@ type RegisterAccountUseCase struct {
 }
 
 func (register *RegisterAccountUseCase) Register(request apiDto.CreateAccountRequest) (result domain.Account, err error) {
-	errKeycloak := register.Keycloak.RegisterAccount(request)
-	if errKeycloak != nil {
-		return domain.Account{}, errKeycloak
-	}
+	//errKeycloak := register.Keycloak.RegisterAccount(request)
+	//if errKeycloak != nil {
+	//	return domain.Account{}, errKeycloak
+	//}
 	return register.Dao.Save(
 		domain.Account{
 			FirstName: request.FirstName,
