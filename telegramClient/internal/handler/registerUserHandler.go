@@ -17,6 +17,12 @@ type RegisterUserCommandHandler struct {
 	AuthServerClient external.AuthServerClient
 }
 
+func NewRegisterUserCommandHandler(authUrl string) *RegisterUserCommandHandler {
+	return &RegisterUserCommandHandler{
+		AuthServerClient: *external.NewAuthServerClient(authUrl),
+	}
+}
+
 var tempUsers = make(map[int64]User)
 
 type State uint

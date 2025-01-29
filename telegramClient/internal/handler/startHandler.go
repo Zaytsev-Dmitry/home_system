@@ -11,6 +11,10 @@ import (
 type StartCommandHandler struct {
 }
 
+func NewStartCommandHandler() *StartCommandHandler {
+	return &StartCommandHandler{}
+}
+
 func (handler *StartCommandHandler) Init(dispatcher *ext.Dispatcher) {
 	dispatcher.AddHandler(handlers.NewCommand("start", start))
 	dispatcher.AddHandler(handlers.NewCallback(callbackquery.Equal("start_callback"), startCB))
