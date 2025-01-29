@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
+	noteSpec "github.com/Zaytsev-Dmitry/home_system_open_api/noteServerBackend"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
@@ -11,7 +12,6 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
-	api "noteBackendApp/api/docs"
 	noteHandler "noteBackendApp/api/handlers"
 	noteConfig "noteBackendApp/configs"
 	noteDaoPorts "noteBackendApp/internal/dao/impl"
@@ -50,7 +50,7 @@ func main() {
 	fmt.Printf("%s!\n", startMessage)
 	router, apiInterface := initAPI(createDAO(config))
 	router.Use(commonMiddleware)
-	api.RegisterHandlers(router, apiInterface)
+	noteSpec.RegisterHandlers(router, apiInterface)
 	log.Println(fmt.Sprintf("Starting server on : %s", config.Server.Port))
 	if err := router.Run(":" + config.Server.Port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
@@ -85,7 +85,7 @@ func migrateDB(config *noteConfig.AppConfig) {
 	}
 }
 
-func initAPI(dao noteInterface.NoteDao) (router *gin.Engine, serverInterface api.ServerInterface) {
+func initAPI(dao noteInterface.NoteDao) (router *gin.Engine, serverInterface noteSpec.ServerInterface) {
 	return gin.Default(), noteHandler.NewNoteBackendApi(dao)
 }
 
