@@ -8,9 +8,16 @@ import (
 	"github.com/PaulSonOfLars/gotgbot/v2/ext/handlers/filters/callbackquery"
 )
 
-func AddStartHandler(dispatcher *ext.Dispatcher) {
+type StartCommandHandler struct {
+}
+
+func (handler *StartCommandHandler) Init(dispatcher *ext.Dispatcher) {
 	dispatcher.AddHandler(handlers.NewCommand("start", start))
 	dispatcher.AddHandler(handlers.NewCallback(callbackquery.Equal("start_callback"), startCB))
+}
+
+func (handler *StartCommandHandler) GetName() string {
+	return "StartCommandHandler"
 }
 
 func start(b *gotgbot.Bot, ctx *ext.Context) error {

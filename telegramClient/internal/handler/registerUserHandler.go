@@ -11,6 +11,8 @@ import (
 	"telegramCLient/internal/util"
 )
 
+type RegisterUserCommandHandler struct{}
+
 var users = make(map[int64]User)
 
 type State uint
@@ -28,13 +30,17 @@ type User struct {
 	Email string
 }
 
-func AddRegisterUserHandler(dispatcher *ext.Dispatcher) {
-	dispatcher.AddHandler(handlers.NewMessage(message.Text, register))
-	dispatcher.AddHandler(handlers.NewCallback(callbackquery.Equal("register_callback_yes"), registerCallbackYes))
-	dispatcher.AddHandler(handlers.NewCallback(callbackquery.Equal("register_callback_no"), registerCallbackNo))
+func (handler *RegisterUserCommandHandler) Init(dispatcher *ext.Dispatcher) {
+	dispatcher.AddHandler(handlers.NewMessage(message.Text, handler.register))
+	dispatcher.AddHandler(handlers.NewCallback(callbackquery.Equal("register_callback_yes"), handler.registerCallbackYes))
+	dispatcher.AddHandler(handlers.NewCallback(callbackquery.Equal("register_callback_no"), handler.registerCallbackNo))
 }
 
-func register(b *gotgbot.Bot, ctx *ext.Context) error {
+func (handler *RegisterUserCommandHandler) GetName() string {
+	return "RegisterCommandHandler"
+}
+
+func (handler *RegisterUserCommandHandler) register(b *gotgbot.Bot, ctx *ext.Context) error {
 	userID := ctx.Message.From.Id
 	user := users[userID]
 
@@ -52,7 +58,7 @@ func register(b *gotgbot.Bot, ctx *ext.Context) error {
 			ctx.Message.Chat.Id,
 			fmt.Sprintf("Login: %s \nEmail: %s \nВсе верно?", user.Name, user.Email),
 			&gotgbot.SendMessageOpts{
-				ReplyMarkup: registerCallBackKeyboard(),
+				ReplyMarkup: handler.registerCallBackKeyboard(),
 			})
 		break
 	default:
@@ -68,7 +74,7 @@ func register(b *gotgbot.Bot, ctx *ext.Context) error {
 }
 
 // TODO вызов сервиса регистрации
-func registerCallbackYes(b *gotgbot.Bot, ctx *ext.Context) error {
+func (handler *RegisterUserCommandHandler) registerCallbackYes(b *gotgbot.Bot, ctx *ext.Context) error {
 	cb := ctx.Update.CallbackQuery
 	user := users[cb.From.Id]
 	b.SendMessage(
@@ -80,18 +86,18 @@ func registerCallbackYes(b *gotgbot.Bot, ctx *ext.Context) error {
 	return nil
 }
 
-func registerCallbackNo(b *gotgbot.Bot, ctx *ext.Context) error {
+func (handler *RegisterUserCommandHandler) registerCallbackNo(b *gotgbot.Bot, ctx *ext.Context) error {
 	cb := ctx.Update.CallbackQuery
 	_, err2 := b.SendMessage(cb.Message.GetChat().Id, "Ну окей...погнали дальше. Введи свой логин", nil)
 	delete(users, cb.From.Id)
-	bot.Dispatcher.AddHandler(handlers.NewMessage(message.Text, register))
+	bot.Dispatcher.AddHandler(handlers.NewMessage(message.Text, handler.register))
 	if err2 != nil {
 		return fmt.Errorf("failed to registerCallbackNo: %w", err2)
 	}
 	return nil
 }
 
-func registerCallBackKeyboard() gotgbot.InlineKeyboardMarkup {
+func (handler *RegisterUserCommandHandler) registerCallBackKeyboard() gotgbot.InlineKeyboardMarkup {
 	return gotgbot.InlineKeyboardMarkup{
 		InlineKeyboard: [][]gotgbot.InlineKeyboardButton{{
 			{Text: "Да", CallbackData: "register_callback_yes"},
