@@ -1,6 +1,8 @@
 package externalDto
 
-import apiDto "authServer/api/docs"
+import (
+	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
+)
 
 type KeycloakUserCreateRequest struct {
 	Enabled     bool          `json:"enabled"`
@@ -17,7 +19,7 @@ type Credentials struct {
 	Temporary bool   `json:"temporary"`
 }
 
-func NewKeycloakUserCreateRequest(request apiDto.CreateAccountRequest) *KeycloakUserCreateRequest {
+func NewKeycloakUserCreateRequest(request authSpec.CreateAccountRequest) *KeycloakUserCreateRequest {
 	credentials := make([]Credentials, 1)
 	credentials[0] = Credentials{
 		Type: "password", Value: *request.Password, Temporary: false,
