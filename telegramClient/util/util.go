@@ -1,6 +1,10 @@
 package util
 
-import "github.com/PaulSonOfLars/gotgbot/v2"
+import (
+	"encoding/json"
+	"github.com/PaulSonOfLars/gotgbot/v2"
+	"net/http"
+)
 
 func InlineKeyboardButton(text string, callbackData string) gotgbot.InlineKeyboardButton {
 	return gotgbot.InlineKeyboardButton{
@@ -29,4 +33,11 @@ func CreateMenuKeyboard() *gotgbot.InlineKeyboardMarkup {
 			InlineKeyboardButton("Совместный учет расходов", "accounting_of_expenses"),
 		),
 	)
+}
+
+func ParseResponseToStruct(respBody *http.Response, response any) any {
+	defer respBody.Body.Close()
+	decoder := json.NewDecoder(respBody.Body)
+	decoder.Decode(response)
+	return response
 }

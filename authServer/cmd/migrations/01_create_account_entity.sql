@@ -6,5 +6,6 @@ CREATE TABLE accounts
     last_name  varchar(100),
     login      varchar(100),
     email      varchar(100),
-    type       varchar(10)
+    type       varchar(10),
+    telegram_id int
 );

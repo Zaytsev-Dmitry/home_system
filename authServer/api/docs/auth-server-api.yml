@@ -50,6 +50,8 @@ components:
         accountType:
           type: string
           enum: [ "TG", "WEB" ]
+        telegramId:
+          type: integer
     #--------------------------------------------------------------------------------------------------------#
     AccountResponse:
       type: object

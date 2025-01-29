@@ -29,11 +29,12 @@ func (register *RegisterAccountUseCase) Register(request apiDto.CreateAccountReq
 	}
 	return register.Dao.Save(
 		domain.Account{
-			FirstName: request.FirstName,
-			LastName:  request.LastName,
-			Email:     request.Email,
-			Login:     *request.Login,
-			Type:      string(*request.AccountType),
+			FirstName:  request.FirstName,
+			LastName:   request.LastName,
+			Email:      request.Email,
+			Login:      *request.Login,
+			Type:       string(*request.AccountType),
+			TelegramId: request.TelegramId,
 		},
 	), nil
 }

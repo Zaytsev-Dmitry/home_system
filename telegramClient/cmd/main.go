@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"telegramCLient/config"
+	"telegramCLient/external"
 	"telegramCLient/internal/bot"
 	"telegramCLient/internal/handler"
 	thCommandHandlerinterface "telegramCLient/internal/handler/interface"
@@ -28,7 +29,9 @@ func createAndInitHandlers(config *config.AppConfig, disp *ext.Dispatcher) {
 			}
 		case REGISTER_HANDLER:
 			{
-				createdHandler = &handler.RegisterUserCommandHandler{}
+				createdHandler = &handler.RegisterUserCommandHandler{
+					AuthServerClient: *external.NewAuthServerClient(config.AuthServerUrl),
+				}
 			}
 		}
 		createdHandler.Init(disp)

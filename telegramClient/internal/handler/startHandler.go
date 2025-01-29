@@ -36,7 +36,7 @@ func start(b *gotgbot.Bot, ctx *ext.Context) error {
 
 func startCB(b *gotgbot.Bot, ctx *ext.Context) error {
 	cb := ctx.Update.CallbackQuery
-	_, err2 := b.SendMessage(cb.Message.GetChat().Id, "Введи свой никнейм", nil)
+	_, err2 := b.SendMessage(cb.Message.GetChat().Id, "Для работы мне нужен твой email. Напиши его мне", nil)
 	if err2 != nil {
 		return fmt.Errorf("failed to startCB: %w", err2)
 	}
