@@ -2,44 +2,19 @@ package main
 
 import (
 	"fmt"
-	"github.com/PaulSonOfLars/gotgbot/v2/ext"
 	"gopkg.in/yaml.v3"
 	"log"
 	"os"
 	"telegramCLient/config"
 	"telegramCLient/internal/bot"
 	"telegramCLient/internal/handler"
-	thCommandHandlerinterface "telegramCLient/internal/handler/interface"
 )
-
-const (
-	START_HANDLER    string = "StartCommandHandler"
-	REGISTER_HANDLER string = "RegisterCommandHandler"
-)
-
-func createAndInitHandlers(config *config.AppConfig, disp *ext.Dispatcher) {
-	for i, value := range config.HandlersToInit {
-		log.Println(fmt.Sprintf("Create handler : %s. With order: %x", value, i+1))
-		var createdHandler thCommandHandlerinterface.TGCommandHandler
-		switch value {
-		case START_HANDLER:
-			{
-				createdHandler = handler.NewStartCommandHandler()
-			}
-		case REGISTER_HANDLER:
-			{
-				createdHandler = handler.NewRegisterUserCommandHandler(config.AuthServerUrl)
-			}
-		}
-		createdHandler.Init(disp)
-	}
-}
 
 // ______________________________________________________________________
 func main() {
 	appConfig := loadConfig("MODE")
 	bot, dispatcher := bot.NewNoteTGBot(appConfig).Init()
-	createAndInitHandlers(appConfig, dispatcher)
+	handler.CreateHandlerStarter(appConfig, dispatcher).InitAndStart()
 	bot.Idle()
 }
 
