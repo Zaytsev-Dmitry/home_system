@@ -6,4 +6,5 @@ type Account struct {
 	LastName  *string `db:"last_name"`
 	Login     string  `db:"login"`
 	Email     *string `db:"email"`
+	Type      string  `db:"type"`
 }
