@@ -1,7 +1,6 @@
 package main
 
 import (
-	api "authServer/api/docs"
 	authServerHandler "authServer/api/handlers"
 	authConfig "authServer/configs"
 	"authServer/external"
@@ -10,6 +9,7 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
+	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -128,14 +128,14 @@ func main() {
 
 	//инициализирую апи
 	router, apiInterface := initAPI(appConfig, dao)
-	api.RegisterHandlers(router, apiInterface)
+	authSpec.RegisterHandlers(router, apiInterface)
 	log.Println("Starting server on :8081")
 	if err := router.Run(":8081"); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
 
-func initAPI(config *authConfig.AppConfig, dao authDaoInterface.AuthDao) (router *gin.Engine, serverInterface api.ServerInterface) {
+func initAPI(config *authConfig.AppConfig, dao authDaoInterface.AuthDao) (router *gin.Engine, serverInterface authSpec.ServerInterface) {
 	client := getKeycloakClient(config)
 	return gin.Default(), authServerHandler.NewAuthServerApi(client, dao)
 }

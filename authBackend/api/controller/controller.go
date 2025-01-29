@@ -1,12 +1,12 @@
 package noteControllers
 
 import (
-	apiDTO "authServer/api/docs"
 	presenter "authServer/api/presenter"
 	"authServer/external"
 	authDaoInterface "authServer/internal/dao/interface"
 	useCases "authServer/internal/usecases"
 	"authServer/pkg/utilities"
+	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -18,7 +18,7 @@ type AccountController struct {
 
 // TODO надо отловить все кейсы keycloak
 func (controller *AccountController) RegisterAccount(context *gin.Context) {
-	var requestEntity apiDTO.CreateAccountRequest
+	var requestEntity authSpec.CreateAccountRequest
 	utilities.CatchMarshallErr(context.BindJSON(&requestEntity), context)
 	entity, err := controller.RegisterUseCase.Register(requestEntity)
 	if err != nil {

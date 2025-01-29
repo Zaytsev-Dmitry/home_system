@@ -1,10 +1,10 @@
 package external
 
 import (
-	apiDto "authServer/api/docs"
 	externalDto "authServer/external/dto"
 	"authServer/pkg/utilities"
 	"fmt"
+	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"net/http"
 	"net/url"
 )
@@ -19,7 +19,7 @@ type KeycloakClient struct {
 	ServerGrantType string
 }
 
-func (client KeycloakClient) RegisterAccount(request apiDto.CreateAccountRequest) error {
+func (client KeycloakClient) RegisterAccount(request authSpec.CreateAccountRequest) error {
 	_, err := utilities.PostWithBearerAuthorization(
 		client.getToken().AccessToken,
 		externalDto.NewKeycloakUserCreateRequest(request),

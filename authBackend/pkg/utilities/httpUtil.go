@@ -1,9 +1,9 @@
 package utilities
 
 import (
-	apiDTO "authServer/api/docs"
 	"bytes"
 	"encoding/json"
+	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
@@ -36,9 +36,9 @@ func UrlencodedRequest(httpMethod string, urlStr string, data url.Values) *http.
 	return resp
 }
 
-func getErrorDto(err string, status int, context *gin.Context) apiDTO.ErrorResponse {
+func getErrorDto(err string, status int, context *gin.Context) authSpec.ErrorResponse {
 	nowString := time.Now().String()
-	return apiDTO.ErrorResponse{
+	return authSpec.ErrorResponse{
 		Timestamp: &nowString,
 		Status:    &status,
 		Error:     &err,

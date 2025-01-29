@@ -1,15 +1,15 @@
 package usecases
 
 import (
-	apiDto "authServer/api/docs"
 	keycloak "authServer/external"
 	authDaoInterface "authServer/internal/dao/interface"
 	domain "authServer/internal/domain"
+	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 )
 
 const (
-	TG  apiDto.CreateAccountRequestAccountType = "TG"
-	WEB apiDto.CreateAccountRequestAccountType = "WEB"
+	TG  authSpec.CreateAccountRequestAccountType = "TG"
+	WEB authSpec.CreateAccountRequestAccountType = "WEB"
 )
 
 type RegisterAccountUseCase struct {
@@ -17,7 +17,7 @@ type RegisterAccountUseCase struct {
 	Dao      authDaoInterface.AuthDao
 }
 
-func (register *RegisterAccountUseCase) Register(request apiDto.CreateAccountRequest) (result domain.Account, err error) {
+func (register *RegisterAccountUseCase) Register(request authSpec.CreateAccountRequest) (result domain.Account, err error) {
 	switch *request.AccountType {
 	case WEB:
 		{
