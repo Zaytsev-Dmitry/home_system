@@ -97,7 +97,8 @@ func (handler *RegisterUserCommandHandler) registerCallbackYes(b *gotgbot.Bot, c
 		handler.tempMessageCollection[cb.Message.GetChat().Id],
 		&gotgbot.DeleteMessagesOpts{},
 	)
-
+	//очищаю мапу
+	delete(handler.tempMessageCollection, cb.Message.GetChat().Id)
 	return nil
 }
 
