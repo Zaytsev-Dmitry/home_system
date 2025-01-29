@@ -14,27 +14,20 @@ import (
 )
 
 type RegisterUserCommandHandler struct {
-	AuthServerClient external.AuthServerClient
+	AuthServerClient      external.AuthServerClient
+	tempMessageCollection map[int64][]int64
 }
 
-func NewRegisterUserCommandHandler(authUrl string) *RegisterUserCommandHandler {
+func NewRegisterUserCommandHandler(authUrl string, tempMsgColl map[int64][]int64) *RegisterUserCommandHandler {
 	return &RegisterUserCommandHandler{
-		AuthServerClient: *external.NewAuthServerClient(authUrl),
+		AuthServerClient:      *external.NewAuthServerClient(authUrl),
+		tempMessageCollection: tempMsgColl,
 	}
 }
 
 var tempUsers = make(map[int64]User)
 
-type State uint
-
-const (
-	StateDefault State = iota
-	StateConfirm
-)
-
-// User data and state
 type User struct {
-	State     State
 	FirstName string
 	LastName  string
 	Login     string
@@ -51,6 +44,7 @@ func (handler *RegisterUserCommandHandler) GetName() string {
 	return "RegisterCommandHandler"
 }
 
+// TODO отловаить ошибки
 func (handler *RegisterUserCommandHandler) register(b *gotgbot.Bot, ctx *ext.Context) error {
 	userID := ctx.Message.From.Id
 	user := User{
@@ -60,7 +54,7 @@ func (handler *RegisterUserCommandHandler) register(b *gotgbot.Bot, ctx *ext.Con
 		Email:     ctx.Message.Text,
 	}
 
-	b.SendMessage(
+	message, _ := b.SendMessage(
 		ctx.Message.Chat.Id,
 		fmt.Sprintf(""+
 			"Супер теперь подтверди почту \n"+
@@ -69,10 +63,13 @@ func (handler *RegisterUserCommandHandler) register(b *gotgbot.Bot, ctx *ext.Con
 		&gotgbot.SendMessageOpts{
 			ReplyMarkup: handler.registerCallBackKeyboard(),
 		})
+	handler.tempMessageCollection[ctx.Message.From.Id] = append(handler.tempMessageCollection[ctx.Message.From.Id], ctx.Message.MessageId)
+	handler.tempMessageCollection[message.Chat.Id] = append(handler.tempMessageCollection[message.Chat.Id], message.MessageId)
 	tempUsers[userID] = user
 	return nil
 }
 
+// TODO отловаить ошибки
 func (handler *RegisterUserCommandHandler) registerCallbackYes(b *gotgbot.Bot, ctx *ext.Context) error {
 	cb := ctx.Update.CallbackQuery
 	user := tempUsers[cb.From.Id]
@@ -94,14 +91,22 @@ func (handler *RegisterUserCommandHandler) registerCallbackYes(b *gotgbot.Bot, c
 			ReplyMarkup: util.CreateMenuKeyboard(),
 		})
 	delete(tempUsers, cb.From.Id)
+
+	b.DeleteMessages(
+		cb.Message.GetChat().Id,
+		handler.tempMessageCollection[cb.Message.GetChat().Id],
+		&gotgbot.DeleteMessagesOpts{},
+	)
+
 	return nil
 }
 
 func (handler *RegisterUserCommandHandler) registerCallbackNo(b *gotgbot.Bot, ctx *ext.Context) error {
 	cb := ctx.Update.CallbackQuery
 	delete(tempUsers, cb.From.Id)
-	_, err2 := b.SendMessage(cb.Message.GetChat().Id, "Ну окей...погнали дальше. Введи свою почту заново", nil)
+	sendedMsg, err2 := b.SendMessage(cb.Message.GetChat().Id, "Ну окей...погнали дальше. Введи свою почту заново", nil)
 	bot.Dispatcher.AddHandler(handlers.NewMessage(message.Text, handler.register))
+	handler.tempMessageCollection[sendedMsg.Chat.Id] = append(handler.tempMessageCollection[sendedMsg.MessageId], sendedMsg.MessageId)
 	if err2 != nil {
 		return fmt.Errorf("failed to registerCallbackNo: %w", err2)
 	}

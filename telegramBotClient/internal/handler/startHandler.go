@@ -9,23 +9,27 @@ import (
 )
 
 type StartCommandHandler struct {
+	tempMessageCollection map[int64][]int64
 }
 
-func NewStartCommandHandler() *StartCommandHandler {
-	return &StartCommandHandler{}
+func NewStartCommandHandler(tempMsgColl map[int64][]int64) *StartCommandHandler {
+	return &StartCommandHandler{
+		tempMessageCollection: tempMsgColl,
+	}
 }
 
 func (handler *StartCommandHandler) Init(dispatcher *ext.Dispatcher) {
-	dispatcher.AddHandler(handlers.NewCommand("start", start))
-	dispatcher.AddHandler(handlers.NewCallback(callbackquery.Equal("start_callback"), startCB))
+	dispatcher.AddHandler(handlers.NewCommand("start", handler.start))
+	dispatcher.AddHandler(handlers.NewCallback(callbackquery.Equal("start_callback"), handler.startCB))
 }
 
 func (handler *StartCommandHandler) GetName() string {
 	return "StartCommandHandler"
 }
 
-func start(b *gotgbot.Bot, ctx *ext.Context) error {
-	b.SendMessage(
+// TODO отловить ошибки
+func (handler *StartCommandHandler) start(b *gotgbot.Bot, ctx *ext.Context) error {
+	message, _ := b.SendMessage(
 		ctx.Message.Chat.Id,
 		"Супер теперь надо зарегаться",
 		&gotgbot.SendMessageOpts{
@@ -35,14 +39,23 @@ func start(b *gotgbot.Bot, ctx *ext.Context) error {
 				}},
 			},
 		})
+	tempMsgSlice := handler.tempMessageCollection[message.Chat.Id]
+	if len(tempMsgSlice) == 0 {
+		handler.tempMessageCollection[message.Chat.Id] = append([]int64{}, message.MessageId)
+	} else {
+		handler.tempMessageCollection[message.Chat.Id] = append(handler.tempMessageCollection[message.Chat.Id], message.MessageId)
+	}
+
 	return nil
 }
 
-func startCB(b *gotgbot.Bot, ctx *ext.Context) error {
+func (handler *StartCommandHandler) startCB(b *gotgbot.Bot, ctx *ext.Context) error {
 	cb := ctx.Update.CallbackQuery
-	_, err2 := b.SendMessage(cb.Message.GetChat().Id, "Для работы мне нужен твой email. Напиши его мне", nil)
+	message, err2 := b.SendMessage(cb.Message.GetChat().Id, "Для работы мне нужен твой email. Напиши его мне", nil)
 	if err2 != nil {
 		return fmt.Errorf("failed to startCB: %w", err2)
 	}
+	handler.tempMessageCollection[message.Chat.Id] = append(handler.tempMessageCollection[message.Chat.Id], cb.Message.GetMessageId())
+	handler.tempMessageCollection[message.Chat.Id] = append(handler.tempMessageCollection[message.Chat.Id], message.MessageId)
 	return nil
 }

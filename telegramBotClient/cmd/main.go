@@ -13,8 +13,9 @@ import (
 // ______________________________________________________________________
 func main() {
 	appConfig := loadConfig("MODE")
+	tempTgMessageId := make(map[int64][]int64)
 	bot, dispatcher := bot.NewNoteTGBot(appConfig).Init()
-	handler.CreateHandlerStarter(appConfig, dispatcher).InitAndStart()
+	handler.CreateHandlerStarter(appConfig, dispatcher, tempTgMessageId).InitAndStart()
 	bot.Idle()
 }
 

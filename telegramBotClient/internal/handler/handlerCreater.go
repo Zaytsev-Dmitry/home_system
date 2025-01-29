@@ -14,14 +14,16 @@ const (
 )
 
 type HandlerStarter struct {
-	Config *config.AppConfig
-	Disp   *ext.Dispatcher
+	Config                *config.AppConfig
+	Disp                  *ext.Dispatcher
+	tempMessageCollection map[int64][]int64
 }
 
-func CreateHandlerStarter(conf *config.AppConfig, disp *ext.Dispatcher) *HandlerStarter {
+func CreateHandlerStarter(conf *config.AppConfig, disp *ext.Dispatcher, tempMessage map[int64][]int64) *HandlerStarter {
 	return &HandlerStarter{
-		Config: conf,
-		Disp:   disp,
+		Config:                conf,
+		Disp:                  disp,
+		tempMessageCollection: tempMessage,
 	}
 }
 
@@ -33,11 +35,11 @@ func (h *HandlerStarter) InitAndStart() {
 		switch value {
 		case START_HANDLER:
 			{
-				createdHandler = NewStartCommandHandler()
+				createdHandler = NewStartCommandHandler(h.tempMessageCollection)
 			}
 		case REGISTER_HANDLER:
 			{
-				createdHandler = NewRegisterUserCommandHandler(h.Config.AuthServerUrl)
+				createdHandler = NewRegisterUserCommandHandler(h.Config.AuthServerUrl, h.tempMessageCollection)
 			}
 		}
 		createdHandler.Init(h.Disp)
