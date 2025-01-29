@@ -17,7 +17,7 @@ services:
 
   note-backend-app:
     build:
-      context: ./noteBackendApp
+      context: noteBackend
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
