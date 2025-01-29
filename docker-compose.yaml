@@ -2,7 +2,7 @@ version: '3'
 services:
   auth-server:
     build:
-      context: ./authServer
+      context: authBackend
       dockerfile: Dockerfile
     ports:
       - "8081:8081"
