@@ -5,6 +5,7 @@ import (
 	"github.com/go-telegram/bot"
 	"log"
 	"telegramCLient/config"
+	"telegramCLient/internal/handler/command"
 )
 
 const (
@@ -32,11 +33,11 @@ func (h *HandlerCreater) Create() []bot.Option {
 		switch value {
 		case START_HANDLER:
 			{
-				result = append(result, NewStartCommandHandler(h.tempMessageCollection).Init()...)
+				result = append(result, command.NewStartCommandHandler(h.tempMessageCollection).Init()...)
 			}
 		case REGISTER_HANDLER:
 			{
-				result = append(result, NewRegisterUserCommandHandler(h.Config.AuthServerUrl, h.tempMessageCollection).Init()...)
+				result = append(result, command.NewRegisterUserCommandHandler(h.Config.AuthServerUrl, h.tempMessageCollection).Init()...)
 			}
 		}
 	}
