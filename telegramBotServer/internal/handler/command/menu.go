@@ -32,11 +32,11 @@ func (handler *MenuCommandHandler) buildMenuKeyboard() models.ReplyMarkup {
 	kb := &models.InlineKeyboardMarkup{
 		InlineKeyboard: [][]models.InlineKeyboardButton{
 			{
-				{Text: "Записки", CallbackData: "/notes"},
-				{Text: "Профиль", CallbackData: "/profile"},
+				{Text: "Записки 📅", CallbackData: "/notes"},
+				{Text: "Профиль 🤖", CallbackData: "/profile"},
 			},
 			{
-				{Text: "Учет совместных расходов", CallbackData: "/expense_accounting"},
+				{Text: "Учет совместных расходов 💸", CallbackData: "/expense_accounting"},
 			},
 		},
 	}
