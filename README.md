@@ -26,3 +26,4 @@ TODO:
 12) Добавить обучалку после регистрации пользака (слайдер - https://github.com/go-telegram/ui/blob/main/slider/readme.md) - DONE
 13) Реализация /profile
 14) добавление записки
+15) добавить telegram bot backend в docker compose 
