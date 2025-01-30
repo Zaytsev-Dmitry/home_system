@@ -1,24 +1,20 @@
 package handler
 
 import (
+	"context"
 	"fmt"
-	"github.com/PaulSonOfLars/gotgbot/v2"
-	"github.com/PaulSonOfLars/gotgbot/v2/ext"
-	"github.com/PaulSonOfLars/gotgbot/v2/ext/handlers"
-	"github.com/PaulSonOfLars/gotgbot/v2/ext/handlers/filters/callbackquery"
-	"github.com/PaulSonOfLars/gotgbot/v2/ext/handlers/filters/message"
+	"github.com/go-telegram/bot"
+	"github.com/go-telegram/bot/models"
 	"telegramCLient/external"
 	"telegramCLient/external/dto"
-	"telegramCLient/internal/bot"
-	"telegramCLient/util"
 )
 
 type RegisterUserCommandHandler struct {
 	AuthServerClient      external.AuthServerClient
-	tempMessageCollection map[int64][]int64
+	tempMessageCollection map[int64][]int
 }
 
-func NewRegisterUserCommandHandler(authUrl string, tempMsgColl map[int64][]int64) *RegisterUserCommandHandler {
+func NewRegisterUserCommandHandler(authUrl string, tempMsgColl map[int64][]int) *RegisterUserCommandHandler {
 	return &RegisterUserCommandHandler{
 		AuthServerClient:      *external.NewAuthServerClient(authUrl),
 		tempMessageCollection: tempMsgColl,
@@ -34,42 +30,47 @@ type User struct {
 	Email     string
 }
 
-func (handler *RegisterUserCommandHandler) Init(dispatcher *ext.Dispatcher) {
-	dispatcher.AddHandler(handlers.NewMessage(message.Text, handler.register))
-	dispatcher.AddHandler(handlers.NewCallback(callbackquery.Equal("register_callback_yes"), handler.registerCallbackYes))
-	dispatcher.AddHandler(handlers.NewCallback(callbackquery.Equal("register_callback_no"), handler.registerCallbackNo))
+func (h *RegisterUserCommandHandler) Init() []bot.Option {
+	return []bot.Option{
+		bot.WithDefaultHandler(h.register),
+		bot.WithCallbackQueryDataHandler("register_callback_yes", bot.MatchTypeExact, h.registerCallbackYes),
+		bot.WithCallbackQueryDataHandler("register_callback_no", bot.MatchTypeExact, h.registerCallbackNo),
+		bot.WithDefaultHandler(h.register),
+	}
 }
 
 // TODO отловаить ошибки
-func (handler *RegisterUserCommandHandler) register(b *gotgbot.Bot, ctx *ext.Context) error {
-	userID := ctx.Message.From.Id
-	user := User{
-		FirstName: ctx.Message.From.FirstName,
-		LastName:  ctx.Message.From.LastName,
-		Login:     ctx.Message.From.Username,
-		Email:     ctx.Message.Text,
+func (handler *RegisterUserCommandHandler) register(ctx context.Context, b *bot.Bot, update *models.Update) {
+	var message = update.Message
+	if message == nil {
+		message = update.CallbackQuery.Message.Message
 	}
 
-	message, _ := b.SendMessage(
-		ctx.Message.Chat.Id,
-		fmt.Sprintf(""+
+	handler.tempMessageCollection[message.From.ID] = append(handler.tempMessageCollection[message.From.ID], message.ID)
+	userID := message.From.ID
+	user := User{
+		FirstName: message.Chat.FirstName,
+		LastName:  message.Chat.LastName,
+		Login:     message.Chat.Username,
+		Email:     message.Text,
+	}
+
+	sendedMSG, _ := b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID: message.Chat.ID,
+		Text: fmt.Sprintf(""+
 			"Супер теперь подтверди почту \n"+
 			"\n"+
 			"Итак: %s...Это точно верная почта?\n%s", user.Login, user.Email),
-		&gotgbot.SendMessageOpts{
-			ReplyMarkup: handler.registerCallBackKeyboard(),
-		})
-	handler.tempMessageCollection[ctx.Message.From.Id] = append(handler.tempMessageCollection[ctx.Message.From.Id], ctx.Message.MessageId)
-	handler.tempMessageCollection[message.Chat.Id] = append(handler.tempMessageCollection[message.Chat.Id], message.MessageId)
+		ReplyMarkup: handler.buildKeyboard(),
+	})
 	tempUsers[userID] = user
-	return nil
+	handler.tempMessageCollection[message.From.ID] = append(handler.tempMessageCollection[message.From.ID], sendedMSG.ID)
 }
 
 // TODO отловаить ошибки
-func (handler *RegisterUserCommandHandler) registerCallbackYes(b *gotgbot.Bot, ctx *ext.Context) error {
-	cb := ctx.Update.CallbackQuery
-	user := tempUsers[cb.From.Id]
-
+func (handler *RegisterUserCommandHandler) registerCallbackYes(ctx context.Context, b *bot.Bot, update *models.Update) {
+	cb := update.CallbackQuery
+	user := tempUsers[cb.From.ID]
 	var TG dto.CreateAccountRequestAccountType = "TG"
 	savedUser := handler.AuthServerClient.RegisterUser(
 		dto.CreateAccountRequest{
@@ -78,44 +79,59 @@ func (handler *RegisterUserCommandHandler) registerCallbackYes(b *gotgbot.Bot, c
 			FirstName:   &cb.From.FirstName,
 			LastName:    &cb.From.LastName,
 			Login:       &cb.From.Username,
-			TelegramId:  &cb.From.Id,
+			TelegramId:  &cb.From.ID,
 		})
-	b.SendMessage(
-		cb.Message.GetChat().Id,
-		fmt.Sprintf("Добро пожаловать %s. \nТеперь тебе доступны следующие менюшки. "+
+	delete(tempUsers, cb.From.ID)
+	b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID: cb.Message.Message.Chat.ID,
+		Text: fmt.Sprintf("Добро пожаловать %s. \nТеперь тебе доступны следующие менюшки. "+
 			"И чтобы узнать о том что я умею. Просто нажми кнопку \"Помощь\" и следуй инструкциям", savedUser.Login),
-		&gotgbot.SendMessageOpts{
-			ReplyMarkup: util.CreateMenuKeyboard(),
-		})
-	delete(tempUsers, cb.From.Id)
+		ReplyMarkup: handler.buildMenuKeyboard(),
+	})
 
-	b.DeleteMessages(
-		cb.Message.GetChat().Id,
-		handler.tempMessageCollection[cb.Message.GetChat().Id],
-		&gotgbot.DeleteMessagesOpts{},
-	)
+	b.DeleteMessages(ctx, &bot.DeleteMessagesParams{
+		ChatID:     cb.Message.Message.Chat.ID,
+		MessageIDs: handler.tempMessageCollection[cb.Message.Message.Chat.ID],
+	})
 	//очищаю мапу
-	delete(handler.tempMessageCollection, cb.Message.GetChat().Id)
-	return nil
+	delete(handler.tempMessageCollection, cb.Message.Message.Chat.ID)
 }
 
-func (handler *RegisterUserCommandHandler) registerCallbackNo(b *gotgbot.Bot, ctx *ext.Context) error {
-	cb := ctx.Update.CallbackQuery
-	delete(tempUsers, cb.From.Id)
-	sendedMsg, err2 := b.SendMessage(cb.Message.GetChat().Id, "Ну окей...погнали дальше. Введи свою почту заново", nil)
-	bot.Dispatcher.AddHandler(handlers.NewMessage(message.Text, handler.register))
-	handler.tempMessageCollection[sendedMsg.Chat.Id] = append(handler.tempMessageCollection[sendedMsg.MessageId], sendedMsg.MessageId)
-	if err2 != nil {
-		return fmt.Errorf("failed to registerCallbackNo: %w", err2)
-	}
-	return nil
+// TODO отловаить ошибки
+func (handler *RegisterUserCommandHandler) registerCallbackNo(ctx context.Context, b *bot.Bot, update *models.Update) {
+	cb := update.CallbackQuery
+	delete(tempUsers, cb.From.ID)
+	sendedMsg, _ := b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID: cb.Message.Message.Chat.ID,
+		Text: fmt.Sprintf("" +
+			"Ну окей...погнали дальше. Введи свою почту заново"),
+	})
+	handler.tempMessageCollection[cb.Message.Message.Chat.ID] = append(handler.tempMessageCollection[cb.Message.Message.Chat.ID], cb.Message.Message.ID)
+	handler.tempMessageCollection[cb.Message.Message.Chat.ID] = append(handler.tempMessageCollection[cb.Message.Message.Chat.ID], sendedMsg.ID)
 }
 
-func (handler *RegisterUserCommandHandler) registerCallBackKeyboard() gotgbot.InlineKeyboardMarkup {
-	return gotgbot.InlineKeyboardMarkup{
-		InlineKeyboard: [][]gotgbot.InlineKeyboardButton{{
-			{Text: "Да", CallbackData: "register_callback_yes"},
-			{Text: "Нет", CallbackData: "register_callback_no"},
-		}},
+func (handler *RegisterUserCommandHandler) buildKeyboard() models.ReplyMarkup {
+	kb := &models.InlineKeyboardMarkup{
+		InlineKeyboard: [][]models.InlineKeyboardButton{
+			{
+				{Text: "Да", CallbackData: "register_callback_yes"},
+				{Text: "Нет", CallbackData: "register_callback_no"},
+			},
+		},
 	}
+
+	return kb
+}
+
+func (handler *RegisterUserCommandHandler) buildMenuKeyboard() models.ReplyMarkup {
+	kb := &models.InlineKeyboardMarkup{
+		InlineKeyboard: [][]models.InlineKeyboardButton{
+			{
+				{Text: "Да", CallbackData: "register_callback_yes"},
+				{Text: "Нет", CallbackData: "register_callback_no"},
+			},
+		},
+	}
+
+	return kb
 }

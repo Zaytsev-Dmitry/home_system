@@ -2,10 +2,9 @@ package handler
 
 import (
 	"fmt"
-	"github.com/PaulSonOfLars/gotgbot/v2/ext"
+	"github.com/go-telegram/bot"
 	"log"
 	"telegramCLient/config"
-	"telegramCLient/internal/handler/interface"
 )
 
 const (
@@ -13,35 +12,33 @@ const (
 	REGISTER_HANDLER string = "RegisterCommandHandler"
 )
 
-type HandlerStarter struct {
+type HandlerCreater struct {
 	Config                *config.AppConfig
-	Disp                  *ext.Dispatcher
-	tempMessageCollection map[int64][]int64
+	tempMessageCollection map[int64][]int
 }
 
-func CreateHandlerStarter(conf *config.AppConfig, disp *ext.Dispatcher, tempMessage map[int64][]int64) *HandlerStarter {
-	return &HandlerStarter{
+func CreateHandlerStarter(conf *config.AppConfig, tempMessage map[int64][]int) *HandlerCreater {
+	return &HandlerCreater{
 		Config:                conf,
-		Disp:                  disp,
 		tempMessageCollection: tempMessage,
 	}
 }
 
 // TODO отловаить ошибки
-func (h *HandlerStarter) InitAndStart() {
+func (h *HandlerCreater) Create() []bot.Option {
+	var result = []bot.Option{}
 	for i, value := range h.Config.HandlersToInit {
 		log.Println(fmt.Sprintf("Create handler : %s. With order: %x", value, i+1))
-		var createdHandler thCommandHandlerinterface.TGCommandHandler
 		switch value {
 		case START_HANDLER:
 			{
-				createdHandler = NewStartCommandHandler(h.tempMessageCollection)
+				result = append(result, NewStartCommandHandler(h.tempMessageCollection).Init()...)
 			}
 		case REGISTER_HANDLER:
 			{
-				createdHandler = NewRegisterUserCommandHandler(h.Config.AuthServerUrl, h.tempMessageCollection)
+				result = append(result, NewRegisterUserCommandHandler(h.Config.AuthServerUrl, h.tempMessageCollection).Init()...)
 			}
 		}
-		createdHandler.Init(h.Disp)
 	}
+	return result
 }

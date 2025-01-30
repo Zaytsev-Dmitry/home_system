@@ -4,6 +4,7 @@ go 1.23.0
 
 require (
 	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.31
+	github.com/go-telegram/bot v1.13.3
 	gopkg.in/yaml.v3 v3.0.1
 )
 
