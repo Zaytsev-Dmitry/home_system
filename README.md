@@ -27,3 +27,6 @@ TODO:
 13) Реализация /profile
 14) добавление записки
 15) добавить telegram bot backend в docker compose 
+16) сделать меню для /notes - DONE
+17) сделать меню для /profile - DONE
+18) Написать свой пагинатор
