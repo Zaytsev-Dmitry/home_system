@@ -17,8 +17,7 @@ func NewSlider() *Slider {
 
 func (sl *Slider) CreateAndRun(ctx context.Context, b *bot.Bot, update *models.Update, slides []slider.Slide) {
 	opts := []slider.Option{
-		slider.OnSelect("Select", true, sl.sliderOnSelect),
-		slider.OnCancel("Cancel", true, sl.sliderOnCancel),
+		slider.OnCancel("Я все понял давай дальше", true, sl.sliderOnCancel),
 	}
 	newSlider := slider.New(b, slides, opts...)
 	newSlider.Show(ctx, b, strconv.Itoa(int(update.Message.Chat.ID)))
