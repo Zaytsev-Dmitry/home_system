@@ -4,63 +4,62 @@ import (
 	"context"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"github.com/go-telegram/ui/dialog"
 	"telegramCLient/internal/components"
 )
 
+const FIRST_PAGE_CONTENT = "*На данный момент есть несколько доступных тебе команд*\n\n" +
+	"\u2714 *\"notes\"* \u2011 записки\n\n" +
+	"\u2714 *\"profile\"* \u2011 информация о твоем аккаунте\n\n" +
+	"\u2714 *\"menu\"* \u2011 вызов меню\n\n" +
+	"нажми *\"Дальше\"* чтобы узнать более подробно о каждой команде и функционале"
+
+const NOTES_COMMAND_INFO_PAGE_CONTENT = "" +
+	" Команда *\"notes\"* или проще говоря записки \n\n" +
+	"Ты можешь *сохранять удалять редактированить просмотривать записки* \n\n" +
+	"Если вдруг надо что то сохранить смело пользуйся"
+
+const PROFILE_COMMAND_INFO_PAGE_CONTENT = "" +
+	"Команда *\"profile\"* это все что касается твоего профиля \n\n" +
+	"*Там хранится информация о твоем пользователе *\n\n" +
+	"Увы но сейчас доступен только просмотр без редактирования"
+
+const MENU_COMMAND_INFO_PAGE_CONTENT = "" +
+	"Команда *\"menu\"* Это вызов контекстного меню \n\n"
+
+const END_TUTORIAL_MSG = "*Теперь ты знаешь что я умею и ты готов к работе*"
+const CLOSE_TEXT = "Закрыть"
+const NEXT_TEXT = "Дальше"
+const BACK_TEXT = "Назад"
+const DONE_TEXT = "Я все понял"
+const START_TEXT_ID = "start"
+const TO_BEGINNING_TEXT = "В начало"
+const SECOND_NODE_ID = "2"
+const THIRD_NODE_ID = "3"
+const FOURTH_NODE_ID = "4"
+const FIFTH_NODE_ID = "5"
+
 var (
-	data = []string{
-		"*1* Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-		"*2* Cras faucibus ipsum vel sodales tincidunt",
-		"*3* Nulla bibendum lacus vitae arcu rutrum, quis accumsan dolor auctor",
-		"*4* Morbi non mi nec nulla rutrum aliquet",
-		"*5* Curabitur quis leo facilisis, vulputate sem id, euismod mauris",
-		"*6* Sed condimentum tellus in diam dapibus, in euismod nisi ornare",
-		"*7* Quisque ut neque congue, blandit orci vitae, viverra mi",
-		"*8* Suspendisse porttitor erat in hendrerit pulvinar",
-		"*9* Suspendisse cursus arcu placerat auctor vehicula",
-		"*10* Phasellus tempus nisi a urna luctus aliquam",
-		"*11* Morbi volutpat tellus placerat molestie ultricies",
-		"*12* Nulla at est eu eros luctus eleifend ut nec lorem",
-		"*13* Praesent suscipit nibh vel nisl feugiat, et dignissim dolor feugiat",
-		"*14* Mauris nec tellus vitae dolor dictum malesuada eget eget felis",
-		"*15* Aenean non turpis eu tellus tristique faucibus vitae vitae nisi",
-		"*16* Sed id urna sit amet est bibendum pellentesque id dictum urna",
-		"*17* Etiam auctor velit quis enim blandit convallis",
-		"*18* Pellentesque ut augue eget est tempor dapibus",
-		"*19* In hendrerit enim et dignissim iaculis",
-		"*20* Etiam eu nibh dignissim, blandit lectus sit amet, euismod libero",
-		"*21* Pellentesque aliquam lorem a erat consectetur, ornare facilisis justo laoreet",
-		"*22* Vestibulum rhoncus leo mollis blandit vehicula",
-		"*23* Etiam maximus ante nec mi euismod, ac finibus arcu congue",
-		"*24* Nulla consectetur velit id turpis vehicula viverra",
-		"*25* Vivamus dignissim arcu vitae nisl dignissim maximus",
-		"*26* Sed euismod tellus sit amet suscipit vehicula",
-		"*27* Donec eu tortor pulvinar, vulputate diam sit amet, aliquam turpis",
-		"*28* Donec interdum risus bibendum aliquam venenatis",
-		"*29* Proin quis tellus in risus interdum iaculis vitae mattis ante",
-		"*30* Duis ac tortor ultrices, tempor enim id, auctor sem",
-		"*31* Nulla lacinia elit vel nunc aliquet, sit amet vulputate ligula dictum",
-		"*32* Phasellus semper nibh aliquet orci viverra aliquet",
-		"*33* Praesent id felis non purus fringilla placerat in at lacus",
-		"*34* Aenean id felis ut tellus fringilla egestas volutpat sed arcu",
-		"*35* Nunc varius magna in scelerisque commodo",
-		"*36* Nunc sed orci nec lacus sodales molestie in in metus",
-		"*37* Fusce a ipsum fermentum, egestas ex sit amet, ultricies libero",
-		"*38* Quisque ullamcorper orci vel ligula posuere iaculis",
-		"*39* Pellentesque non orci pellentesque felis consequat varius",
-		"*40* Maecenas id mauris scelerisque, elementum elit et, rutrum felis",
+	dialogNodes = []dialog.Node{
+		{ID: START_TEXT_ID, Text: FIRST_PAGE_CONTENT, Keyboard: [][]dialog.Button{{{Text: CLOSE_TEXT, NodeID: SECOND_NODE_ID}, {Text: NEXT_TEXT, NodeID: THIRD_NODE_ID}}}},
+		{ID: SECOND_NODE_ID, Text: END_TUTORIAL_MSG},
+		{ID: THIRD_NODE_ID, Text: NOTES_COMMAND_INFO_PAGE_CONTENT, Keyboard: [][]dialog.Button{{{Text: TO_BEGINNING_TEXT, NodeID: START_TEXT_ID}, {Text: NEXT_TEXT, NodeID: FOURTH_NODE_ID}}}},
+		{ID: FOURTH_NODE_ID, Text: PROFILE_COMMAND_INFO_PAGE_CONTENT, Keyboard: [][]dialog.Button{{{Text: BACK_TEXT, NodeID: THIRD_NODE_ID}}, {{Text: NEXT_TEXT, NodeID: FIFTH_NODE_ID}}}},
+		{ID: FIFTH_NODE_ID, Text: MENU_COMMAND_INFO_PAGE_CONTENT, Keyboard: [][]dialog.Button{{{Text: BACK_TEXT, NodeID: FOURTH_NODE_ID}}, {{Text: DONE_TEXT, NodeID: SECOND_NODE_ID}}}},
 	}
 )
 
 type TutorialCommandHandler struct {
 	Slider    components.Slider
 	Paginator components.Paginator
+	Dialog    components.DialogInline
 }
 
 func NewTutorialCommandHandler() *TutorialCommandHandler {
 	return &TutorialCommandHandler{
 		*components.NewSlider(),
 		*components.NewPaginator(),
+		*components.NewDialogInline(),
 	}
 }
 
@@ -71,44 +70,5 @@ func (c *TutorialCommandHandler) Init() []bot.Option {
 }
 
 func (c *TutorialCommandHandler) tutorialCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
-	//slides := []slider.Slide{
-	//	{
-	//		Text:  "*0\\. YouTube* is an American online video sharing and social media platform headquartered in San Bruno, California\\. It was launched on _February 14, 2005_, by *Steve Chen*, *Chad Hurley*, and *Jawed Karim*",
-	//		Photo: "https://images.unsplash.com/photo-1733725071146-5e4157a308da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxODY2Nzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MzgyMzA1MTZ8&ixlib=rb-4.0.3&q=80&w=1080",
-	//	},
-	//	{
-	//		Text:  "*1\\. VK* \\(short for its original name VKontakte; Russian: ВКонтакте, meaning InContact\\) is a Russian online social media and social networking service based in *Saint Petersburg*",
-	//		Photo: "https://images.unsplash.com/photo-1733725071146-5e4157a308da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxODY2Nzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MzgyMzA1MTZ8&ixlib=rb-4.0.3&q=80&w=1080",
-	//	},
-	//	{
-	//		Text:  "*2\\. Skype* is a proprietary telecommunications application operated by Skype Technologies, a division of *Microsoft*, best known for VoIP\\-based videotelephony, videoconferencing and voice calls",
-	//		Photo: "https://images.unsplash.com/photo-1733725071146-5e4157a308da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxODY2Nzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MzgyMzA1MTZ8&ixlib=rb-4.0.3&q=80&w=1080",
-	//	},
-	//	{
-	//		Text:  "*3\\. Reddit* \\(\\/ˈrɛdɪt\\/, stylized as reddit\\) is an American social news aggregation, web content rating, and discussion website",
-	//		Photo: "https://images.unsplash.com/photo-1733725071146-5e4157a308da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxODY2Nzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MzgyMzA1MTZ8&ixlib=rb-4.0.3&q=80&w=1080",
-	//	},
-	//	{
-	//		Text:  "*4\\. Twitter* is an American microblogging and social networking service on which users post and interact with messages known as *tweets*",
-	//		Photo: "https://images.unsplash.com/photo-1733725071146-5e4157a308da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxODY2Nzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MzgyMzA1MTZ8&ixlib=rb-4.0.3&q=80&w=1080",
-	//	},
-	//	{
-	//		Text:  "*5\\. Pinterest* is an image sharing and social media service designed to enable saving and discovery of information on the internet using images, and on a smaller scale, animated GIFs and videos, in the form of pinboards",
-	//		Photo: "https://images.unsplash.com/photo-1733725071146-5e4157a308da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxODY2Nzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MzgyMzA1MTZ8&ixlib=rb-4.0.3&q=80&w=1080",
-	//	},
-	//	{
-	//		Text:  "*6\\. Instagram* is an American photo and video sharing social networking service founded by *Kevin Systrom* and *Mike Krieger*\\. In April 2012, Facebook Inc\\. acquired the service for approximately *US$1 billion* in cash and stock",
-	//		Photo: "https://images.unsplash.com/photo-1733725071146-5e4157a308da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxODY2Nzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MzgyMzA1MTZ8&ixlib=rb-4.0.3&q=80&w=1080",
-	//	},
-	//	{
-	//		Text:  "*7\\. LinkedIn* is an American business and employment\\-oriented online service that operates via websites and mobile apps\\. Launched on May 5, 2003",
-	//		Photo: "https://images.unsplash.com/photo-1733725071146-5e4157a308da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxODY2Nzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MzgyMzA1MTZ8&ixlib=rb-4.0.3&q=80&w=1080",
-	//	},
-	//	{
-	//		Text:  "*8\\. Facebook* is an American online social media and social networking service owned by Meta Platforms\\. Founded in 2004 by *Mark Zuckerberg* with fellow Harvard College students and roommates *Eduardo Saverin*, *Andrew McCollum*, *Dustin Moskovitz*, and *Chris Hughes*",
-	//		Photo: "https://images.unsplash.com/photo-1733725071146-5e4157a308da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxODY2Nzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MzgyMzA1MTZ8&ixlib=rb-4.0.3&q=80&w=1080",
-	//	},
-	//}
-	//c.Slider.CreateAndRun(ctx, b, update, slides)
-	//c.Paginator.CreateAndRun(ctx, b, update, data, 1)
+	c.Dialog.CreateAndRun(dialogNodes, ctx, b, update)
 }

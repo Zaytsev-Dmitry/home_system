@@ -84,8 +84,8 @@ func (handler *RegisterUserCommandHandler) registerCallbackYes(ctx context.Conte
 	delete(tempUsers, cb.From.ID)
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: cb.Message.Message.Chat.ID,
-		Text: fmt.Sprintf("Добро пожаловать %s. \nТеперь тебе доступны следующие менюшки. "+
-			"И чтобы узнать о том что я умею. Просто нажми кнопку \"Помощь\" и следуй инструкциям", savedUser.Login),
+		Text: fmt.Sprintf("Добро пожаловать %s. \n "+
+			"Чтобы узнать о том что я умею. Просто введи команду \"/tutorial\" и следуй инструкциям. Сделай это прямо сейчас!", savedUser.Login),
 		ReplyMarkup: handler.buildMenuKeyboard(),
 	})
 
