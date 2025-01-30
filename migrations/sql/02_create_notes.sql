@@ -1,4 +1,3 @@
--- +goose Up
 CREATE TABLE notes (
                       id SERIAL PRIMARY KEY,
                       account_id integer,

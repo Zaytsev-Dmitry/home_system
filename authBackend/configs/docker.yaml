@@ -8,7 +8,7 @@ keycloak:
   serverGrantType: "client_credentials"
 
 database:
-  host: "localhost"
+  host: "postgresServer"
   user: "postgres"
   password: "root"
   dataBaseName: "auth"

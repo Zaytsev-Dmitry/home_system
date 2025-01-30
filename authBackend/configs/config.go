@@ -11,7 +11,6 @@ type AppConfig struct {
 		ServerGrantType string `yaml:"serverGrantType"`
 	}
 	Database struct {
-		Url          string `yaml:"url"`
 		Host         string `yaml:"host"`
 		Username     string `yaml:"user"`
 		Password     string `yaml:"password"`

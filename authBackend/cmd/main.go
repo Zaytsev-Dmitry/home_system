@@ -6,14 +6,11 @@ import (
 	"authServer/external"
 	authDaoPorts "authServer/internal/dao/impl"
 	authDaoInterface "authServer/internal/dao/interface"
-	"database/sql"
-	"embed"
 	"fmt"
 	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/pressly/goose/v3"
 	"gopkg.in/yaml.v3"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -29,6 +26,8 @@ func loadConfig(env string) *authConfig.AppConfig {
 		appProfile = fmt.Sprintf(appProfile, "dev")
 	case "test":
 		appProfile = fmt.Sprintf(appProfile, "test")
+	case "docker":
+		appProfile = fmt.Sprintf(appProfile, "docker")
 	}
 	log.Println(fmt.Sprintf("Run application in mode : %s", getenv))
 	f, err := os.Open(appProfile)
@@ -43,30 +42,6 @@ func loadConfig(env string) *authConfig.AppConfig {
 
 	}
 	return &cfg
-}
-
-//go:embed migrations/*.sql
-var embedMigrations embed.FS
-
-func migrateDB(config *authConfig.AppConfig) {
-	dataSourceName := fmt.Sprintf(
-		"postgres://%s:%s@%s:5432/%s?sslmode=disable",
-		config.Database.Username,
-		config.Database.Password,
-		config.Database.Host,
-		config.Database.DataBaseName,
-	)
-	db, err := sql.Open(config.Database.Dialect, dataSourceName)
-	if err != nil {
-		panic(err)
-	}
-	goose.SetBaseFS(embedMigrations)
-	if err := goose.SetDialect(config.Database.Dialect); err != nil {
-		panic(err)
-	}
-	if err := goose.Up(db, "migrations"); err != nil {
-		panic(err)
-	}
 }
 
 func initOrmPort(config *authConfig.AppConfig) *authDaoPorts.OrmAuthPort {
@@ -118,9 +93,6 @@ func main() {
 	fmt.Printf("%s!\n", startMessage)
 	//гружу конфиг
 	appConfig := loadConfig("MODE")
-
-	//мигрирую базу
-	migrateDB(appConfig)
 
 	//создаю нужный DAO на основе конфига
 	dao := createDAO(appConfig)

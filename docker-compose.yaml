@@ -1,13 +1,13 @@
 version: '3'
 services:
-  auth-server:
+  auth-backend:
     build:
       context: authBackend
       dockerfile: Dockerfile
     ports:
       - "8081:8081"
     environment:
-      MODE: dev
+      MODE: docker
     restart: unless-stopped
     depends_on:
       - keycloak
@@ -31,6 +31,7 @@ services:
       - keycloak
 
   postgres_server:
+    container_name: postgresServer
     restart: always
     image: postgres:14
     environment:
@@ -38,7 +39,7 @@ services:
       POSTGRES_PASSWORD: root
       POSTGRES_DB: auth
     ports:
-      - '5432:5432'
+      - "5432:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 1s

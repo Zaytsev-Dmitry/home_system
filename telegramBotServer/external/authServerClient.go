@@ -3,6 +3,7 @@ package external
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"telegramCLient/external/dto"
 	"telegramCLient/util"
@@ -20,7 +21,10 @@ func NewAuthServerClient(authServerUrl string) *AuthServerClient {
 
 // TODO отловаить ошибки
 func (serverClient *AuthServerClient) RegisterUser(source dto.CreateAccountRequest) dto.AccountDTO {
-	response, _ := post(source, serverClient.AuthServerUrl+"/account")
+	response, err := post(source, serverClient.AuthServerUrl+"/account")
+	if err != nil {
+		fmt.Println(err)
+	}
 	var respDto dto.AccountResponse
 	util.ParseResponseToStruct(response, &respDto)
 	return dto.AccountDTO{
