@@ -11,6 +11,7 @@ import (
 const (
 	START_HANDLER    string = "StartCommandHandler"
 	REGISTER_HANDLER string = "RegisterCommandHandler"
+	TUTORIAL_HANDLER string = "TutorialCommandHandler"
 )
 
 type HandlerCreater struct {
@@ -38,6 +39,11 @@ func (h *HandlerCreater) CreateHandlers() []bot.Option {
 		case REGISTER_HANDLER:
 			{
 				result = append(result, command.NewRegisterUserCommandHandler(h.Config.AuthServerUrl, h.tempMessageCollection).Init()...)
+			}
+
+		case TUTORIAL_HANDLER:
+			{
+				result = append(result, command.NewTutorialCommandHandler().Init()...)
 			}
 		}
 	}
