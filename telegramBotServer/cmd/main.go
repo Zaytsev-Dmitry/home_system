@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	_ "embed"
 	"fmt"
 	"github.com/go-telegram/bot"
 	"gopkg.in/yaml.v3"
