@@ -86,7 +86,8 @@ func (handler *RegisterUserCommandHandler) registerCallbackYes(b *gotgbot.Bot, c
 		})
 	b.SendMessage(
 		cb.Message.GetChat().Id,
-		fmt.Sprintf("Добро пожаловать %s. \nТеперь тебе доступны следующие менюшки", savedUser.Login),
+		fmt.Sprintf("Добро пожаловать %s. \nТеперь тебе доступны следующие менюшки. "+
+			"И чтобы узнать о том что я умею. Просто нажми кнопку \"Помощь\" и следуй инструкциям", savedUser.Login),
 		&gotgbot.SendMessageOpts{
 			ReplyMarkup: util.CreateMenuKeyboard(),
 		})

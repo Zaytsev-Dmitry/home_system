@@ -31,7 +31,7 @@ func (handler *StartCommandHandler) GetName() string {
 func (handler *StartCommandHandler) start(b *gotgbot.Bot, ctx *ext.Context) error {
 	message, _ := b.SendMessage(
 		ctx.Message.Chat.Id,
-		"Супер теперь надо зарегаться",
+		"Привет!Прежде чем начать работу мне необходима твоя почта! Нажми кнопку \"Вперед\" чтобы продолжить",
 		&gotgbot.SendMessageOpts{
 			ReplyMarkup: gotgbot.InlineKeyboardMarkup{
 				InlineKeyboard: [][]gotgbot.InlineKeyboardButton{{

@@ -4,7 +4,7 @@
  - oapi-codegen -package=generatedApi -generate "types,spec,gin" authServer/api/docs/auth-server-api.yml > authServer/api/docs/auth-server-api.gen.go
 
 TODO:
-1) Убрать gorm и написать свой клиент используя (https://github.com/jackc/pgx или https://github.com/jmoiron/sqlx) - DONE
+1) Убрать в authBackend gorm и написать свой клиент используя (https://github.com/jackc/pgx или https://github.com/jmoiron/sqlx) - DONE
 2) Допилить клиент для свагера
 3) Создать проект для миграций и отдельно запускать его в докере
 4) Вынос общего кода в отдельную либу (возможно стоит вынести все yml файлы и кодогенерацию)
@@ -23,3 +23,4 @@ TODO:
 9) удаление всех старых сообщений после того как пользак апрувнул регистрацию - DONE
 10) вынести весь утилитный класс в библиотеку
 11) Удалить /start после того как пользак апрувнул инфу
+12) Добавить обучалку после регистрации пользака (слайдер - https://github.com/go-telegram/ui/blob/main/slider/readme.md)
