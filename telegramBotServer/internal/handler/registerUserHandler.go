@@ -40,10 +40,6 @@ func (handler *RegisterUserCommandHandler) Init(dispatcher *ext.Dispatcher) {
 	dispatcher.AddHandler(handlers.NewCallback(callbackquery.Equal("register_callback_no"), handler.registerCallbackNo))
 }
 
-func (handler *RegisterUserCommandHandler) GetName() string {
-	return "RegisterCommandHandler"
-}
-
 // TODO отловаить ошибки
 func (handler *RegisterUserCommandHandler) register(b *gotgbot.Bot, ctx *ext.Context) error {
 	userID := ctx.Message.From.Id

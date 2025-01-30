@@ -23,10 +23,6 @@ func (handler *StartCommandHandler) Init(dispatcher *ext.Dispatcher) {
 	dispatcher.AddHandler(handlers.NewCallback(callbackquery.Equal("start_callback"), handler.startCB))
 }
 
-func (handler *StartCommandHandler) GetName() string {
-	return "StartCommandHandler"
-}
-
 // TODO отловить ошибки
 func (handler *StartCommandHandler) start(b *gotgbot.Bot, ctx *ext.Context) error {
 	handler.tempMessageCollection[ctx.Message.GetChat().Id] = append([]int64{}, ctx.Message.MessageId)
