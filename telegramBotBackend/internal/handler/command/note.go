@@ -82,14 +82,7 @@ func (h *NoteCommandHandler) deleteNoteCallback(ctx context.Context, b *bot.Bot,
 }
 
 func (h *NoteCommandHandler) showAllNoteCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
-	buttons := make([]models.InlineKeyboardButton, 1)
-	buttons = append(buttons, models.InlineKeyboardButton{
-		Text: "Открыть меню 📄", CallbackData: "open_menu",
-	})
-	opts := []components.Option{
-		components.WithCloseButton("Закрыть"),
-	}
-	components.NewPaginator(b, fakeData, 2, opts...).CreateAndRun(ctx, b, update, buttons)
+	components.NewPaginator().CreateAndRun(ctx, b, update, fakeData, 5, "Закрыть ❌")
 }
 
 func (h *NoteCommandHandler) showNoteByNameCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
