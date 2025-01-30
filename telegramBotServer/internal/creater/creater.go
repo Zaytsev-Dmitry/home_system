@@ -1,4 +1,4 @@
-package handler
+package creater
 
 import (
 	"fmt"
@@ -26,10 +26,10 @@ func CreateHandlerStarter(conf *config.AppConfig, tempMessage map[int64][]int) *
 }
 
 // TODO отловаить ошибки
-func (h *HandlerCreater) Create() []bot.Option {
+func (h *HandlerCreater) CreateHandlers() []bot.Option {
 	var result = []bot.Option{}
 	for i, value := range h.Config.HandlersToInit {
-		log.Println(fmt.Sprintf("Create handler : %s. With order: %x", value, i+1))
+		log.Println(fmt.Sprintf("CreateHandlers handler : %s. With order: %x", value, i+1))
 		switch value {
 		case START_HANDLER:
 			{

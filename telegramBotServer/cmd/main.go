@@ -9,7 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"telegramCLient/config"
-	"telegramCLient/internal/handler"
+	"telegramCLient/internal/creater"
 )
 
 // ______________________________________________________________________
@@ -19,7 +19,7 @@ func main() {
 	ctx, cancel := getContext()
 	defer cancel()
 
-	opts := handler.CreateHandlerStarter(appConfig, make(map[int64][]int)).Create()
+	opts := creater.CreateHandlerStarter(appConfig, make(map[int64][]int)).CreateHandlers()
 	createAndStartBot(ctx, appConfig, opts)
 }
 
