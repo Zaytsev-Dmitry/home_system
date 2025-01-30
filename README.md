@@ -31,3 +31,4 @@ TODO:
 17) сделать меню для /profile - DONE
 18) Написать свой пагинатор
 19) Написать компонент. Регистрация
+20) b.UnregisterHandler(p.callbackHandlerID) ненужных 

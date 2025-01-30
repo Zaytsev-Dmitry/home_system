@@ -37,15 +37,11 @@ var (
 )
 
 type TutorialCommandHandler struct {
-	Slider    components.Slider
-	Paginator components.Paginator
-	Dialog    components.DialogInline
+	Dialog components.DialogInline
 }
 
 func NewTutorialCommandHandler() *TutorialCommandHandler {
 	return &TutorialCommandHandler{
-		*components.NewSlider(),
-		*components.NewPaginator(),
 		*components.NewDialogInline(),
 	}
 }
