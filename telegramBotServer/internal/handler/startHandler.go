@@ -29,6 +29,7 @@ func (handler *StartCommandHandler) GetName() string {
 
 // TODO отловить ошибки
 func (handler *StartCommandHandler) start(b *gotgbot.Bot, ctx *ext.Context) error {
+	handler.tempMessageCollection[ctx.Message.GetChat().Id] = append([]int64{}, ctx.Message.MessageId)
 	message, _ := b.SendMessage(
 		ctx.Message.Chat.Id,
 		"Привет!Прежде чем начать работу мне необходима твоя почта! Нажми кнопку \"Вперед\" чтобы продолжить",
@@ -39,19 +40,14 @@ func (handler *StartCommandHandler) start(b *gotgbot.Bot, ctx *ext.Context) erro
 				}},
 			},
 		})
-	tempMsgSlice := handler.tempMessageCollection[message.Chat.Id]
-	if len(tempMsgSlice) == 0 {
-		handler.tempMessageCollection[message.Chat.Id] = append([]int64{}, message.MessageId)
-	} else {
-		handler.tempMessageCollection[message.Chat.Id] = append(handler.tempMessageCollection[message.Chat.Id], message.MessageId)
-	}
+	handler.tempMessageCollection[message.Chat.Id] = append(handler.tempMessageCollection[message.Chat.Id], message.MessageId)
 
 	return nil
 }
 
 func (handler *StartCommandHandler) startCB(b *gotgbot.Bot, ctx *ext.Context) error {
 	cb := ctx.Update.CallbackQuery
-	message, err2 := b.SendMessage(cb.Message.GetChat().Id, "Для работы мне нужен твой email. Напиши его мне", nil)
+	message, err2 := b.SendMessage(cb.Message.GetChat().Id, "Отправь мне свой email", nil)
 	if err2 != nil {
 		return fmt.Errorf("failed to startCB: %w", err2)
 	}
