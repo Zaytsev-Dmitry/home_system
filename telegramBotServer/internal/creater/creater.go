@@ -12,6 +12,7 @@ const (
 	START_HANDLER    string = "StartCommandHandler"
 	REGISTER_HANDLER string = "RegisterCommandHandler"
 	TUTORIAL_HANDLER string = "TutorialCommandHandler"
+	MENU_HANDLER     string = "MenuCommandHandler"
 )
 
 type HandlerCreater struct {
@@ -44,6 +45,10 @@ func (h *HandlerCreater) CreateHandlers() []bot.Option {
 		case TUTORIAL_HANDLER:
 			{
 				result = append(result, command.NewTutorialCommandHandler().Init()...)
+			}
+		case MENU_HANDLER:
+			{
+				result = append(result, command.NewMenuCommandHandler().Init()...)
 			}
 		}
 	}

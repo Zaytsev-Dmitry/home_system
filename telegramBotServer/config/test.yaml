@@ -1,1 +1,2 @@
 botToken: "8193938957:AAEh3-Yu8h0TPCri1HBpm6VfEa2ewqugQBQ"
+handlersToInit: [ StartCommandHandler, RegisterCommandHandler , TutorialCommandHandler, MenuCommandHandler]

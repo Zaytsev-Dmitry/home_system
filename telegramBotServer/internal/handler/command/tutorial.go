@@ -12,6 +12,7 @@ const FIRST_PAGE_CONTENT = "*На данный момент есть неско�
 	"\u2714 *\"notes\"* \u2011 записки\n\n" +
 	"\u2714 *\"profile\"* \u2011 информация о твоем аккаунте\n\n" +
 	"\u2714 *\"menu\"* \u2011 вызов меню\n\n" +
+	"\u2714 *\"expense accounting\"* \u2011 учет совместных расходов\n\n" +
 	"нажми *\"Дальше\"* чтобы узнать более подробно о каждой команде и функционале"
 
 const NOTES_COMMAND_INFO_PAGE_CONTENT = "" +
@@ -27,6 +28,9 @@ const PROFILE_COMMAND_INFO_PAGE_CONTENT = "" +
 const MENU_COMMAND_INFO_PAGE_CONTENT = "" +
 	"Команда *\"menu\"* Это вызов контекстного меню \n\n"
 
+const EXPENSE_ACCOUNTING__INFO_PAGE_CONTENT = "" +
+	"Команда *\"expense accounting\"* Рано радуешься я еще не сделал это говно \n\n"
+
 const END_TUTORIAL_MSG = "*Теперь ты знаешь что я умею и ты готов к работе*"
 const CLOSE_TEXT = "Закрыть"
 const NEXT_TEXT = "Дальше"
@@ -38,6 +42,7 @@ const SECOND_NODE_ID = "2"
 const THIRD_NODE_ID = "3"
 const FOURTH_NODE_ID = "4"
 const FIFTH_NODE_ID = "5"
+const SIX_NODE_ID = "6"
 
 var (
 	dialogNodes = []dialog.Node{
@@ -45,7 +50,8 @@ var (
 		{ID: SECOND_NODE_ID, Text: END_TUTORIAL_MSG},
 		{ID: THIRD_NODE_ID, Text: NOTES_COMMAND_INFO_PAGE_CONTENT, Keyboard: [][]dialog.Button{{{Text: TO_BEGINNING_TEXT, NodeID: START_TEXT_ID}, {Text: NEXT_TEXT, NodeID: FOURTH_NODE_ID}}}},
 		{ID: FOURTH_NODE_ID, Text: PROFILE_COMMAND_INFO_PAGE_CONTENT, Keyboard: [][]dialog.Button{{{Text: BACK_TEXT, NodeID: THIRD_NODE_ID}}, {{Text: NEXT_TEXT, NodeID: FIFTH_NODE_ID}}}},
-		{ID: FIFTH_NODE_ID, Text: MENU_COMMAND_INFO_PAGE_CONTENT, Keyboard: [][]dialog.Button{{{Text: BACK_TEXT, NodeID: FOURTH_NODE_ID}}, {{Text: DONE_TEXT, NodeID: SECOND_NODE_ID}}}},
+		{ID: FIFTH_NODE_ID, Text: MENU_COMMAND_INFO_PAGE_CONTENT, Keyboard: [][]dialog.Button{{{Text: BACK_TEXT, NodeID: FOURTH_NODE_ID}}, {{Text: NEXT_TEXT, NodeID: SIX_NODE_ID}}}},
+		{ID: SIX_NODE_ID, Text: EXPENSE_ACCOUNTING__INFO_PAGE_CONTENT, Keyboard: [][]dialog.Button{{{Text: BACK_TEXT, NodeID: FIFTH_NODE_ID}}, {{Text: DONE_TEXT, NodeID: SECOND_NODE_ID}}}},
 	}
 )
 
