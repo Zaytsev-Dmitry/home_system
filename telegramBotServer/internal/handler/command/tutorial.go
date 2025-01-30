@@ -7,6 +7,7 @@ import (
 	"github.com/go-telegram/bot/models"
 	"github.com/go-telegram/ui/dialog"
 	"telegramCLient/internal/components"
+	"telegramCLient/internal/handler/loader"
 )
 
 const (
@@ -25,28 +26,13 @@ const (
 )
 
 var (
-	//go:embed tutorial_start_text.txt
-	startText string
-
-	//go:embed note_command_desc_text.txt
-	noteCommandDescText string
-
-	//go:embed profile_command_desc_text.txt
-	profileCommandDescText string
-
-	//go:embed menu_command_desc_text.txt
-	menuCommandDescText string
-
-	//go:embed expense_accounting_command_desc_text.txt
-	expenseAccCommandDescText string
-
 	dialogNodes = []dialog.Node{
-		{ID: START_TEXT_ID, Text: startText, Keyboard: [][]dialog.Button{{{Text: CLOSE_TEXT, NodeID: SECOND_NODE_ID}, {Text: NEXT_TEXT, NodeID: THIRD_NODE_ID}}}},
+		{ID: START_TEXT_ID, Text: loader.StartText, Keyboard: [][]dialog.Button{{{Text: CLOSE_TEXT, NodeID: SECOND_NODE_ID}, {Text: NEXT_TEXT, NodeID: THIRD_NODE_ID}}}},
 		{ID: SECOND_NODE_ID, Text: END_TUTORIAL_MSG},
-		{ID: THIRD_NODE_ID, Text: noteCommandDescText, Keyboard: [][]dialog.Button{{{Text: TO_BEGINNING_TEXT, NodeID: START_TEXT_ID}, {Text: NEXT_TEXT, NodeID: FOURTH_NODE_ID}}}},
-		{ID: FOURTH_NODE_ID, Text: profileCommandDescText, Keyboard: [][]dialog.Button{{{Text: BACK_TEXT, NodeID: THIRD_NODE_ID}}, {{Text: NEXT_TEXT, NodeID: FIFTH_NODE_ID}}}},
-		{ID: FIFTH_NODE_ID, Text: menuCommandDescText, Keyboard: [][]dialog.Button{{{Text: BACK_TEXT, NodeID: FOURTH_NODE_ID}}, {{Text: NEXT_TEXT, NodeID: SIX_NODE_ID}}}},
-		{ID: SIX_NODE_ID, Text: expenseAccCommandDescText, Keyboard: [][]dialog.Button{{{Text: BACK_TEXT, NodeID: FIFTH_NODE_ID}}, {{Text: DONE_TEXT, NodeID: SECOND_NODE_ID}}}},
+		{ID: THIRD_NODE_ID, Text: loader.NoteCommandDescText, Keyboard: [][]dialog.Button{{{Text: TO_BEGINNING_TEXT, NodeID: START_TEXT_ID}, {Text: NEXT_TEXT, NodeID: FOURTH_NODE_ID}}}},
+		{ID: FOURTH_NODE_ID, Text: loader.ProfileCommandDescText, Keyboard: [][]dialog.Button{{{Text: BACK_TEXT, NodeID: THIRD_NODE_ID}}, {{Text: NEXT_TEXT, NodeID: FIFTH_NODE_ID}}}},
+		{ID: FIFTH_NODE_ID, Text: loader.MenuCommandDescText, Keyboard: [][]dialog.Button{{{Text: BACK_TEXT, NodeID: FOURTH_NODE_ID}}, {{Text: NEXT_TEXT, NodeID: SIX_NODE_ID}}}},
+		{ID: SIX_NODE_ID, Text: loader.ExpenseAccCommandDescText, Keyboard: [][]dialog.Button{{{Text: BACK_TEXT, NodeID: FIFTH_NODE_ID}}, {{Text: DONE_TEXT, NodeID: SECOND_NODE_ID}}}},
 	}
 )
 
