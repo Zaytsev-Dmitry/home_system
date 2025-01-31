@@ -40,7 +40,7 @@ func (handler *MenuCommandHandler) buildMenuKeyboard() models.ReplyMarkup {
 		InlineKeyboard: [][]models.InlineKeyboardButton{
 			{
 				{Text: "Записки 📅", CallbackData: "open_notes"},
-				{Text: "Профиль 🤖", CallbackData: "/profile"},
+				{Text: "Профиль 🤖", CallbackData: "open_profile"},
 			},
 			{
 				{Text: "Учет совместных расходов 💸", CallbackData: "/expense_accounting"},

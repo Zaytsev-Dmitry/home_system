@@ -14,9 +14,9 @@ type RegisterUserCommandHandler struct {
 	tempMessageCollection map[int64][]int
 }
 
-func NewRegisterUserCommandHandler(authUrl string, tempMsgColl map[int64][]int) *RegisterUserCommandHandler {
+func NewRegisterUserCommandHandler(authServerClient *external.AuthServerClient, tempMsgColl map[int64][]int) *RegisterUserCommandHandler {
 	return &RegisterUserCommandHandler{
-		AuthServerClient:      *external.NewAuthServerClient(authUrl),
+		AuthServerClient:      *authServerClient,
 		tempMessageCollection: tempMsgColl,
 	}
 }

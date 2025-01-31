@@ -19,7 +19,10 @@ func main() {
 	appConfig := loadConfig("MODE")
 	ctx, cancel := getContext()
 	defer cancel()
-	opts := creater.CreateHandlerStarter(appConfig, make(map[int64][]int)).CreateHandlers(external.NewNoteBackendClient(appConfig.NoteBackendUrl))
+	opts := creater.CreateHandlerStarter(appConfig, make(map[int64][]int)).CreateHandlers(
+		external.NewNoteBackendClient(appConfig.NoteBackendUrl),
+		external.NewAuthServerClient(appConfig.AuthServerUrl),
+	)
 	createAndStartBot(ctx, appConfig, opts)
 }
 

@@ -17,4 +17,7 @@ var (
 
 	//go:embed files/expense_accounting_command_desc_text.txt
 	ExpenseAccCommandDescText string
+
+	//go:embed files/profile_text_info.txt
+	ProfileInfoDescText string
 )

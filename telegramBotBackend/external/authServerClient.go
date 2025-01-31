@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"net/http"
+	"strconv"
 	"telegramCLient/external/dto"
 	"telegramCLient/util"
 )
@@ -35,9 +37,26 @@ func (serverClient *AuthServerClient) RegisterUser(source dto.CreateAccountReque
 	}
 }
 
+// TODO отловаить ошибки
+func (serverClient *AuthServerClient) GetProfileByTelegramId(tgId int) authSpec.ProfileResponse {
+	response, err := get(serverClient.AuthServerUrl + "/profile/" + strconv.Itoa(tgId))
+	if err != nil {
+		fmt.Println(err)
+	}
+	var respDto authSpec.ProfileResponse
+	util.ParseResponseToStruct(response, &respDto)
+	return respDto
+}
+
 func post(body any, url string) (*http.Response, error) {
 	marshal, _ := json.Marshal(body)
 	req, _ := http.NewRequest("POST", url, bytes.NewReader(marshal))
+	req.Header.Add("Accept", "application/json")
+	return client.Do(req)
+}
+
+func get(url string) (*http.Response, error) {
+	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("Accept", "application/json")
 	return client.Do(req)
 }

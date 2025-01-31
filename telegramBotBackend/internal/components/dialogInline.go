@@ -16,5 +16,12 @@ func NewDialogInline() *DialogInline {
 
 func (*DialogInline) CreateAndRun(dialogNodes []dialog.Node, ctx context.Context, b *bot.Bot, update *models.Update) {
 	p := dialog.New(b, dialogNodes, dialog.Inline())
-	p.Show(ctx, b, update.Message.Chat.ID, "start")
+
+	var chatId int64
+	if update.Message != nil {
+		chatId = update.Message.Chat.ID
+	} else {
+		chatId = update.CallbackQuery.Message.Message.Chat.ID
+	}
+	p.Show(ctx, b, chatId, "start")
 }

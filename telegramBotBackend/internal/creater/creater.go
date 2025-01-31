@@ -31,7 +31,7 @@ func CreateHandlerStarter(conf *config.AppConfig, tempMessage map[int64][]int) *
 }
 
 // TODO отловаить ошибки
-func (h *HandlerCreater) CreateHandlers(noteBackClient *external.NoteBackendClient) []bot.Option {
+func (h *HandlerCreater) CreateHandlers(noteBackClient *external.NoteBackendClient, authServerClient *external.AuthServerClient) []bot.Option {
 	var result = []bot.Option{}
 	for i, value := range h.Config.HandlersToInit {
 		log.Println(fmt.Sprintf("CreateHandlers handler : %s. With order: %x", value, i+1))
@@ -42,7 +42,7 @@ func (h *HandlerCreater) CreateHandlers(noteBackClient *external.NoteBackendClie
 			}
 		case REGISTER_HANDLER:
 			{
-				result = append(result, command.NewRegisterUserCommandHandler(h.Config.AuthServerUrl, h.tempMessageCollection).Init()...)
+				result = append(result, command.NewRegisterUserCommandHandler(authServerClient, h.tempMessageCollection).Init()...)
 			}
 
 		case TUTORIAL_HANDLER:
@@ -60,7 +60,7 @@ func (h *HandlerCreater) CreateHandlers(noteBackClient *external.NoteBackendClie
 
 		case PROFILE_HANDLER:
 			{
-				result = append(result, command.NewProfileCommandHandler().Init()...)
+				result = append(result, command.NewProfileCommandHandler(authServerClient).Init()...)
 			}
 		}
 	}
