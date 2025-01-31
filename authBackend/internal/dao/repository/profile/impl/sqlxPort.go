@@ -8,7 +8,7 @@ import (
 
 const (
 	INSERT           = "insert into profile (account_id, role, telegram_username) values($1, $2, $3) RETURNING id, account_id, role, telegram_username"
-	SELECT_BY_ACC_ID = "select * from profile where account_id=($1)"
+	SELECT_BY_ACC_ID = "select * from profile where account_id=($1) limit 1"
 )
 
 type SqlxProfilePort struct {
@@ -30,7 +30,7 @@ func (p *SqlxProfilePort) CreateProfile(account authServerDomain.Account, tgUser
 
 func (p *SqlxProfilePort) GetProfileByAccountId(accId int64) authServerDomain.Profile {
 	var resp authServerDomain.Profile
-	err := p.Db.Select(&resp, SELECT_BY_ACC_ID, accId)
+	err := p.Db.Get(&resp, SELECT_BY_ACC_ID, accId)
 	if err != nil {
 		//TODO кинуть ошибку и потом создать базовый профиль
 		fmt.Println(err)

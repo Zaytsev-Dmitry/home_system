@@ -15,6 +15,10 @@ func (port *OrmAuthPort) Save(entity authServerDomain.Account) authServerDomain.
 	return entity
 }
 
+func (port *OrmAuthPort) GetIdByTgId(tgId int64) int64 {
+	panic("implement me")
+}
+
 func (port *OrmAuthPort) CloseConnection() {
 	dbInstance, _ := port.Db.DB()
 	dbInstance.Close()

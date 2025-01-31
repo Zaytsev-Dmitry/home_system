@@ -12,23 +12,23 @@ const (
 	WEB authSpec.CreateAccountRequestAccountType = "WEB"
 )
 
-type RegisterAccountUseCase struct {
+type AccountUseCase struct {
 	Keycloak       *keycloak.KeycloakClient
 	Repo           account.AccountRepository
 	ProfileUsecase ProfileUseCase
 }
 
-func (register *RegisterAccountUseCase) Register(request authSpec.CreateAccountRequest) (result domain.Account, err error) {
+func (usecase *AccountUseCase) Register(request authSpec.CreateAccountRequest) (result domain.Account, err error) {
 	switch *request.AccountType {
 	case WEB:
 		{
-			errKeycloak := register.Keycloak.RegisterAccount(request)
+			errKeycloak := usecase.Keycloak.RegisterAccount(request)
 			if errKeycloak != nil {
 				return domain.Account{}, errKeycloak
 			}
 		}
 	}
-	saved := register.Repo.Save(
+	saved := usecase.Repo.Save(
 		domain.Account{
 			FirstName:  request.FirstName,
 			LastName:   request.LastName,
@@ -38,6 +38,10 @@ func (register *RegisterAccountUseCase) Register(request authSpec.CreateAccountR
 			IsActive:   true,
 		},
 	)
-	register.ProfileUsecase.Create(saved, *request.TelegramUsername)
+	usecase.ProfileUsecase.Create(saved, *request.TelegramUsername)
 	return saved, nil
+}
+
+func (usecase *AccountUseCase) GetAccountIdByTgId(tgId int64) (accId int64) {
+	return usecase.Repo.GetIdByTgId(tgId)
 }

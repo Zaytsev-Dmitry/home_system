@@ -1,4 +1,4 @@
-package authServerPresenter
+package account
 
 import (
 	domain "authServer/internal/domain"

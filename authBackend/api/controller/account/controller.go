@@ -1,7 +1,7 @@
-package noteControllers
+package account
 
 import (
-	presenter "authServer/api/presenter"
+	presenter "authServer/api/presenter/account"
 	"authServer/external"
 	daoImpl "authServer/internal/dao"
 	useCases "authServer/internal/usecases"
@@ -12,7 +12,7 @@ import (
 )
 
 type AccountController struct {
-	RegisterUseCase *useCases.RegisterAccountUseCase
+	RegisterUseCase *useCases.AccountUseCase
 	presenter       *presenter.Presenter
 }
 
@@ -32,7 +32,7 @@ func (controller *AccountController) RegisterAccount(context *gin.Context) {
 
 func Create(keycloakClient external.KeycloakClient, dao daoImpl.AuthDao) *AccountController {
 	return &AccountController{
-		RegisterUseCase: &useCases.RegisterAccountUseCase{
+		RegisterUseCase: &useCases.AccountUseCase{
 			Keycloak:       &keycloakClient,
 			Repo:           dao.AccountRepo,
 			ProfileUsecase: useCases.ProfileUseCase{Repo: dao.ProfileRepo},
