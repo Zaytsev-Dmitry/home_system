@@ -33,8 +33,9 @@ func (controller *AccountController) RegisterAccount(context *gin.Context) {
 func Create(keycloakClient external.KeycloakClient, dao daoImpl.AuthDao) *AccountController {
 	return &AccountController{
 		RegisterUseCase: &useCases.RegisterAccountUseCase{
-			Keycloak: &keycloakClient,
-			Repo:     dao.AccountRepo,
+			Keycloak:       &keycloakClient,
+			Repo:           dao.AccountRepo,
+			ProfileUsecase: useCases.ProfileUseCase{Repo: dao.ProfileRepo},
 		},
 		presenter: &presenter.Presenter{},
 	}

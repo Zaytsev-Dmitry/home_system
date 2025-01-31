@@ -26,7 +26,7 @@ func NewKeycloakUserCreateRequest(request authSpec.CreateAccountRequest) *Keyclo
 	}
 	return &KeycloakUserCreateRequest{
 		Enabled:     true,
-		Username:    *request.Login,
+		Username:    *request.TelegramUsername,
 		Email:       *request.Email,
 		FirstName:   *request.FirstName,
 		LastName:    *request.LastName,

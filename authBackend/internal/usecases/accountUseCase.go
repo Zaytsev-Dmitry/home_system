@@ -13,8 +13,9 @@ const (
 )
 
 type RegisterAccountUseCase struct {
-	Keycloak *keycloak.KeycloakClient
-	Repo     account.AccountRepository
+	Keycloak       *keycloak.KeycloakClient
+	Repo           account.AccountRepository
+	ProfileUsecase ProfileUseCase
 }
 
 func (register *RegisterAccountUseCase) Register(request authSpec.CreateAccountRequest) (result domain.Account, err error) {
@@ -27,13 +28,16 @@ func (register *RegisterAccountUseCase) Register(request authSpec.CreateAccountR
 			}
 		}
 	}
-	return register.Repo.Save(
+	saved := register.Repo.Save(
 		domain.Account{
 			FirstName:  request.FirstName,
 			LastName:   request.LastName,
 			Email:      *request.Email,
 			Type:       string(*request.AccountType),
 			TelegramId: *request.TelegramId,
+			IsActive:   true,
 		},
-	), nil
+	)
+	register.ProfileUsecase.Create(saved, *request.TelegramUsername)
+	return saved, nil
 }

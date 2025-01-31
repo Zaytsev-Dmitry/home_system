@@ -12,6 +12,11 @@ type AuthServerApi struct {
 	controller *accountController.AccountController
 }
 
+func (api *AuthServerApi) GetProfileByTgId(c *gin.Context, telegramId int) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (api *AuthServerApi) RegisterAccount(context *gin.Context) {
 	api.controller.RegisterAccount(context)
 }
@@ -26,5 +31,7 @@ func NewAuthServerApi(config *authConfig.AppConfig, dao daoImpl.AuthDao) *AuthSe
 		ClientSecret:    config.Keycloak.ClientSecret,
 		ServerGrantType: config.Keycloak.ServerGrantType,
 	}
-	return &AuthServerApi{controller: accountController.Create(keycloak, dao)}
+	return &AuthServerApi{
+		controller: accountController.Create(keycloak, dao),
+	}
 }

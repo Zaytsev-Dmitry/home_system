@@ -5,7 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-const INSERT_ACCOUNT = "insert into accounts (first_name, last_name, email, type, telegram_id) values($1, $2, $3, $4, $5, $6) RETURNING id, first_name, last_name, login, email, type"
+const INSERT_ACCOUNT = "insert into accounts (first_name, last_name, email, type, telegram_id) values($1, $2, $3, $4, $5) RETURNING id, first_name, last_name, email, type"
 
 type SqlxAccountPort struct {
 	Db *sqlx.DB
