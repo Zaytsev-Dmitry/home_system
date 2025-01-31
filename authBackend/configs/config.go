@@ -18,4 +18,8 @@ type AppConfig struct {
 		Dialect      string `yaml:"dialect"`
 		Impl         string `yaml:"impl"`
 	} `yaml:"database"`
+	Server struct {
+		Name string `yaml:"name"`
+		Port int    `yaml:"port"`
+	} `yaml:"server"`
 }

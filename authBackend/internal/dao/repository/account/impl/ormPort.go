@@ -1,4 +1,4 @@
-package authDaoPorts
+package impl
 
 import (
 	authServerDomain "authServer/internal/domain"

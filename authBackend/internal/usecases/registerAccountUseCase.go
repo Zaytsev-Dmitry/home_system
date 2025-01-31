@@ -2,7 +2,7 @@ package usecases
 
 import (
 	keycloak "authServer/external"
-	authDaoInterface "authServer/internal/dao/interface"
+	"authServer/internal/dao/repository/account"
 	domain "authServer/internal/domain"
 	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 )
@@ -14,7 +14,7 @@ const (
 
 type RegisterAccountUseCase struct {
 	Keycloak *keycloak.KeycloakClient
-	Dao      authDaoInterface.AuthDao
+	Repo     account.AccountRepository
 }
 
 func (register *RegisterAccountUseCase) Register(request authSpec.CreateAccountRequest) (result domain.Account, err error) {
@@ -27,14 +27,13 @@ func (register *RegisterAccountUseCase) Register(request authSpec.CreateAccountR
 			}
 		}
 	}
-	return register.Dao.Save(
+	return register.Repo.Save(
 		domain.Account{
 			FirstName:  request.FirstName,
 			LastName:   request.LastName,
-			Email:      request.Email,
-			Login:      *request.Login,
+			Email:      *request.Email,
 			Type:       string(*request.AccountType),
-			TelegramId: request.TelegramId,
+			TelegramId: *request.TelegramId,
 		},
 	), nil
 }

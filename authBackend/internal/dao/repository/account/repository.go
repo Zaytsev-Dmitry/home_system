@@ -1,8 +1,8 @@
-package authDaoInterface
+package account
 
 import authServerDomain "authServer/internal/domain"
 
-type AuthDao interface {
+type AccountRepository interface {
 	Save(entity authServerDomain.Account) authServerDomain.Account
 	CloseConnection()
 }

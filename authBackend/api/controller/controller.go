@@ -3,7 +3,7 @@ package noteControllers
 import (
 	presenter "authServer/api/presenter"
 	"authServer/external"
-	authDaoInterface "authServer/internal/dao/interface"
+	daoImpl "authServer/internal/dao"
 	useCases "authServer/internal/usecases"
 	"authServer/pkg/utilities"
 	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
@@ -30,11 +30,11 @@ func (controller *AccountController) RegisterAccount(context *gin.Context) {
 	)
 }
 
-func Create(keycloakClient external.KeycloakClient, dao authDaoInterface.AuthDao) *AccountController {
+func Create(keycloakClient external.KeycloakClient, dao daoImpl.AuthDao) *AccountController {
 	return &AccountController{
 		RegisterUseCase: &useCases.RegisterAccountUseCase{
 			Keycloak: &keycloakClient,
-			Dao:      dao,
+			Repo:     dao.AccountRepo,
 		},
 		presenter: &presenter.Presenter{},
 	}

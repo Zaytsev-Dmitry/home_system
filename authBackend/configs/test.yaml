@@ -15,3 +15,7 @@ database:
   dataBaseName: "auth"
   dialect: "postgres"
   impl: "sqlx"
+
+server:
+  name: "auth backend server"
+  port: 8081
