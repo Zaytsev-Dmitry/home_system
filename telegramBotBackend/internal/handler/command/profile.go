@@ -73,6 +73,7 @@ func (h *ProfileCommandHandler) buildKeyboard() models.ReplyMarkup {
 		InlineKeyboard: [][]models.InlineKeyboardButton{
 			{
 				{Text: "Закрыть ❌", CallbackData: "close_profile"},
+				{Text: "Вызов меню 🤙", CallbackData: "open_menu"},
 			},
 		},
 	}
