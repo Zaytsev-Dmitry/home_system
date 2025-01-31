@@ -4,6 +4,7 @@ import (
 	"fmt"
 	noteSpec "github.com/Zaytsev-Dmitry/home_system_open_api/noteServerBackend"
 	"github.com/gin-gonic/gin"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"gopkg.in/yaml.v3"
 	"gorm.io/driver/postgres"
@@ -61,7 +62,20 @@ func initAPI(dao noteInterface.NoteDao) (router *gin.Engine, serverInterface not
 	return gin.Default(), noteHandler.NewNoteBackendApi(dao)
 }
 
-func initPostgresPort(config *noteConfig.AppConfig) *noteDaoPorts.PostgresNotePort {
+func createDAO(config *noteConfig.AppConfig) noteInterface.NoteDao {
+	var dao noteInterface.NoteDao
+	if config.Database.Impl == "sqlx" {
+		dao = initSqlxPort(config)
+	} else if config.Database.Impl == "orm" {
+		dao = initOrmPort(config)
+	} else {
+		//dao = initInMemoryPort()
+	}
+
+	return dao
+}
+
+func initOrmPort(config *noteConfig.AppConfig) *noteDaoPorts.OrmNotePort {
 	dbURL := fmt.Sprintf(
 		"postgres://%s:%s@%s:5432/%s",
 		config.Database.Username,
@@ -70,15 +84,31 @@ func initPostgresPort(config *noteConfig.AppConfig) *noteDaoPorts.PostgresNotePo
 		config.Database.DataBaseName,
 	)
 	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
+	dbInstance, _ := db.DB()
+	_ = dbInstance.Close()
 	if err != nil {
 		panic(err)
 	}
-	return noteDaoPorts.CreatePostgresNotePort(db)
+	return noteDaoPorts.CreateOrmNotePort(db)
 }
 
-func createDAO(config *noteConfig.AppConfig) noteInterface.NoteDao {
-	port := initPostgresPort(config)
-	var dao noteInterface.NoteDao
-	dao = port
-	return dao
+func initSqlxPort(config *noteConfig.AppConfig) *noteDaoPorts.SqlxAuthPort {
+	dbURL := fmt.Sprintf(
+		"postgres://%s:%s@%s:5432/%s?sslmode=disable",
+		config.Database.Username,
+		config.Database.Password,
+		config.Database.Host,
+		config.Database.DataBaseName,
+	)
+
+	db, err := sqlx.Connect("postgres", dbURL)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
+	}
+	return noteDaoPorts.CreateSqlxAuthPort(db)
+}
+
+func initInMemoryPort() *noteDaoPorts.InMemoryPort {
+	return noteDaoPorts.NewInMemoryPort()
 }

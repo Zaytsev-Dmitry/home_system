@@ -9,6 +9,6 @@ type GetNoteUseCase struct {
 	DAO noteInterface.NoteDao
 }
 
-func (byId *GetNoteUseCase) GetNoteByAccountId(id int) []noteDomain.TelegramAccount {
+func (byId *GetNoteUseCase) GetNoteByAccountId(id int) []noteDomain.Note {
 	return byId.DAO.GetNotesByAccountId(id)
 }

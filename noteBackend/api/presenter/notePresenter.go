@@ -26,14 +26,19 @@ func (presenter *Presenter) ToEntity(requestEntity *noteSpec.CreateNoteRequest) 
 	}
 }
 
-func (presenter *Presenter) ToListNoteResponse(entities []noteDomain.TelegramAccount) []noteSpec.NoteResponse {
+func (presenter *Presenter) ToListNoteResponse(entities []noteDomain.Note) noteSpec.NoteResponseList {
 	var result = make([]noteSpec.NoteResponse, len(entities))
 	for i, value := range entities {
 		var response = noteSpec.NoteResponse{
-			Link: value.Link,
-			Name: &value.Name,
+			AccountId:   &value.AccountId,
+			Link:        value.Link,
+			Name:        &value.Name,
+			Description: value.Description,
 		}
 		result[i] = response
 	}
-	return result
+
+	return noteSpec.NoteResponseList{
+		Objects: &result,
+	}
 }

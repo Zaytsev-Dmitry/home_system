@@ -5,17 +5,17 @@ import (
 	noteDomain "noteBackendApp/internal/domain"
 )
 
-type InMemoryNoteRepository struct {
+type InMemoryPort struct {
 	Notes map[int]noteDomain.TelegramAccount
 }
 
-func NewInMemoryNoteRepository() *InMemoryNoteRepository {
-	return &InMemoryNoteRepository{
+func NewInMemoryPort() *InMemoryPort {
+	return &InMemoryPort{
 		Notes: make(map[int]noteDomain.TelegramAccount),
 	}
 }
 
-func (db *InMemoryNoteRepository) Save(toSave noteDomain.TelegramAccount) noteDomain.TelegramAccount {
+func (db *InMemoryPort) Save(toSave noteDomain.TelegramAccount) noteDomain.TelegramAccount {
 	notes := db.Notes
 	if _, found := db.Notes[toSave.AccountId]; !found {
 		notes[toSave.AccountId] = toSave
@@ -26,7 +26,7 @@ func (db *InMemoryNoteRepository) Save(toSave noteDomain.TelegramAccount) noteDo
 }
 
 // TODO добавить логирование
-func (db *InMemoryNoteRepository) GetNoteByAccountId(id int) (noteDomain.TelegramAccount, error) {
+func (db *InMemoryPort) GetNoteByAccountId(id int) (noteDomain.TelegramAccount, error) {
 	notes := db.Notes
 	if obj, found := notes[id]; found {
 		return obj, nil
@@ -38,7 +38,7 @@ func (db *InMemoryNoteRepository) GetNoteByAccountId(id int) (noteDomain.Telegra
 }
 
 // TODO добавить логирование
-func (db *InMemoryNoteRepository) DeleteNoteByAccountId(id int) {
+func (db *InMemoryPort) DeleteNoteByAccountId(id int) {
 	notes := db.Notes
 	if obj, found := notes[id]; found {
 		delete(notes, obj.AccountId)

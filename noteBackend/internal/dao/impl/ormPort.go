@@ -7,26 +7,26 @@ import (
 	noteDomain "noteBackendApp/internal/domain"
 )
 
-type PostgresNotePort struct {
+type OrmNotePort struct {
 	db *gorm.DB
 }
 
-func (port *PostgresNotePort) Save(entity noteDomain.TelegramAccount) noteDomain.TelegramAccount {
+func (port *OrmNotePort) Save(entity noteDomain.TelegramAccount) noteDomain.TelegramAccount {
 	port.db.Clauses(clause.Returning{}).Create(&entity)
 	return entity
 }
 
-func (port *PostgresNotePort) DeleteNotesByAccountId(accountId int) {
+func (port *OrmNotePort) DeleteNotesByAccountId(accountId int) {
 	port.db.Where("account_id = ?", accountId).Delete(&noteDomain.TelegramAccount{})
 }
 
-func (port *PostgresNotePort) GetNotesByAccountId(accountId int) []noteDomain.TelegramAccount {
-	var result []noteDomain.TelegramAccount
+func (port *OrmNotePort) GetNotesByAccountId(accountId int) []noteDomain.Note {
+	var result []noteDomain.Note
 	port.db.Where("account_id = ?", accountId).Find(&result)
 	return result
 }
 
-func (port *PostgresNotePort) ExistByName(name string) bool {
+func (port *OrmNotePort) ExistByName(name string) bool {
 	var exists bool
 	err := port.db.Model(&noteDomain.TelegramAccount{}).
 		Select("count(*) > 0").
@@ -40,12 +40,12 @@ func (port *PostgresNotePort) ExistByName(name string) bool {
 	return exists
 }
 
-func (port *PostgresNotePort) GetByName(name string) noteDomain.TelegramAccount {
+func (port *OrmNotePort) GetByName(name string) noteDomain.TelegramAccount {
 	var result noteDomain.TelegramAccount
 	port.db.Where("name = ?", name).Find(&result)
 	return result
 }
 
-func CreatePostgresNotePort(db *gorm.DB) *PostgresNotePort {
-	return &PostgresNotePort{db: db}
+func CreateOrmNotePort(db *gorm.DB) *OrmNotePort {
+	return &OrmNotePort{db: db}
 }
