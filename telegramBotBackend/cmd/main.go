@@ -10,17 +10,16 @@ import (
 	"os"
 	"os/signal"
 	"telegramCLient/config"
+	"telegramCLient/external"
 	"telegramCLient/internal/creater"
 )
 
 // ______________________________________________________________________
 func main() {
 	appConfig := loadConfig("MODE")
-
 	ctx, cancel := getContext()
 	defer cancel()
-
-	opts := creater.CreateHandlerStarter(appConfig, make(map[int64][]int)).CreateHandlers()
+	opts := creater.CreateHandlerStarter(appConfig, make(map[int64][]int)).CreateHandlers(external.NewNoteBackendClient(appConfig.NoteBackendUrl))
 	createAndStartBot(ctx, appConfig, opts)
 }
 

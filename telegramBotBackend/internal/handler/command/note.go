@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"telegramCLient/external"
 	"telegramCLient/internal/components"
 )
 
@@ -54,10 +55,13 @@ var (
 )
 
 type NoteCommandHandler struct {
+	noteBackClient *external.NoteBackendClient
 }
 
-func NewNoteCommandHandler() *NoteCommandHandler {
-	return &NoteCommandHandler{}
+func NewNoteCommandHandler(client *external.NoteBackendClient) *NoteCommandHandler {
+	return &NoteCommandHandler{
+		noteBackClient: client,
+	}
 }
 
 func (h *NoteCommandHandler) Init() []bot.Option {
@@ -82,6 +86,7 @@ func (h *NoteCommandHandler) deleteNoteCallback(ctx context.Context, b *bot.Bot,
 }
 
 func (h *NoteCommandHandler) showAllNoteCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
+	//data := h.noteBackClient.GetAllNotesByAccount(update.CallbackQuery.From.ID)
 	components.NewPaginator().CreateAndRun(ctx, b, update, fakeData, 5, "Закрыть ❌")
 }
 

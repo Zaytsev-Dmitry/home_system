@@ -5,6 +5,7 @@ import (
 	"github.com/go-telegram/bot"
 	"log"
 	"telegramCLient/config"
+	"telegramCLient/external"
 	"telegramCLient/internal/handler/command"
 )
 
@@ -30,7 +31,7 @@ func CreateHandlerStarter(conf *config.AppConfig, tempMessage map[int64][]int) *
 }
 
 // TODO отловаить ошибки
-func (h *HandlerCreater) CreateHandlers() []bot.Option {
+func (h *HandlerCreater) CreateHandlers(noteBackClient *external.NoteBackendClient) []bot.Option {
 	var result = []bot.Option{}
 	for i, value := range h.Config.HandlersToInit {
 		log.Println(fmt.Sprintf("CreateHandlers handler : %s. With order: %x", value, i+1))
@@ -54,7 +55,7 @@ func (h *HandlerCreater) CreateHandlers() []bot.Option {
 			}
 		case NOTE_HANDLER:
 			{
-				result = append(result, command.NewNoteCommandHandler().Init()...)
+				result = append(result, command.NewNoteCommandHandler(noteBackClient).Init()...)
 			}
 
 		case PROFILE_HANDLER:
