@@ -17,11 +17,11 @@ type KeycloakClient struct {
 	ServerGrantType string
 }
 
-func (client KeycloakClient) RegisterAccount(request authSpec.CreateAccountRequest) (error, domain.Account) {
-	var result domain.Account
+func (client KeycloakClient) RegisterAccount(request authSpec.CreateAccountRequest) (error, domain.KeycloakEntity) {
+	var result domain.KeycloakEntity
 	serviceAccountToken, err := client.getToken()
 	if err != nil {
-		return errors.Join(Internal, errors.New("Wrap error: "+err.Error())), domain.Account{}
+		return errors.Join(Internal, errors.New("Wrap error: "+err.Error())), domain.KeycloakEntity{}
 	}
 	resp, err := utilities.PostWithBearerAuthorization(
 		serviceAccountToken.AccessToken,
@@ -29,12 +29,12 @@ func (client KeycloakClient) RegisterAccount(request authSpec.CreateAccountReque
 		client.KeycloakHost+"/admin/realms/"+client.KeycloakRealm+"/users",
 	)
 	if err != nil {
-		return errors.Join(Internal, errors.New("Wrap error: "+err.Error())), domain.Account{}
+		return errors.Join(Internal, errors.New("Wrap error: "+err.Error())), domain.KeycloakEntity{}
 	}
 
 	err = client.catchHttpStatus(resp)
 	if err != nil {
-		return err, domain.Account{}
+		return err, domain.KeycloakEntity{}
 	}
 
 	utilities.ParseResponseToStruct(resp, &result)

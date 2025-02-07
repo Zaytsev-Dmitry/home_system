@@ -28,14 +28,14 @@ func (port *SqlxAccountPort) Register(entity authServerDomain.Account) (authServ
 	var resultErr error
 
 	tx := port.Db.MustBegin()
-	resultErr = tx.Get(&result, SELECT_BY_TG_ID, int64(*entity.TelegramId))
-	resultErr = port.proceedSelectErrorsWithCallback(resultErr, tx)
-	if *result.TelegramId == 0 {
+	selErr := tx.Get(&result, SELECT_BY_TG_ID, int64(*entity.TelegramId))
+	resultErr = port.proceedSelectErrorsWithCallback(selErr, tx)
+	if result.TelegramId == nil && resultErr == nil {
 		resultErr = tx.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Email, entity.Type, entity.TelegramId).StructScan(&result)
 		resultErr = port.proceedInsertErrorsWithCallback(resultErr, tx)
 	}
 	resultErr = port.commitAndProceedErrors(tx, resultErr)
-	return entity, resultErr
+	return result, resultErr
 }
 
 func (port *SqlxAccountPort) Save(entity authServerDomain.Account) (authServerDomain.Account, error) {
