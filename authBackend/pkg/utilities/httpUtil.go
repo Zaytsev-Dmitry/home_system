@@ -47,6 +47,21 @@ func PostWithBearerAuthorization(token string, body any, url string) (*http.Resp
 	return do, err
 }
 
+func GetWithBearerAuthorization(token string, url string) (*http.Response, error) {
+	var err error
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		err = HttpCreateReqError
+	}
+	req.Header.Add("Authorization", "Bearer "+token)
+	req.Header.Add("Accept", "application/json")
+	do, err := client.Do(req)
+	if err != nil {
+		err = HttpDoRequestError
+	}
+	return do, err
+}
+
 func UrlencodedRequest(httpMethod string, urlStr string, data url.Values) (*http.Response, error) {
 	uri, err := url.ParseRequestURI(urlStr)
 	if err != nil {

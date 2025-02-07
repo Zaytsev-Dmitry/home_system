@@ -25,6 +25,15 @@ type KeycloakUserCreateRequest struct {
 	Credentials []Credentials `json:"credentials"`
 }
 
+type KeycloakEntity struct {
+	ID        string `json:"id"`
+	Username  string `json:"username"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Email     string `json:"email"`
+	Enabled   bool   `json:"enabled"`
+}
+
 type Credentials struct {
 	Type      string `json:"type"`
 	Value     string `json:"value"`

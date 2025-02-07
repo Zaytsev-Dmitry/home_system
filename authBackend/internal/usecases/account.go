@@ -24,7 +24,7 @@ type AccountUseCase struct {
 func (usecase *AccountUseCase) Register(request authSpec.CreateAccountRequest) (domain.Account, error, int) {
 	var status int
 	var respErr error
-	var keycloakEntity domain.KeycloakEntity
+	var keycloakEntity keycloak.KeycloakEntity
 
 	if *request.AccountType == WEB {
 		respErr, keycloakEntity = usecase.Keycloak.RegisterAccount(request)
@@ -32,7 +32,12 @@ func (usecase *AccountUseCase) Register(request authSpec.CreateAccountRequest) (
 			if errors.Is(respErr, keycloak.Conflict409) {
 				//пользак уже есть в keycloak и соответственно в базе
 				utilities.GetLogger().Warn(respErr.Error())
-				//TODO сходить в keycloak
+				user, getUserErr := usecase.Keycloak.GetUser(*request.Email)
+				keycloakEntity = user
+				if getUserErr != nil {
+					utilities.GetLogger().Error(respErr.Error())
+					status = http.StatusInternalServerError
+				}
 			} else {
 				utilities.GetLogger().Error(respErr.Error())
 				status = http.StatusInternalServerError
@@ -41,8 +46,8 @@ func (usecase *AccountUseCase) Register(request authSpec.CreateAccountRequest) (
 	}
 	saved, respErr := usecase.Repo.Register(
 		domain.Account{
-			FirstName:  keycloakEntity.FirstName,
-			LastName:   keycloakEntity.LastName,
+			FirstName:  &keycloakEntity.FirstName,
+			LastName:   &keycloakEntity.LastName,
 			Email:      keycloakEntity.Email,
 			Type:       string(*request.AccountType),
 			TelegramId: request.TelegramId,
