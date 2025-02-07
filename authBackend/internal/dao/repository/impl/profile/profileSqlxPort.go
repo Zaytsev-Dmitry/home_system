@@ -25,8 +25,10 @@ func (p *SqlxProfilePort) CreateProfile(account authServerDomain.Account, tgUser
 	var resultErr error
 
 	tx := p.Db.MustBegin()
-	insertErr := tx.QueryRowx(INSERT, account.ID, "USER", tgUsername).StructScan(&result)
-	resultErr = repository.ProceedInsertErrorsWithCallback(insertErr, tx)
+	if p.GetProfileByAccountId(int64(account.ID)).ID == 0 {
+		insertErr := tx.QueryRowx(INSERT, account.ID, "USER", tgUsername).StructScan(&result)
+		resultErr = repository.ProceedInsertErrorsWithCallback(insertErr, tx)
+	}
 	resultErr = repository.CommitAndProceedErrors(tx, resultErr)
 
 	return resultErr
