@@ -41,11 +41,6 @@ func CommitAndProceedErrors(tx *sqlx.Tx, resultErr error) error {
 		if commitErr != nil {
 			resultErr = errors.Join(CommitError, errors.New("Wrap error: "+commitErr.Error()))
 		}
-	} else {
-		rollbackErr := tx.Rollback()
-		if rollbackErr != nil {
-			resultErr = errors.Join(InsertError, errors.New("Wrap error_1: "+resultErr.Error()), errors.New("Wrap error_2: "+rollbackErr.Error()))
-		}
 	}
 	return resultErr
 }

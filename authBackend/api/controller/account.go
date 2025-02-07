@@ -22,9 +22,10 @@ func (controller *AccountController) RegisterAccount(context *gin.Context) {
 	if err != nil {
 		utilities.SetResponseError(context, status)
 	} else {
-		utilities.SetResponse(
+		utilities.SetResponseWithStatus(
 			controller.presenter.ToAccountResponse(entity),
 			context,
+			status,
 		)
 	}
 }

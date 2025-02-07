@@ -35,8 +35,6 @@ func (client KeycloakClient) RegisterAccount(request authSpec.CreateAccountReque
 	if err != nil {
 		return err, KeycloakEntity{}
 	}
-
-	utilities.ParseResponseToStruct(resp, &result)
 	defer resp.Body.Close()
 	return err, result
 }

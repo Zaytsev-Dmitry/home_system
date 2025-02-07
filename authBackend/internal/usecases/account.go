@@ -39,21 +39,13 @@ func (usecase *AccountUseCase) runBusinessLayout(request authSpec.CreateAccountR
 	var respErr error
 	respErr, keycloakEntity = usecase.getKeycloakUser(request)
 	if respErr == nil {
-		result, respErr = usecase.getAccount(request, keycloakEntity)
+		result, respErr = usecase.getAccount(keycloakEntity, *request.TelegramId)
 	}
 	return respErr, result
 }
 
-func (usecase *AccountUseCase) getAccount(request authSpec.CreateAccountRequest, keycloakEntity keycloak.KeycloakEntity) (domain.Account, error) {
-	saved, respErr := usecase.Repo.Register(
-		domain.Account{
-			FirstName:  &keycloakEntity.FirstName,
-			LastName:   &keycloakEntity.LastName,
-			Email:      keycloakEntity.Email,
-			TelegramId: request.TelegramId,
-			IsActive:   true,
-		},
-	)
+func (usecase *AccountUseCase) getAccount(keycloakEntity keycloak.KeycloakEntity, telegramId int) (domain.Account, error) {
+	saved, respErr := usecase.Repo.Register(keycloakEntity, telegramId)
 	return saved, respErr
 }
 
@@ -73,6 +65,8 @@ func (usecase *AccountUseCase) getKeycloakUser(request authSpec.CreateAccountReq
 		} else {
 			utilities.GetLogger().Error(err.Error())
 		}
+	} else {
+		keycloakEntity, err = usecase.Keycloak.GetUser(*request.Email)
 	}
 	return err, keycloakEntity
 }

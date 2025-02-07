@@ -1,6 +1,7 @@
 package account
 
 import (
+	"authServer/external/keycloak"
 	"authServer/internal/dao/repository"
 	"authServer/internal/dao/repository/intefraces"
 	authServerDomain "authServer/internal/domain"
@@ -10,7 +11,7 @@ import (
 )
 
 const (
-	INSERT_ACCOUNT     = "insert into accounts (first_name, last_name, email, type, telegram_id) values($1, $2, $3, $4, $5) RETURNING id, first_name, last_name, email, type"
+	INSERT_ACCOUNT     = "insert into accounts (first_name, last_name, username, email, telegram_id, keycloak_id, is_active) values($1, $2, $3, $4, $5, $6, $7) RETURNING id, first_name, last_name, username, email, telegram_id, keycloak_id, is_active"
 	SELECT_ID_BY_TG_ID = "select ac.id from accounts ac where ac.telegram_id = ($1) limit 1"
 	SELECT_BY_TG_ID    = "select ac.* from accounts ac where ac.telegram_id = ($1)"
 )
@@ -20,16 +21,15 @@ type SqlxAccountPort struct {
 	ProfileRepo intefraces.ProfileRepository
 }
 
-func (port *SqlxAccountPort) Register(entity authServerDomain.Account) (authServerDomain.Account, error) {
+func (port *SqlxAccountPort) Register(entity keycloak.KeycloakEntity, tgId int) (authServerDomain.Account, error) {
 	var result authServerDomain.Account
 	var resultErr error
 
 	tx := port.Db.MustBegin()
-	selErr := tx.Get(&result, SELECT_BY_TG_ID, int64(*entity.TelegramId))
-	resultErr = repository.ProceedSelectErrorsWithCallback(selErr, tx)
+	tx.Get(&result, SELECT_BY_TG_ID, int64(tgId))
 
-	if result.TelegramId == nil && resultErr == nil {
-		insertErr := tx.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Email, entity.Type, entity.TelegramId).StructScan(&result)
+	if result.ID == 0 {
+		insertErr := tx.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Username, entity.Email, tgId, entity.ID, true).StructScan(&result)
 		resultErr = repository.ProceedInsertErrorsWithCallback(insertErr, tx)
 	}
 	if resultErr == nil {
@@ -38,16 +38,6 @@ func (port *SqlxAccountPort) Register(entity authServerDomain.Account) (authServ
 
 	resultErr = repository.CommitAndProceedErrors(tx, resultErr)
 	return result, resultErr
-}
-
-func (port *SqlxAccountPort) Save(entity authServerDomain.Account) (authServerDomain.Account, error) {
-	var account authServerDomain.Account
-	var errResp error
-	insertErr := port.Db.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Email, entity.Type, entity.TelegramId).StructScan(&account)
-	if insertErr != nil {
-		errResp = errors.Join(repository.InsertError, errors.New("Wrap error: "+insertErr.Error()))
-	}
-	return account, errResp
 }
 
 func (port *SqlxAccountPort) GetIdByTgId(tgId int64) int64 {

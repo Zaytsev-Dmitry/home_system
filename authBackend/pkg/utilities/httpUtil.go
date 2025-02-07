@@ -101,6 +101,12 @@ func SetResponse(v any, context *gin.Context) {
 	json.NewEncoder(context.Writer).Encode(v)
 }
 
+func SetResponseWithStatus(v any, context *gin.Context, status int) {
+	context.Writer.Header().Set("Content-Type", "application/json")
+	context.Status(status)
+	json.NewEncoder(context.Writer).Encode(v)
+}
+
 func SetResponseError(context *gin.Context, status int) {
 	var responseError = getErrorDto("Oops...что то пошло не так", status, context)
 	context.Writer.Header().Set("Content-Type", "application/json")
