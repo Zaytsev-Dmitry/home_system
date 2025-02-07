@@ -17,11 +17,9 @@ type AccountUseCase struct {
 
 func (usecase *AccountUseCase) Register(request authSpec.CreateAccountRequest) (domain.Account, error, int) {
 	var status = http.StatusOK
-	var respErr error
-	var keycloakEntity keycloak.KeycloakEntity
 	var result domain.Account
 
-	respErr, result = usecase.runBusinessLayout(request, keycloakEntity)
+	result, respErr := usecase.runBusinessLayout(request)
 	status = usecase.getStatus(respErr, status)
 	return result, respErr, status
 }
@@ -34,19 +32,13 @@ func (usecase *AccountUseCase) getStatus(respErr error, status int) int {
 	return status
 }
 
-func (usecase *AccountUseCase) runBusinessLayout(request authSpec.CreateAccountRequest, keycloakEntity keycloak.KeycloakEntity) (error, domain.Account) {
+func (usecase *AccountUseCase) runBusinessLayout(request authSpec.CreateAccountRequest) (domain.Account, error) {
 	var result domain.Account
-	var respErr error
-	respErr, keycloakEntity = usecase.getKeycloakUser(request)
+	respErr, keycloakEntity := usecase.getKeycloakUser(request)
 	if respErr == nil {
-		result, respErr = usecase.getAccount(keycloakEntity, *request.TelegramId)
+		result, respErr = usecase.Repo.CreateAccountAndProfile(keycloakEntity, *request.TelegramId)
 	}
-	return respErr, result
-}
-
-func (usecase *AccountUseCase) getAccount(keycloakEntity keycloak.KeycloakEntity, telegramId int) (domain.Account, error) {
-	saved, respErr := usecase.Repo.Register(keycloakEntity, telegramId)
-	return saved, respErr
+	return result, respErr
 }
 
 func (usecase *AccountUseCase) getKeycloakUser(request authSpec.CreateAccountRequest) (error, keycloak.KeycloakEntity) {

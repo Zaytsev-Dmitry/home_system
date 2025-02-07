@@ -22,7 +22,7 @@ type SqlxAccountPort struct {
 	ProfileRepo intefraces.ProfileRepository
 }
 
-func (port *SqlxAccountPort) Register(entity keycloak.KeycloakEntity, tgId int) (authServerDomain.Account, error) {
+func (port *SqlxAccountPort) CreateAccountAndProfile(entity keycloak.KeycloakEntity, tgId int) (authServerDomain.Account, error) {
 	var result authServerDomain.Account
 	var resultErr error
 

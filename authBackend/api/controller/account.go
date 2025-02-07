@@ -11,14 +11,14 @@ import (
 )
 
 type AccountController struct {
-	RegisterUseCase *useCases.AccountUseCase
-	presenter       *presenter.AccountPresenter
+	AccountUseCase *useCases.AccountUseCase
+	presenter      *presenter.AccountPresenter
 }
 
 func (controller *AccountController) RegisterAccount(context *gin.Context) {
 	var requestEntity authSpec.CreateAccountRequest
 	utilities.CatchMarshallErr(context.BindJSON(&requestEntity), context)
-	entity, err, status := controller.RegisterUseCase.Register(requestEntity)
+	entity, err, status := controller.AccountUseCase.Register(requestEntity)
 	if err != nil {
 		utilities.SetResponseError(context, status)
 	} else {
@@ -32,7 +32,7 @@ func (controller *AccountController) RegisterAccount(context *gin.Context) {
 
 func CreateAccountController(keycloakClient keycloak.KeycloakClient, dao daoImpl.AuthDao) *AccountController {
 	return &AccountController{
-		RegisterUseCase: &useCases.AccountUseCase{
+		AccountUseCase: &useCases.AccountUseCase{
 			Keycloak: &keycloakClient,
 			Repo:     dao.AccountRepo,
 		},

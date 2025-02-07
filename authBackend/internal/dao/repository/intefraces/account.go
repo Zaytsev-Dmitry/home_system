@@ -6,7 +6,7 @@ import (
 )
 
 type AccountRepository interface {
-	Register(entity keycloak.KeycloakEntity, telegramId int) (authServerDomain.Account, error)
+	CreateAccountAndProfile(entity keycloak.KeycloakEntity, telegramId int) (authServerDomain.Account, error)
 	GetIdByTgId(tgId int64) int64
 	GetByTgId(tgId int64) (authServerDomain.Account, error)
 	CloseConnection()
