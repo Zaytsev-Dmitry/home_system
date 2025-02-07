@@ -15,6 +15,6 @@ func (presenter *ProfilePresenter) ToProfileResponse(entity domain.Profile) auth
 		AccountId:        &accId64,
 		Id:               &id64,
 		Role:             &entity.Role,
-		TelegramUsername: &entity.TelegramUsername,
+		TelegramUsername: &entity.Username,
 	}
 }

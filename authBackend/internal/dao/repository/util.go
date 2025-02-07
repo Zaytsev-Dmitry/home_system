@@ -11,28 +11,18 @@ var (
 	CommitError = errors.New("SqlxAccountPort.Tx commit error.")
 )
 
-func ProceedSelectErrorsWithCallback(err error, tx *sqlx.Tx) error {
-	var resultErr error
-	if err != nil {
-		resultErr = errors.Join(SelectError, errors.New("Wrap error: "+err.Error()))
+func RollbackTx(inErr error, tx *sqlx.Tx) {
+	if inErr != nil {
 		rollbackErr := tx.Rollback()
 		if rollbackErr != nil {
-			resultErr = errors.Join(SelectError, errors.New("Wrap error_1: "+err.Error()), errors.New("Wrap error_2: "+rollbackErr.Error()))
+			inErr = errors.Join(inErr, errors.New("Wrap error: "+rollbackErr.Error()))
 		}
 	}
-	return resultErr
 }
 
-func ProceedInsertErrorsWithCallback(err error, tx *sqlx.Tx) error {
-	var resultErr error
-	if err != nil {
-		resultErr = errors.Join(InsertError, errors.New("Wrap error: "+err.Error()))
-		rollbackErr := tx.Rollback()
-		if rollbackErr != nil {
-			resultErr = errors.Join(InsertError, errors.New("Wrap error_1: "+err.Error()), errors.New("Wrap error_2: "+rollbackErr.Error()))
-		}
-	}
-	return resultErr
+func ProceedErrorWithRollback(err error, tx *sqlx.Tx) error {
+	RollbackTx(err, tx)
+	return err
 }
 
 func CommitAndProceedErrors(tx *sqlx.Tx, resultErr error) error {
@@ -41,6 +31,8 @@ func CommitAndProceedErrors(tx *sqlx.Tx, resultErr error) error {
 		if commitErr != nil {
 			resultErr = errors.Join(CommitError, errors.New("Wrap error: "+commitErr.Error()))
 		}
+	} else {
+		RollbackTx(resultErr, tx)
 	}
 	return resultErr
 }

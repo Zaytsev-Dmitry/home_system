@@ -12,8 +12,9 @@ type Account struct {
 }
 
 type Profile struct {
-	ID               uint64 `db:"id"`
-	AccountId        uint64 `db:"account_id"`
-	Role             string `db:"role"`
-	TelegramUsername string `db:"telegram_username"`
+	ID        uint64 `db:"id"`
+	AccountId uint64 `db:"account_id"`
+	Role      string `db:"role"`
+	IsActive  bool   `db:"is_active"`
+	Username  string `db:"username"`
 }

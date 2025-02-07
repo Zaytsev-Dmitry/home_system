@@ -27,16 +27,15 @@ func (port *SqlxAccountPort) Register(entity keycloak.KeycloakEntity, tgId int) 
 
 	tx := port.Db.MustBegin()
 	tx.Get(&result, SELECT_BY_TG_ID, int64(tgId))
-
 	if result.ID == 0 {
-		insertErr := tx.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Username, entity.Email, tgId, entity.ID, true).StructScan(&result)
-		resultErr = repository.ProceedInsertErrorsWithCallback(insertErr, tx)
-	}
-	if resultErr == nil {
-		resultErr = port.ProfileRepo.CreateProfile(result, "")
+		err := tx.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Username, entity.Email, tgId, entity.ID, true).StructScan(&result)
+		resultErr = repository.ProceedErrorWithRollback(err, tx)
 	}
 
 	resultErr = repository.CommitAndProceedErrors(tx, resultErr)
+	if resultErr == nil {
+		resultErr = port.ProfileRepo.CreateProfile(result)
+	}
 	return result, resultErr
 }
 
@@ -63,6 +62,6 @@ func (port *SqlxAccountPort) CloseConnection() {
 	port.Db.Close()
 }
 
-func CreateSqlxAccountPort(db *sqlx.DB) *SqlxAccountPort {
-	return &SqlxAccountPort{Db: db}
+func CreateSqlxAccountPort(db *sqlx.DB, prof *intefraces.ProfileRepository) *SqlxAccountPort {
+	return &SqlxAccountPort{Db: db, ProfileRepo: *prof}
 }

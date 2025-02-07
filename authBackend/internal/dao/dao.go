@@ -29,8 +29,8 @@ func CreateDao(config authConfig.AppConfig) *AuthDao {
 func initRepos(acc *intefraces.AccountRepository, prof *intefraces.ProfileRepository, config *authConfig.AppConfig) {
 	if config.Database.Impl == "sqlx" {
 		db := initSqlxDB(config)
-		*acc = account.CreateSqlxAccountPort(db)
 		*prof = implAccount.CreateSqlxProfilePort(db)
+		*acc = account.CreateSqlxAccountPort(db, prof)
 	}
 }
 
