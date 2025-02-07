@@ -2,6 +2,7 @@ package account
 
 import (
 	authServerDomain "authServer/internal/domain"
+	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 )
@@ -9,26 +10,42 @@ import (
 const (
 	INSERT_ACCOUNT     = "insert into accounts (first_name, last_name, email, type, telegram_id) values($1, $2, $3, $4, $5) RETURNING id, first_name, last_name, email, type"
 	SELECT_ID_BY_TG_ID = "select ac.id from accounts ac where ac.telegram_id = ($1) limit 1"
+	SELECT_BY_TG_ID    = "select ac.* from accounts ac where ac.telegram_id = ($1)"
+)
+
+var (
+	SelectError = errors.New("SqlxAccountPort.Select error.")
+	InsertError = errors.New("SqlxAccountPort.Insert error.")
+	CommitError = errors.New("SqlxAccountPort.Tx commit error.")
 )
 
 type SqlxAccountPort struct {
 	Db *sqlx.DB
 }
 
-func (port *SqlxAccountPort) Save(entity authServerDomain.Account) (authServerDomain.Account, error) {
+func (port *SqlxAccountPort) Register(entity authServerDomain.Account) (authServerDomain.Account, error) {
+	var result authServerDomain.Account
+	var resultErr error
+
 	tx := port.Db.MustBegin()
+	resultErr = tx.Get(&result, SELECT_BY_TG_ID, int64(*entity.TelegramId))
+	resultErr = port.proceedSelectErrorsWithCallback(resultErr, tx)
+	if *result.TelegramId == 0 {
+		resultErr = tx.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Email, entity.Type, entity.TelegramId).StructScan(&result)
+		resultErr = port.proceedInsertErrorsWithCallback(resultErr, tx)
+	}
+	resultErr = port.commitAndProceedErrors(tx, resultErr)
+	return entity, resultErr
+}
+
+func (port *SqlxAccountPort) Save(entity authServerDomain.Account) (authServerDomain.Account, error) {
 	var account authServerDomain.Account
-	err := port.Db.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Email, entity.Type, entity.TelegramId).StructScan(&account)
-	if err != nil {
-		//TODO кинуть ошибку
-		tx.Rollback()
+	var errResp error
+	insertErr := port.Db.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Email, entity.Type, entity.TelegramId).StructScan(&account)
+	if insertErr != nil {
+		errResp = errors.Join(InsertError, errors.New("Wrap error: "+insertErr.Error()))
 	}
-	//TODO кинуть ошибку
-	err = tx.Commit()
-	if err != nil {
-		return authServerDomain.Account{}, nil
-	}
-	return account, nil
+	return account, errResp
 }
 
 func (port *SqlxAccountPort) GetIdByTgId(tgId int64) int64 {
@@ -39,6 +56,15 @@ func (port *SqlxAccountPort) GetIdByTgId(tgId int64) int64 {
 		fmt.Println(err)
 	}
 	return resp
+}
+func (port *SqlxAccountPort) GetByTgId(tgId int64) (authServerDomain.Account, error) {
+	var resp authServerDomain.Account
+	var errResp error
+	err := port.Db.Get(&resp, SELECT_BY_TG_ID, tgId)
+	if err != nil {
+		errResp = errors.Join(SelectError, errors.New("Wrap error: "+err.Error()))
+	}
+	return resp, errResp
 }
 
 func (port *SqlxAccountPort) CloseConnection() {

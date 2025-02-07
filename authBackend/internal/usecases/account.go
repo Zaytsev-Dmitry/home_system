@@ -23,12 +23,14 @@ type AccountUseCase struct {
 
 func (usecase *AccountUseCase) Register(request authSpec.CreateAccountRequest) (domain.Account, error, int) {
 	var status int
+	var respErr error
 	if *request.AccountType == WEB {
 		err, account := usecase.Keycloak.RegisterAccount(request)
 		if err != nil {
 			if errors.Is(err, keycloak.Conflict409) {
+				//пользак уже есть в keycloak и соответственно в базе
 				utilities.GetLogger().Warn(err.Error())
-				//todo select из базы
+				//TODO сходить в keycloak
 				return account, nil, http.StatusOK
 			} else {
 				utilities.GetLogger().Error(err.Error())
@@ -37,7 +39,7 @@ func (usecase *AccountUseCase) Register(request authSpec.CreateAccountRequest) (
 			return account, err, status
 		}
 	}
-	saved, err := usecase.Repo.Save(
+	saved, regUserErr := usecase.Repo.Register(
 		domain.Account{
 			FirstName:  request.FirstName,
 			LastName:   request.LastName,
@@ -47,11 +49,11 @@ func (usecase *AccountUseCase) Register(request authSpec.CreateAccountRequest) (
 			IsActive:   true,
 		},
 	)
-	if err != nil {
+	if regUserErr != nil {
 		status = http.StatusInternalServerError
 	}
 	usecase.ProfileUsecase.Create(saved, *request.TelegramUsername)
-	return saved, nil, http.StatusOK
+	return saved, respErr, status
 }
 
 func (usecase *AccountUseCase) GetAccountIdByTgId(tgId int64) (accId int64) {

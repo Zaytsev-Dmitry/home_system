@@ -10,6 +10,10 @@ type OrmAuthPort struct {
 	Db *gorm.DB
 }
 
+func (port *OrmAuthPort) Register(entity authServerDomain.Account) (authServerDomain.Account, error) {
+	panic("implement me")
+}
+
 func (port *OrmAuthPort) Save(entity authServerDomain.Account) (authServerDomain.Account, error) {
 	port.Db.Clauses(clause.Returning{}).Create(&entity)
 	return entity, nil
