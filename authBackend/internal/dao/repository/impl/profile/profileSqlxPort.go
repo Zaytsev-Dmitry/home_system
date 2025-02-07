@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	INSERT           = "insert into profile (account_id, role, is_active, username) values($1, $2, $3, $4) RETURNING id, account_id, role, is_active, username"
+	INSERT_PROFILE   = "insert into profile (account_id, role, is_active, username) values($1, $2, $3, $4) RETURNING id, account_id, role, is_active, username"
 	SELECT_BY_ACC_ID = "select * from profile where account_id=($1) limit 1"
 )
 
@@ -26,7 +26,7 @@ func (p *SqlxProfilePort) CreateProfile(account authServerDomain.Account) error 
 
 	tx := p.Db.MustBegin()
 	if p.GetProfileByAccountId(int64(account.ID)).ID == 0 {
-		insertErr := tx.QueryRowx(INSERT, account.ID, "USER", true, account.Username).StructScan(&result)
+		insertErr := tx.QueryRowx(INSERT_PROFILE, account.ID, "USER", true, account.Username).StructScan(&result)
 		resultErr = repository.ProceedErrorWithRollback(insertErr, tx)
 	}
 	resultErr = repository.CommitAndProceedErrors(tx, resultErr)

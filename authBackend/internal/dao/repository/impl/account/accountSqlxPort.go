@@ -3,6 +3,7 @@ package account
 import (
 	"authServer/external/keycloak"
 	"authServer/internal/dao/repository"
+	"authServer/internal/dao/repository/impl/profile"
 	"authServer/internal/dao/repository/intefraces"
 	authServerDomain "authServer/internal/domain"
 	"errors"
@@ -28,13 +29,9 @@ func (port *SqlxAccountPort) Register(entity keycloak.KeycloakEntity, tgId int) 
 	tx := port.Db.MustBegin()
 	tx.Get(&result, SELECT_BY_TG_ID, int64(tgId))
 	if result.ID == 0 {
-		err := tx.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Username, entity.Email, tgId, entity.ID, true).StructScan(&result)
-		resultErr = repository.ProceedErrorWithRollback(err, tx)
-	}
-
-	resultErr = repository.CommitAndProceedErrors(tx, resultErr)
-	if resultErr == nil {
-		resultErr = port.ProfileRepo.CreateProfile(result)
+		errInsertAcc := tx.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Username, entity.Email, tgId, entity.ID, true).StructScan(&result)
+		errInsertProf := tx.QueryRowx(profile.INSERT_PROFILE, result.ID, "USER", true, result.Username).Err()
+		resultErr = repository.CommitOrRollbackTx([]error{errInsertAcc, errInsertProf}, tx)
 	}
 	return result, resultErr
 }
