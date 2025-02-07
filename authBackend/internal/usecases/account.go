@@ -38,7 +38,7 @@ func (usecase *AccountUseCase) getStatus(respErr error, status int) int {
 func (usecase *AccountUseCase) runBusinessLayout(request authSpec.CreateAccountRequest, respErr error, keycloakEntity keycloak.KeycloakEntity, result domain.Account) (error, domain.Account) {
 	respErr, keycloakEntity = usecase.getKeycloakUser(request)
 	if respErr == nil {
-		result = usecase.getDaoEntity(request, respErr, keycloakEntity)
+		result, respErr = usecase.getDaoEntity(request, keycloakEntity)
 	}
 	if respErr == nil {
 		usecase.ProfileUsecase.Create(result, *request.TelegramUsername)
@@ -46,7 +46,7 @@ func (usecase *AccountUseCase) runBusinessLayout(request authSpec.CreateAccountR
 	return respErr, result
 }
 
-func (usecase *AccountUseCase) getDaoEntity(request authSpec.CreateAccountRequest, respErr error, keycloakEntity keycloak.KeycloakEntity) domain.Account {
+func (usecase *AccountUseCase) getDaoEntity(request authSpec.CreateAccountRequest, keycloakEntity keycloak.KeycloakEntity) (domain.Account, error) {
 	saved, respErr := usecase.Repo.Register(
 		domain.Account{
 			FirstName:  &keycloakEntity.FirstName,
@@ -56,7 +56,7 @@ func (usecase *AccountUseCase) getDaoEntity(request authSpec.CreateAccountReques
 			IsActive:   true,
 		},
 	)
-	return saved
+	return saved, respErr
 }
 
 func (usecase *AccountUseCase) getKeycloakUser(request authSpec.CreateAccountRequest) (error, keycloak.KeycloakEntity) {
