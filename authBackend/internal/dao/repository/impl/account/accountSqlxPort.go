@@ -29,8 +29,8 @@ func (port *SqlxAccountPort) Register(entity authServerDomain.Account) (authServ
 	resultErr = repository.ProceedSelectErrorsWithCallback(selErr, tx)
 
 	if result.TelegramId == nil && resultErr == nil {
-		resultErr = tx.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Email, entity.Type, entity.TelegramId).StructScan(&result)
-		resultErr = repository.ProceedInsertErrorsWithCallback(resultErr, tx)
+		insertErr := tx.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Email, entity.Type, entity.TelegramId).StructScan(&result)
+		resultErr = repository.ProceedInsertErrorsWithCallback(insertErr, tx)
 	}
 	if resultErr == nil {
 		resultErr = port.ProfileRepo.CreateProfile(result, "")
