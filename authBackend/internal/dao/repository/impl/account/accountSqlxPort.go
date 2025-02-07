@@ -1,4 +1,4 @@
-package impl
+package account
 
 import (
 	authServerDomain "authServer/internal/domain"
@@ -15,7 +15,7 @@ type SqlxAccountPort struct {
 	Db *sqlx.DB
 }
 
-func (port *SqlxAccountPort) Save(entity authServerDomain.Account) authServerDomain.Account {
+func (port *SqlxAccountPort) Save(entity authServerDomain.Account) (authServerDomain.Account, error) {
 	tx := port.Db.MustBegin()
 	var account authServerDomain.Account
 	err := port.Db.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Email, entity.Type, entity.TelegramId).StructScan(&account)
@@ -26,9 +26,9 @@ func (port *SqlxAccountPort) Save(entity authServerDomain.Account) authServerDom
 	//TODO кинуть ошибку
 	err = tx.Commit()
 	if err != nil {
-		return authServerDomain.Account{}
+		return authServerDomain.Account{}, nil
 	}
-	return account
+	return account, nil
 }
 
 func (port *SqlxAccountPort) GetIdByTgId(tgId int64) int64 {

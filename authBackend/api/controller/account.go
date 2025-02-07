@@ -1,42 +1,41 @@
-package account
+package controller
 
 import (
-	presenter "authServer/api/presenter/account"
-	"authServer/external"
+	"authServer/api/presenter"
+	"authServer/external/keycloak"
 	daoImpl "authServer/internal/dao"
 	useCases "authServer/internal/usecases"
 	"authServer/pkg/utilities"
 	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type AccountController struct {
 	RegisterUseCase *useCases.AccountUseCase
-	presenter       *presenter.Presenter
+	presenter       *presenter.AccountPresenter
 }
 
-// TODO надо отловить все кейсы keycloak
 func (controller *AccountController) RegisterAccount(context *gin.Context) {
 	var requestEntity authSpec.CreateAccountRequest
 	utilities.CatchMarshallErr(context.BindJSON(&requestEntity), context)
-	entity, err := controller.RegisterUseCase.Register(requestEntity)
+	entity, err, status := controller.RegisterUseCase.Register(requestEntity)
 	if err != nil {
-		utilities.SetResponseError(err, context, http.StatusInternalServerError)
+		utilities.SetResponseError(context, status)
+	} else {
+		utilities.SetResponse(
+			controller.presenter.ToAccountResponse(entity),
+			context,
+		)
 	}
-	utilities.SetResponse(
-		controller.presenter.ToAccountResponse(entity),
-		context,
-	)
 }
 
-func Create(keycloakClient external.KeycloakClient, dao daoImpl.AuthDao) *AccountController {
+func CreateAccountController(keycloakClient keycloak.KeycloakClient, dao daoImpl.AuthDao) *AccountController {
 	return &AccountController{
 		RegisterUseCase: &useCases.AccountUseCase{
 			Keycloak:       &keycloakClient,
 			Repo:           dao.AccountRepo,
 			ProfileUsecase: useCases.ProfileUseCase{Repo: dao.ProfileRepo},
 		},
-		presenter: &presenter.Presenter{},
+		presenter: &presenter.AccountPresenter{},
 	}
 }

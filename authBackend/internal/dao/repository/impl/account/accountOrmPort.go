@@ -1,4 +1,4 @@
-package impl
+package account
 
 import (
 	authServerDomain "authServer/internal/domain"
@@ -10,9 +10,9 @@ type OrmAuthPort struct {
 	Db *gorm.DB
 }
 
-func (port *OrmAuthPort) Save(entity authServerDomain.Account) authServerDomain.Account {
+func (port *OrmAuthPort) Save(entity authServerDomain.Account) (authServerDomain.Account, error) {
 	port.Db.Clauses(clause.Returning{}).Create(&entity)
-	return entity
+	return entity, nil
 }
 
 func (port *OrmAuthPort) GetIdByTgId(tgId int64) int64 {
@@ -24,6 +24,6 @@ func (port *OrmAuthPort) CloseConnection() {
 	dbInstance.Close()
 }
 
-func CreateOrmAuthPort(db *gorm.DB) *OrmAuthPort {
+func CreateOrmAccountPort(db *gorm.DB) *OrmAuthPort {
 	return &OrmAuthPort{Db: db}
 }

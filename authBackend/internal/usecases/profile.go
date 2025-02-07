@@ -1,12 +1,12 @@
 package usecases
 
 import (
-	"authServer/internal/dao/repository/profile"
+	"authServer/internal/dao/repository/intefraces"
 	domain "authServer/internal/domain"
 )
 
 type ProfileUseCase struct {
-	Repo profile.ProfileRepository
+	Repo intefraces.ProfileRepository
 }
 
 func (p *ProfileUseCase) Create(acc domain.Account, tgUsername string) {

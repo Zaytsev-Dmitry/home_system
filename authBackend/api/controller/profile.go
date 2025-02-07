@@ -1,7 +1,7 @@
-package profile
+package controller
 
 import (
-	"authServer/api/presenter/profile"
+	"authServer/api/presenter"
 	daoImpl "authServer/internal/dao"
 	useCases "authServer/internal/usecases"
 	"authServer/pkg/utilities"
@@ -11,14 +11,14 @@ import (
 type ProfileController struct {
 	ProfileUseCase *useCases.ProfileUseCase
 	AccountUseCase *useCases.AccountUseCase
-	Presenter      *profile.Presenter
+	Presenter      *presenter.ProfilePresenter
 }
 
-func Create(dao daoImpl.AuthDao) *ProfileController {
+func CreateProfileController(dao daoImpl.AuthDao) *ProfileController {
 	return &ProfileController{
 		ProfileUseCase: &useCases.ProfileUseCase{Repo: dao.ProfileRepo},
 		AccountUseCase: &useCases.AccountUseCase{Repo: dao.AccountRepo},
-		Presenter:      &profile.Presenter{},
+		Presenter:      &presenter.ProfilePresenter{},
 	}
 }
 

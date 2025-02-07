@@ -1,10 +1,10 @@
-package noteConfigs
+package configs
 
 type AppConfig struct {
 	Keycloak struct {
 		KeycloakUrl     string `yaml:"keycloakUrl"`
 		KeycloakHost    string `yaml:"keycloakHost"`
-		KeycloakRealm   string `yaml:"KeycloakRealm"`
+		KeycloakRealm   string `yaml:"keycloakRealm"`
 		TokenUrl        string `yaml:"tokenUrl"`
 		ClientId        string `yaml:"clientId"`
 		ClientSecret    string `yaml:"clientSecret"`

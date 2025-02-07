@@ -1,4 +1,4 @@
-package impl
+package profile
 
 import (
 	authServerDomain "authServer/internal/domain"
@@ -21,9 +21,14 @@ func CreateSqlxProfilePort(db *sqlx.DB) *SqlxProfilePort {
 
 func (p *SqlxProfilePort) CreateProfile(account authServerDomain.Account, tgUsername string) authServerDomain.Profile {
 	var result authServerDomain.Profile
-	err := p.Db.QueryRowx(INSERT, account.ID, "USER", tgUsername).StructScan(&result)
-	if err != nil {
-		//TODO кинуть ошибку
+	rowx := p.Db.QueryRowx(INSERT, account.ID, "USER", tgUsername)
+	if rowx.Err() != nil {
+
+	} else {
+		err := rowx.StructScan(&result)
+		if err != nil {
+			//TODO кинуть ошибку
+		}
 	}
 	return result
 }

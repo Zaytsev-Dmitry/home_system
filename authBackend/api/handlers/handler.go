@@ -1,17 +1,16 @@
-package noteHandlers
+package handlers
 
 import (
-	accountController "authServer/api/controller/account"
-	profileController "authServer/api/controller/profile"
+	accountController "authServer/api/controller"
 	authConfig "authServer/configs"
-	"authServer/external"
+	"authServer/external/keycloak"
 	daoImpl "authServer/internal/dao"
 	"github.com/gin-gonic/gin"
 )
 
 type AuthServerApi struct {
 	accController     *accountController.AccountController
-	profileController *profileController.ProfileController
+	profileController *accountController.ProfileController
 }
 
 func (api *AuthServerApi) GetProfileByTgId(c *gin.Context, telegramId int) {
@@ -23,7 +22,7 @@ func (api *AuthServerApi) RegisterAccount(context *gin.Context) {
 }
 
 func NewAuthServerApi(config *authConfig.AppConfig, dao daoImpl.AuthDao) *AuthServerApi {
-	keycloak := external.KeycloakClient{
+	keycloak := keycloak.KeycloakClient{
 		KeycloakUrl:     config.Keycloak.KeycloakUrl,
 		TokenUrl:        config.Keycloak.TokenUrl,
 		KeycloakHost:    config.Keycloak.KeycloakHost,
@@ -33,7 +32,7 @@ func NewAuthServerApi(config *authConfig.AppConfig, dao daoImpl.AuthDao) *AuthSe
 		ServerGrantType: config.Keycloak.ServerGrantType,
 	}
 	return &AuthServerApi{
-		accController:     accountController.Create(keycloak, dao),
-		profileController: profileController.Create(dao),
+		accController:     accountController.CreateAccountController(keycloak, dao),
+		profileController: accountController.CreateProfileController(dao),
 	}
 }

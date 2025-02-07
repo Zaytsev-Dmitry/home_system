@@ -6,7 +6,7 @@ type Account struct {
 	LastName   *string `db:"last_name"`
 	Email      string  `db:"email"`
 	Type       string  `db:"type"`
-	TelegramId int     `db:"telegram_id"`
+	TelegramId *int    `db:"telegram_id"`
 	IsActive   bool    `db:"is_active"`
 }
 

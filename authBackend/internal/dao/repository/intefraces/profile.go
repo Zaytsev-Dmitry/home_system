@@ -1,4 +1,4 @@
-package profile
+package intefraces
 
 import authServerDomain "authServer/internal/domain"
 
