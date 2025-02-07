@@ -9,8 +9,8 @@ type ProfileUseCase struct {
 	Repo intefraces.ProfileRepository
 }
 
-func (p *ProfileUseCase) Create(acc domain.Account, tgUsername string) {
-	p.Repo.CreateProfile(acc, tgUsername)
+func (p *ProfileUseCase) Create(acc domain.Account, tgUsername string) error {
+	return p.Repo.CreateProfile(acc, tgUsername)
 }
 
 func (p *ProfileUseCase) GetByTGId(accId int64) domain.Profile {

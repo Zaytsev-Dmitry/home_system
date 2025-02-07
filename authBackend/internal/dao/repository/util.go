@@ -1,11 +1,17 @@
-package account
+package repository
 
 import (
 	"errors"
 	"github.com/jmoiron/sqlx"
 )
 
-func (port *SqlxAccountPort) proceedSelectErrorsWithCallback(err error, tx *sqlx.Tx) error {
+var (
+	SelectError = errors.New("SqlxAccountPort.Select error.")
+	InsertError = errors.New("SqlxAccountPort.Insert error.")
+	CommitError = errors.New("SqlxAccountPort.Tx commit error.")
+)
+
+func ProceedSelectErrorsWithCallback(err error, tx *sqlx.Tx) error {
 	var resultErr error
 	if err != nil {
 		resultErr = errors.Join(SelectError, errors.New("Wrap error: "+err.Error()))
@@ -17,7 +23,7 @@ func (port *SqlxAccountPort) proceedSelectErrorsWithCallback(err error, tx *sqlx
 	return resultErr
 }
 
-func (port *SqlxAccountPort) proceedInsertErrorsWithCallback(err error, tx *sqlx.Tx) error {
+func ProceedInsertErrorsWithCallback(err error, tx *sqlx.Tx) error {
 	var resultErr error
 	if err != nil {
 		resultErr = errors.Join(InsertError, errors.New("Wrap error: "+err.Error()))
@@ -29,11 +35,16 @@ func (port *SqlxAccountPort) proceedInsertErrorsWithCallback(err error, tx *sqlx
 	return resultErr
 }
 
-func (port *SqlxAccountPort) commitAndProceedErrors(tx *sqlx.Tx, resultErr error) error {
+func CommitAndProceedErrors(tx *sqlx.Tx, resultErr error) error {
 	if resultErr == nil {
 		commitErr := tx.Commit()
 		if commitErr != nil {
 			resultErr = errors.Join(CommitError, errors.New("Wrap error: "+commitErr.Error()))
+		}
+	} else {
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			resultErr = errors.Join(InsertError, errors.New("Wrap error_1: "+resultErr.Error()), errors.New("Wrap error_2: "+rollbackErr.Error()))
 		}
 	}
 	return resultErr

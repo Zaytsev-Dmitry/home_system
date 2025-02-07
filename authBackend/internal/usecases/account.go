@@ -11,9 +11,8 @@ import (
 )
 
 type AccountUseCase struct {
-	Keycloak       *keycloak.KeycloakClient
-	Repo           intefraces.AccountRepository
-	ProfileUsecase ProfileUseCase
+	Keycloak *keycloak.KeycloakClient
+	Repo     intefraces.AccountRepository
 }
 
 func (usecase *AccountUseCase) Register(request authSpec.CreateAccountRequest) (domain.Account, error, int) {
@@ -22,7 +21,7 @@ func (usecase *AccountUseCase) Register(request authSpec.CreateAccountRequest) (
 	var keycloakEntity keycloak.KeycloakEntity
 	var result domain.Account
 
-	respErr, result = usecase.runBusinessLayout(request, respErr, keycloakEntity, result)
+	respErr, result = usecase.runBusinessLayout(request, keycloakEntity)
 	status = usecase.getStatus(respErr, status)
 	return result, respErr, status
 }
@@ -35,18 +34,17 @@ func (usecase *AccountUseCase) getStatus(respErr error, status int) int {
 	return status
 }
 
-func (usecase *AccountUseCase) runBusinessLayout(request authSpec.CreateAccountRequest, respErr error, keycloakEntity keycloak.KeycloakEntity, result domain.Account) (error, domain.Account) {
+func (usecase *AccountUseCase) runBusinessLayout(request authSpec.CreateAccountRequest, keycloakEntity keycloak.KeycloakEntity) (error, domain.Account) {
+	var result domain.Account
+	var respErr error
 	respErr, keycloakEntity = usecase.getKeycloakUser(request)
 	if respErr == nil {
-		result, respErr = usecase.getDaoEntity(request, keycloakEntity)
-	}
-	if respErr == nil {
-		usecase.ProfileUsecase.Create(result, *request.TelegramUsername)
+		result, respErr = usecase.getAccount(request, keycloakEntity)
 	}
 	return respErr, result
 }
 
-func (usecase *AccountUseCase) getDaoEntity(request authSpec.CreateAccountRequest, keycloakEntity keycloak.KeycloakEntity) (domain.Account, error) {
+func (usecase *AccountUseCase) getAccount(request authSpec.CreateAccountRequest, keycloakEntity keycloak.KeycloakEntity) (domain.Account, error) {
 	saved, respErr := usecase.Repo.Register(
 		domain.Account{
 			FirstName:  &keycloakEntity.FirstName,

@@ -1,6 +1,7 @@
 package profile
 
 import (
+	"authServer/internal/dao/repository"
 	authServerDomain "authServer/internal/domain"
 	"fmt"
 	"github.com/jmoiron/sqlx"
@@ -19,18 +20,16 @@ func CreateSqlxProfilePort(db *sqlx.DB) *SqlxProfilePort {
 	return &SqlxProfilePort{Db: db}
 }
 
-func (p *SqlxProfilePort) CreateProfile(account authServerDomain.Account, tgUsername string) authServerDomain.Profile {
+func (p *SqlxProfilePort) CreateProfile(account authServerDomain.Account, tgUsername string) error {
 	var result authServerDomain.Profile
-	rowx := p.Db.QueryRowx(INSERT, account.ID, "USER", tgUsername)
-	if rowx.Err() != nil {
+	var resultErr error
 
-	} else {
-		err := rowx.StructScan(&result)
-		if err != nil {
-			//TODO кинуть ошибку
-		}
-	}
-	return result
+	tx := p.Db.MustBegin()
+	insertErr := tx.QueryRowx(INSERT, account.ID, "USER", tgUsername).StructScan(&result)
+	resultErr = repository.ProceedInsertErrorsWithCallback(insertErr, tx)
+	resultErr = repository.CommitAndProceedErrors(tx, resultErr)
+
+	return resultErr
 }
 
 func (p *SqlxProfilePort) GetProfileByAccountId(accId int64) authServerDomain.Profile {
