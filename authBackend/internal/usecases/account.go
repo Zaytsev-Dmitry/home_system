@@ -20,8 +20,7 @@ func (usecase *AccountUseCase) Register(request authSpec.CreateAccountRequest) (
 	var result domain.Account
 
 	result, respErr := usecase.runBusinessLayout(request)
-	status = usecase.getStatus(respErr, status)
-	return result, respErr, status
+	return result, respErr, usecase.getStatus(respErr, status)
 }
 
 func (usecase *AccountUseCase) getStatus(respErr error, status int) int {
@@ -42,10 +41,7 @@ func (usecase *AccountUseCase) runBusinessLayout(request authSpec.CreateAccountR
 }
 
 func (usecase *AccountUseCase) getKeycloakUser(request authSpec.CreateAccountRequest) (error, keycloak.KeycloakEntity) {
-	var keycloakEntity keycloak.KeycloakEntity
-	var err error
-
-	err, keycloakEntity = usecase.Keycloak.RegisterAccount(request)
+	err, keycloakEntity := usecase.Keycloak.RegisterAccount(request)
 	if err != nil {
 		if errors.Is(err, keycloak.Conflict409) {
 			//пользак уже есть в keycloak и соответственно в базе
