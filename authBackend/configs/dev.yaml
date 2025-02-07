@@ -9,8 +9,8 @@ keycloak:
 
 database:
   host: "localhost"
-  user: "postgres"
-  password: "root"
+  user: "auth_user"
+  password: "8c6b18ac-84ff-4436-8916-6e11aaa41e92"
   dataBaseName: "auth"
   dialect: "postgres"
   impl: "sqlx"

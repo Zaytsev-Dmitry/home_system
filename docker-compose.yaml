@@ -52,9 +52,10 @@ services:
     environment:
       PGUSER: postgres
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: auth
     ports:
       - "5432:5432"
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 1s
