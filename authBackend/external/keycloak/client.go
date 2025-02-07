@@ -47,13 +47,16 @@ func (client KeycloakClient) GetUser(mail string) (KeycloakEntity, error) {
 	serviceAccountToken, err := client.getToken()
 	if err != nil {
 		resultErr = errors.Join(Internal, errors.New("Wrap error: "+err.Error()))
+		return KeycloakEntity{}, resultErr
 	}
+
 	resp, err := utilities.GetWithBearerAuthorization(
 		serviceAccountToken.AccessToken,
 		client.KeycloakHost+"/admin/realms/"+client.KeycloakRealm+"/users?email="+mail,
 	)
+
 	if err != nil {
-		resultErr = errors.Join(Internal, err)
+		resultErr = errors.Join(Internal, errors.New("Wrap error: "+err.Error()))
 	}
 
 	utilities.ParseResponseToStruct(resp, &result)
