@@ -45,7 +45,6 @@ func (usecase *AccountUseCase) getKeycloakUser(request authSpec.CreateAccountReq
 	if err != nil {
 		if errors.Is(err, keycloak.Conflict409) {
 			//пользак уже есть в keycloak и соответственно в базе
-			utilities.GetLogger().Warn(err.Error())
 			keycloakEntity, err = usecase.Keycloak.GetUser(*request.Email)
 			if err != nil {
 				utilities.GetLogger().Error(err.Error())

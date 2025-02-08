@@ -6,6 +6,8 @@ import (
 	"authServer/internal/dao/repository/impl/profile"
 	"authServer/internal/dao/repository/intefraces"
 	authServerDomain "authServer/internal/domain"
+	"authServer/pkg/utilities"
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
@@ -27,11 +29,37 @@ func (port *SqlxAccountPort) CreateAccountAndProfile(entity keycloak.KeycloakEnt
 	var resultErr error
 
 	tx := port.Db.MustBegin()
-	tx.Get(&result, SELECT_BY_TG_ID, int64(tgId))
-	if result.ID == 0 {
+	defer tx.Rollback()
+
+	selectErr := tx.Get(&result, SELECT_BY_TG_ID, int64(tgId))
+	if selectErr == sql.ErrNoRows {
+		//INSERT аккаунт
 		errInsertAcc := tx.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Username, entity.Email, tgId, entity.ID, true).StructScan(&result)
+		if errInsertAcc != nil {
+			return authServerDomain.Account{}, repository.Fail(utilities.Error{
+				Msg: "CreateAccountAndProfile.INSERT_ACCOUNT fail",
+				Err: errInsertAcc,
+			})
+		}
+		//создани базового профиля
 		errInsertProf := tx.QueryRowx(profile.INSERT_PROFILE, result.ID, "USER", true, result.Username).Err()
-		resultErr = repository.CommitOrRollbackTx([]error{errInsertAcc, errInsertProf}, tx)
+		if errInsertProf != nil {
+			return authServerDomain.Account{}, repository.Fail(utilities.Error{
+				Msg: "CreateAccountAndProfile.INSERT_PROFILE fail",
+				Err: errInsertAcc,
+			})
+		}
+	} else if selectErr != nil {
+		return authServerDomain.Account{}, repository.Fail(utilities.Error{
+			Msg: "CreateAccountAndProfile.SELECT_BY_TG_ID failed",
+			Err: selectErr,
+		})
+	}
+	if resultErr = tx.Commit(); resultErr != nil {
+		resultErr = repository.Fail(utilities.Error{
+			Msg: "CreateAccountAndProfile.Transaction commit fail",
+			Err: resultErr,
+		})
 	}
 	return result, resultErr
 }
@@ -45,6 +73,7 @@ func (port *SqlxAccountPort) GetIdByTgId(tgId int64) int64 {
 	}
 	return resp
 }
+
 func (port *SqlxAccountPort) GetByTgId(tgId int64) (authServerDomain.Account, error) {
 	var resp authServerDomain.Account
 	var errResp error

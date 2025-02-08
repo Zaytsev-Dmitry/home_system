@@ -1,7 +1,9 @@
 package repository
 
 import (
+	"authServer/pkg/utilities"
 	"errors"
+	"fmt"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -55,4 +57,11 @@ func CommitAndProceedErrors(tx *sqlx.Tx, resultErr error) error {
 		}
 	}
 	return resultErr
+}
+
+func Fail(error utilities.Error) error {
+	logger := utilities.GetLogger()
+	text := error.Msg + "." + " Wrapped: " + error.Err.Error()
+	logger.Error(text)
+	return fmt.Errorf(text)
 }

@@ -3,7 +3,6 @@ package utilities
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -13,13 +12,6 @@ import (
 )
 
 var client = &http.Client{}
-
-var (
-	MarshallError      = errors.New("marshalling error")
-	HttpCreateReqError = errors.New("new request creating error")
-	HttpDoRequestError = errors.New("client do error")
-	ParseRequest       = errors.New("parse request URI error")
-)
 
 func ParseResponseToStruct(respBody *http.Response, response any) any {
 	defer respBody.Body.Close()
