@@ -3,6 +3,7 @@ package util
 import (
 	"encoding/json"
 	"github.com/PaulSonOfLars/gotgbot/v2"
+	"github.com/go-telegram/bot/models"
 	"net/http"
 )
 
@@ -33,6 +34,19 @@ func CreateMenuKeyboard() *gotgbot.InlineKeyboardMarkup {
 			InlineKeyboardButton("Совместный учет расходов", "accounting_of_expenses"),
 		),
 	)
+}
+
+func GetChatAndMsgId(update *models.Update) (int64, int) {
+	var chatId int64
+	var msgId int
+	if update.Message != nil {
+		chatId = update.Message.Chat.ID
+		msgId = update.Message.ID
+	} else {
+		chatId = update.CallbackQuery.Message.Message.Chat.ID
+		msgId = update.CallbackQuery.Message.Message.ID
+	}
+	return chatId, msgId
 }
 
 func ParseResponseToStruct(respBody *http.Response, response any) any {

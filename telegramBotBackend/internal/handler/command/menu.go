@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"telegramCLient/util"
 )
 
 type MenuCommandHandler struct {
@@ -22,17 +23,29 @@ func (c *MenuCommandHandler) Init() []bot.Option {
 }
 
 func (handler *MenuCommandHandler) callback(ctx context.Context, b *bot.Bot, update *models.Update) {
-	var chatId int64
-	if update.Message != nil {
-		chatId = update.Message.Chat.ID
+	chatId, msgId := util.GetChatAndMsgId(update)
+	//клик по кнопке
+	if update.CallbackQuery != nil {
+		b.EditMessageText(
+			ctx,
+			&bot.EditMessageTextParams{
+				ChatID:      chatId,
+				MessageID:   msgId,
+				Text:        "Выбери то что тебе интересно",
+				ReplyMarkup: handler.buildMenuKeyboard(),
+			})
 	} else {
-		chatId = update.CallbackQuery.Message.Message.Chat.ID
+		//была вызвана команда
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID:      chatId,
+			Text:        fmt.Sprintf("Выбери то что тебе интересно"),
+			ReplyMarkup: handler.buildMenuKeyboard(),
+		})
+		b.DeleteMessage(ctx, &bot.DeleteMessageParams{
+			ChatID:    chatId,
+			MessageID: msgId,
+		})
 	}
-	b.SendMessage(ctx, &bot.SendMessageParams{
-		ChatID:      chatId,
-		Text:        fmt.Sprintf("Выбери то что тебе интересно"),
-		ReplyMarkup: handler.buildMenuKeyboard(),
-	})
 }
 
 func (handler *MenuCommandHandler) buildMenuKeyboard() models.ReplyMarkup {

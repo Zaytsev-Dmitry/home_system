@@ -2,11 +2,11 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/external"
 	"telegramCLient/internal/components"
+	"telegramCLient/util"
 )
 
 var (
@@ -96,17 +96,15 @@ func (h *NoteCommandHandler) showNoteByNameCallback(ctx context.Context, b *bot.
 
 // TODO отловаить ошибки
 func (h *NoteCommandHandler) showNotesKeyboardCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
-	var chatId int64
-	if update.Message != nil {
-		chatId = update.Message.Chat.ID
-	} else {
-		chatId = update.CallbackQuery.Message.Message.Chat.ID
-	}
-	b.SendMessage(ctx, &bot.SendMessageParams{
-		ChatID:      chatId,
-		Text:        fmt.Sprintf("Выбери действие"),
-		ReplyMarkup: h.buildNotesKeyboard(),
-	})
+	chatId, msgId := util.GetChatAndMsgId(update)
+	b.EditMessageText(
+		ctx,
+		&bot.EditMessageTextParams{
+			ChatID:      chatId,
+			MessageID:   msgId,
+			Text:        "Выбери действие",
+			ReplyMarkup: h.buildNotesKeyboard(),
+		})
 }
 
 func (h *NoteCommandHandler) buildNotesKeyboard() models.ReplyMarkup {
@@ -123,6 +121,9 @@ func (h *NoteCommandHandler) buildNotesKeyboard() models.ReplyMarkup {
 			},
 			{
 				{Text: "Поиск записки по названию 🔎", CallbackData: "show_note_by_name"},
+			},
+			{
+				{Text: "Назад к меню 🤙", CallbackData: "open_menu"},
 			},
 		},
 	}
