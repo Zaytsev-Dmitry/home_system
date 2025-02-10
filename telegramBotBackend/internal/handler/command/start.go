@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"telegramCLient/internal/dao"
 	"telegramCLient/util"
 )
 
 type StartCommandHandler struct {
+	dao dao.TelegramBotDao
 }
 
 var tempMessageSlice = make(map[int64]TempMessage)
@@ -31,14 +33,13 @@ const (
 	StateConfirm
 )
 
-func NewStartCommandHandler() *StartCommandHandler {
-	return &StartCommandHandler{}
+func NewStartCommandHandler(d dao.TelegramBotDao) *StartCommandHandler {
+	return &StartCommandHandler{dao: d}
 }
 
 func (h *StartCommandHandler) Init() []bot.Option {
 	return []bot.Option{
 		bot.WithMessageTextHandler("/start", bot.MatchTypeExact, h.callback),
-		bot.WithMessageTextHandler("", bot.MatchTypeContains, h.callback),
 		bot.WithCallbackQueryDataHandler("start_callback", bot.MatchTypeExact, h.callback),
 		bot.WithCallbackQueryDataHandler("register_callback_yes", bot.MatchTypeExact, h.callback),
 		bot.WithCallbackQueryDataHandler("register_callback_no", bot.MatchTypeExact, h.callback),
@@ -56,7 +57,6 @@ func (h *StartCommandHandler) buildKeyboard() models.ReplyMarkup {
 	return kb
 }
 
-// TODO отловить ошибки
 func (h *StartCommandHandler) callback(ctx context.Context, b *bot.Bot, update *models.Update) {
 	message := util.GetChatMessage(update)
 	user := tempMessageSlice[message.Chat.ID]
@@ -113,7 +113,6 @@ func (h *StartCommandHandler) callback(ctx context.Context, b *bot.Bot, update *
 		})
 		msgToDelete = append(msgToDelete, sendMessage.ID)
 	}
-
 }
 
 func (handler *StartCommandHandler) confirmKeyboard() models.ReplyMarkup {

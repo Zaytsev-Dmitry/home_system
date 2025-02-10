@@ -6,6 +6,7 @@ import (
 	"log"
 	"telegramCLient/config"
 	"telegramCLient/external"
+	"telegramCLient/internal/dao"
 	"telegramCLient/internal/handler/command"
 )
 
@@ -28,14 +29,14 @@ func CreateHandlerStarter(conf *config.AppConfig) *HandlerCreater {
 }
 
 // TODO отловаить ошибки
-func (h *HandlerCreater) CreateCommandsHandlers(noteBackClient *external.NoteBackendClient, authServerClient *external.AuthServerClient) []bot.Option {
+func (h *HandlerCreater) CreateCommandsHandlers(noteBackClient *external.NoteBackendClient, authServerClient *external.AuthServerClient, d dao.TelegramBotDao) []bot.Option {
 	var result = []bot.Option{}
-	for i, value := range h.Config.HandlersToInit {
+	for i, value := range h.Config.Server.HandlersToInit {
 		log.Println(fmt.Sprintf("CreateHandlers handler : %s. With order: %x", value, i+1))
 		switch value {
 		case START_HANDLER:
 			{
-				result = append(result, command.NewStartCommandHandler().Init()...)
+				result = append(result, command.NewStartCommandHandler(d).Init()...)
 			}
 		case TUTORIAL_HANDLER:
 			{

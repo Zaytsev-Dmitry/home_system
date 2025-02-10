@@ -1,8 +1,18 @@
 package config
 
 type AppConfig struct {
-	BotToken       string   `yaml:"botToken"`
-	HandlersToInit []string `yaml:"handlersToInit"`
-	AuthServerUrl  string   `yaml:"authServerUrl"`
-	NoteBackendUrl string   `yaml:"noteBackendUrl"`
+	Server struct {
+		BotToken       string   `yaml:"botToken"`
+		HandlersToInit []string `yaml:"handlersToInit"`
+		AuthServerUrl  string   `yaml:"authServerUrl"`
+		NoteBackendUrl string   `yaml:"noteBackendUrl"`
+	} `yaml:"server"`
+	Database struct {
+		Host         string `yaml:"host"`
+		Username     string `yaml:"user"`
+		Password     string `yaml:"password"`
+		DataBaseName string `yaml:"dataBaseName"`
+		Dialect      string `yaml:"dialect"`
+		Impl         string `yaml:"impl"`
+	} `yaml:"database"`
 }

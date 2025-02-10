@@ -3,10 +3,11 @@ module telegramCLient
 go 1.23.0
 
 require (
-	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.31
 	github.com/Zaytsev-Dmitry/home_system_open_api v1.0.4
 	github.com/go-telegram/bot v1.13.3
 	github.com/go-telegram/ui v0.4.1
+	github.com/jmoiron/sqlx v1.4.0
+	github.com/lib/pq v1.10.9
 	gopkg.in/yaml.v3 v3.0.1
 )
 

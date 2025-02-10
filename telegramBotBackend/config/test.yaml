@@ -1,4 +1,13 @@
-botToken: "8193938957:AAEh3-Yu8h0TPCri1HBpm6VfEa2ewqugQBQ"
-handlersToInit: [StartCommandHandler,TutorialCommandHandler,MenuCommandHandler,NoteCommandHandler,ProfileCommandHandler]
-authServerUrl: "http://localhost:8081"
-noteBackendUrl: "http://localhost:8080"
+server:
+  botToken: "8193938957:AAEh3-Yu8h0TPCri1HBpm6VfEa2ewqugQBQ"
+  handlersToInit: [StartCommandHandler,TutorialCommandHandler,MenuCommandHandler,NoteCommandHandler,ProfileCommandHandler]
+  authServerUrl: "http://localhost:8081"
+  noteBackendUrl: "http://localhost:8080"
+
+database:
+  host: "localhost"
+  user: "telegram_bot_user"
+  password: "9876c88e-94a6-45c0-8e88-161d7519bf12"
+  dataBaseName: "telegram_bot"
+  dialect: "postgres"
+  impl: "sqlx"

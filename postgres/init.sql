@@ -9,3 +9,7 @@ GRANT ALL PRIVILEGES ON DATABASE notes TO notes_user;
 create database keycloak;
 CREATE USER keycloak_user WITH LOGIN PASSWORD '32f21777-78c6-49bb-a5fe-b3ebeb325593';
 GRANT ALL PRIVILEGES ON DATABASE keycloak TO keycloak_user;
+
+create database telegram_bot;
+CREATE USER telegram_bot_user WITH LOGIN PASSWORD '9876c88e-94a6-45c0-8e88-161d7519bf12';
+GRANT ALL PRIVILEGES ON DATABASE telegram_bot TO telegram_bot_user;

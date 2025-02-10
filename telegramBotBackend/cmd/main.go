@@ -5,13 +5,17 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/go-telegram/bot"
+	"github.com/go-telegram/bot/models"
+	_ "github.com/lib/pq"
 	"gopkg.in/yaml.v3"
 	"log"
 	"os"
 	"os/signal"
 	"telegramCLient/config"
 	"telegramCLient/external"
+	"telegramCLient/internal/action"
 	"telegramCLient/internal/creater"
+	"telegramCLient/internal/dao"
 )
 
 // ______________________________________________________________________
@@ -19,9 +23,14 @@ func main() {
 	appConfig := loadConfig("MODE")
 	ctx, cancel := getContext()
 	defer cancel()
+
+	dao := dao.CreateDao(*appConfig)
+	defer dao.Close()
+
 	opts := creater.CreateHandlerStarter(appConfig).CreateCommandsHandlers(
-		external.NewNoteBackendClient(appConfig.NoteBackendUrl),
-		external.NewAuthServerClient(appConfig.AuthServerUrl),
+		external.NewNoteBackendClient(appConfig.Server.NoteBackendUrl),
+		external.NewAuthServerClient(appConfig.Server.AuthServerUrl),
+		*dao,
 	)
 	createAndStartBot(ctx, appConfig, opts)
 }
@@ -29,10 +38,14 @@ func main() {
 //______________________________________________________________________
 
 func createAndStartBot(ctx context.Context, appConfig *config.AppConfig, opts []bot.Option) {
-	b, err := bot.New(appConfig.BotToken, opts...)
+	b, err := bot.New(appConfig.Server.BotToken, opts...)
 	if nil != err {
 		panic(err)
 	}
+	userAction := action.NewAction()
+	b.RegisterHandler(bot.HandlerTypeMessageText, "", bot.MatchTypeContains, func(ctx context.Context, b *bot.Bot, update *models.Update) {
+		userAction.Proceed(ctx, b, update)
+	})
 	b.Start(ctx)
 }
 
