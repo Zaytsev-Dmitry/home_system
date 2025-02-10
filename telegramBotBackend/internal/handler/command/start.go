@@ -2,24 +2,46 @@ package command
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"telegramCLient/util"
 )
 
 type StartCommandHandler struct {
-	tempMessageCollection map[int64][]int
 }
 
-func NewStartCommandHandler(tempMsgColl map[int64][]int) *StartCommandHandler {
-	return &StartCommandHandler{
-		tempMessageCollection: tempMsgColl,
-	}
+var tempMessageSlice = make(map[int64]TempMessage)
+var msgToDelete = make([]int, 0)
+
+type TempMessage struct {
+	FirstName string
+	LastName  string
+	Username  string
+	Email     string
+	State     State
+}
+
+type State uint
+
+const (
+	StateDefault           State = iota
+	StateDrawHelloKeyboard State = iota
+	StateAskEmail
+	StateConfirm
+)
+
+func NewStartCommandHandler() *StartCommandHandler {
+	return &StartCommandHandler{}
 }
 
 func (h *StartCommandHandler) Init() []bot.Option {
 	return []bot.Option{
-		bot.WithMessageTextHandler("/start", bot.MatchTypeExact, h.start),
-		bot.WithCallbackQueryDataHandler("start_callback", bot.MatchTypeExact, h.startCB),
+		bot.WithMessageTextHandler("/start", bot.MatchTypeExact, h.callback),
+		bot.WithMessageTextHandler("", bot.MatchTypeContains, h.callback),
+		bot.WithCallbackQueryDataHandler("start_callback", bot.MatchTypeExact, h.callback),
+		bot.WithCallbackQueryDataHandler("register_callback_yes", bot.MatchTypeExact, h.callback),
+		bot.WithCallbackQueryDataHandler("register_callback_no", bot.MatchTypeExact, h.callback),
 	}
 }
 
@@ -27,32 +49,82 @@ func (h *StartCommandHandler) buildKeyboard() models.ReplyMarkup {
 	kb := &models.InlineKeyboardMarkup{
 		InlineKeyboard: [][]models.InlineKeyboardButton{
 			{
-				{Text: "Вперед:)", CallbackData: "start_callback"},
+				{Text: "Понятно", CallbackData: "start_callback"},
+			},
+		},
+	}
+	return kb
+}
+
+// TODO отловить ошибки
+func (h *StartCommandHandler) callback(ctx context.Context, b *bot.Bot, update *models.Update) {
+	message := util.GetChatMessage(update)
+	user := tempMessageSlice[message.Chat.ID]
+	var keyboard models.ReplyMarkup
+	var text string
+	var isCanEdit = true
+	switch user.State {
+	case StateDefault:
+		user.State = StateDrawHelloKeyboard
+		text = "Привет сначала мне нужна твоя почта"
+		keyboard = h.buildKeyboard()
+		isCanEdit = false
+		b.DeleteMessage(ctx, &bot.DeleteMessageParams{ChatID: message.Chat.ID, MessageID: message.ID})
+	case StateDrawHelloKeyboard:
+		user.State = StateAskEmail
+		text = "Введи свою почту"
+	case StateAskEmail:
+		msgToDelete = append(msgToDelete, message.ID)
+		user.Email = message.Text
+		user.FirstName = message.Chat.FirstName
+		user.LastName = message.Chat.LastName
+		user.Username = message.Chat.Username
+
+		keyboard = h.confirmKeyboard()
+		user.State = StateConfirm
+		text = fmt.Sprintf("Супер %s теперь конфирми почту\n"+
+			"Это она? "+"%s", user.Username, user.Email)
+		isCanEdit = false
+	case StateConfirm:
+		if update.CallbackQuery.Data == "register_callback_no_2" {
+			text = "Ну окэй поехали дальше. Введи почту"
+			user.State = StateAskEmail
+		} else {
+			b.DeleteMessages(ctx, &bot.DeleteMessagesParams{ChatID: message.Chat.ID, MessageIDs: msgToDelete})
+			//TODO зарегать пользака и очистить диалог
+		}
+	default:
+		panic("unknown state")
+	}
+
+	tempMessageSlice[message.Chat.ID] = user
+	if isCanEdit {
+		b.EditMessageText(ctx, &bot.EditMessageTextParams{
+			MessageID:   message.ID,
+			ChatID:      message.Chat.ID,
+			Text:        text,
+			ReplyMarkup: keyboard,
+		})
+	} else {
+		sendMessage, _ := b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID:      message.Chat.ID,
+			Text:        text,
+			ReplyMarkup: keyboard,
+		})
+		msgToDelete = append(msgToDelete, sendMessage.ID)
+	}
+
+}
+
+func (handler *StartCommandHandler) confirmKeyboard() models.ReplyMarkup {
+	kb := &models.InlineKeyboardMarkup{
+		InlineKeyboard: [][]models.InlineKeyboardButton{
+			{
+				{Text: "Да", CallbackData: "register_callback_yes"},
+				{Text: "Нет", CallbackData: "register_callback_no"},
 			},
 		},
 	}
 
 	return kb
-}
-
-// TODO отловить ошибки
-func (h *StartCommandHandler) start(ctx context.Context, b *bot.Bot, update *models.Update) {
-	h.tempMessageCollection[update.Message.Chat.ID] = append([]int{}, update.Message.ID)
-
-	message, _ := b.SendMessage(ctx, &bot.SendMessageParams{
-		ChatID:      update.Message.Chat.ID,
-		Text:        "Привет!Прежде чем начать работу мне необходима твоя почта! Нажми кнопку \"Вперед\" чтобы продолжить",
-		ReplyMarkup: h.buildKeyboard(),
-	})
-	h.tempMessageCollection[update.Message.Chat.ID] = append(h.tempMessageCollection[update.Message.Chat.ID], message.ID)
-}
-
-// TODO отловить ошибки
-func (h *StartCommandHandler) startCB(ctx context.Context, b *bot.Bot, update *models.Update) {
-	h.tempMessageCollection[update.CallbackQuery.Message.Message.Chat.ID] = append(h.tempMessageCollection[update.CallbackQuery.Message.Message.Chat.ID], update.CallbackQuery.Message.Message.ID)
-	sendedMSG, _ := b.SendMessage(ctx, &bot.SendMessageParams{
-		ChatID: update.CallbackQuery.Message.Message.Chat.ID,
-		Text:   "Отправь мне свой email",
-	})
-	h.tempMessageCollection[update.CallbackQuery.Message.Message.Chat.ID] = append(h.tempMessageCollection[update.CallbackQuery.Message.Message.Chat.ID], sendedMSG.ID)
 }

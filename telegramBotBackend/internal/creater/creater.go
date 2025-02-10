@@ -11,7 +11,6 @@ import (
 
 const (
 	START_HANDLER    string = "StartCommandHandler"
-	REGISTER_HANDLER string = "RegisterCommandHandler"
 	TUTORIAL_HANDLER string = "TutorialCommandHandler"
 	MENU_HANDLER     string = "MenuCommandHandler"
 	NOTE_HANDLER     string = "NoteCommandHandler"
@@ -19,32 +18,25 @@ const (
 )
 
 type HandlerCreater struct {
-	Config                *config.AppConfig
-	tempMessageCollection map[int64][]int
+	Config *config.AppConfig
 }
 
-func CreateHandlerStarter(conf *config.AppConfig, tempMessage map[int64][]int) *HandlerCreater {
+func CreateHandlerStarter(conf *config.AppConfig) *HandlerCreater {
 	return &HandlerCreater{
-		Config:                conf,
-		tempMessageCollection: tempMessage,
+		Config: conf,
 	}
 }
 
 // TODO отловаить ошибки
-func (h *HandlerCreater) CreateHandlers(noteBackClient *external.NoteBackendClient, authServerClient *external.AuthServerClient) []bot.Option {
+func (h *HandlerCreater) CreateCommandsHandlers(noteBackClient *external.NoteBackendClient, authServerClient *external.AuthServerClient) []bot.Option {
 	var result = []bot.Option{}
 	for i, value := range h.Config.HandlersToInit {
 		log.Println(fmt.Sprintf("CreateHandlers handler : %s. With order: %x", value, i+1))
 		switch value {
 		case START_HANDLER:
 			{
-				result = append(result, command.NewStartCommandHandler(h.tempMessageCollection).Init()...)
+				result = append(result, command.NewStartCommandHandler().Init()...)
 			}
-		case REGISTER_HANDLER:
-			{
-				result = append(result, command.NewRegisterUserCommandHandler(authServerClient, h.tempMessageCollection).Init()...)
-			}
-
 		case TUTORIAL_HANDLER:
 			{
 				result = append(result, command.NewTutorialCommandHandler().Init()...)
