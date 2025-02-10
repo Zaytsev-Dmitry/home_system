@@ -1,5 +1,5 @@
 server:
-  botToken: "8193938957:AAEh3-Yu8h0TPCri1HBpm6VfEa2ewqugQBQ"
+  botToken: "7553203004:AAE7nqBQfz7sRzEDwg0L4VIbUzriDjDFL1I"
   handlersToInit: [StartCommandHandler,TutorialCommandHandler,MenuCommandHandler,NoteCommandHandler,ProfileCommandHandler]
   authServerUrl: "http://localhost:8081"
   noteBackendUrl: "http://localhost:8080"

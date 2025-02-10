@@ -20,4 +20,10 @@ var (
 
 	//go:embed files/profile_text_info.txt
 	ProfileInfoDescText string
+
+	//go:embed files/start_msg_info.txt
+	StartMsgDescText string
+
+	//go:embed files/unnecessary_action_info.txt
+	UnnecessaryActionInfo string
 )

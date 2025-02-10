@@ -2,6 +2,11 @@ package dto
 
 type CreateAccountRequestAccountType string
 
+const (
+	TG  CreateAccountRequestAccountType = "TG"
+	WEB CreateAccountRequestAccountType = "WEB"
+)
+
 type AccountResponse struct {
 	Email     *string `json:"email,omitempty"`
 	FirstName *string `json:"firstName,omitempty"`

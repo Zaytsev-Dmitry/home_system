@@ -5,18 +5,21 @@ import (
 	"fmt"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"telegramCLient/external"
+	"telegramCLient/external/dto"
 	"telegramCLient/internal/dao"
+	"telegramCLient/internal/handler/loader"
 	"telegramCLient/util"
 )
 
 type StartCommandHandler struct {
-	dao dao.TelegramBotDao
+	dao              dao.TelegramBotDao
+	authServerClient external.AuthServerClient
 }
 
-var tempMessageSlice = make(map[int64]TempMessage)
-var msgToDelete = make([]int, 0)
+var tempMessageSlice = make(map[int64]TempUser)
 
-type TempMessage struct {
+type TempUser struct {
 	FirstName string
 	LastName  string
 	Username  string
@@ -27,8 +30,8 @@ type TempMessage struct {
 type State uint
 
 const (
-	StateDefault           State = iota
-	StateDrawHelloKeyboard State = iota
+	StateDefault State = iota
+	StateDrawHelloKeyboard
 	StateAskEmail
 	StateConfirm
 )
@@ -48,7 +51,9 @@ func (h *StartCommandHandler) Init() []bot.Option {
 
 func (h *StartCommandHandler) StartCommand(ctx context.Context, b *bot.Bot, update *models.Update) {
 	chatId, msgId := util.GetChatAndMsgId(update)
-	h.dao.ActionRepo.Save(chatId, "START_COMMAND", "", msgId)
+
+	//TODO проверить зареган ли пользак или нет
+	h.dao.ActionRepo.SaveOrUpdate(chatId, "StateDefault", false, msgId, h.GetName())
 	h.callback(ctx, b, update)
 }
 
@@ -57,14 +62,19 @@ func (h *StartCommandHandler) ProceedMessage(ctx context.Context, b *bot.Bot, up
 }
 
 func (h *StartCommandHandler) GetName() string {
-	return "START_COMMAND"
+	return "/start"
+}
+
+func (h *StartCommandHandler) ClearStatus(update *models.Update) {
+	chatId, _ := util.GetChatAndMsgId(update)
+	tempMessageSlice[chatId] = TempUser{}
 }
 
 func (h *StartCommandHandler) buildKeyboard() models.ReplyMarkup {
 	kb := &models.InlineKeyboardMarkup{
 		InlineKeyboard: [][]models.InlineKeyboardButton{
 			{
-				{Text: "Понятно", CallbackData: "start_callback"},
+				{Text: "Да да...давай дальше", CallbackData: "start_callback"},
 			},
 		},
 	}
@@ -79,16 +89,19 @@ func (h *StartCommandHandler) callback(ctx context.Context, b *bot.Bot, update *
 	var isCanEdit = true
 	switch user.State {
 	case StateDefault:
+		//b.DeleteMessage(ctx, &bot.DeleteMessageParams{ChatID: message.Chat.ID, MessageID: message.ID})
+
 		user.State = StateDrawHelloKeyboard
-		text = "Привет сначала мне нужна твоя почта"
+		text = loader.StartMsgDescText
 		keyboard = h.buildKeyboard()
 		isCanEdit = false
-		b.DeleteMessage(ctx, &bot.DeleteMessageParams{ChatID: message.Chat.ID, MessageID: message.ID})
+		h.dao.ActionRepo.SaveOrUpdate(message.Chat.ID, "StateDrawHelloKeyboard", false, message.ID, h.GetName())
 	case StateDrawHelloKeyboard:
 		user.State = StateAskEmail
-		text = "Введи свою почту"
+		text = "Итак начнем...напиши мне свою почту"
+		h.dao.ActionRepo.SaveOrUpdate(message.Chat.ID, "StateAskEmail", true, message.ID, h.GetName())
 	case StateAskEmail:
-		msgToDelete = append(msgToDelete, message.ID)
+		//msgToDelete = append(msgToDelete, message.ID)
 		user.Email = message.Text
 		user.FirstName = message.Chat.FirstName
 		user.LastName = message.Chat.LastName
@@ -101,12 +114,23 @@ func (h *StartCommandHandler) callback(ctx context.Context, b *bot.Bot, update *
 		isCanEdit = false
 	case StateConfirm:
 		if update.CallbackQuery.Data == "register_callback_no" {
-			text = "Ну окэй поехали дальше. Введи почту"
+			text = "Ну окэй поехали заново. Введи почту"
 			user.State = StateAskEmail
+			h.dao.ActionRepo.SaveOrUpdate(message.Chat.ID, "StateAskEmail", true, message.ID, h.GetName())
 		} else {
-			b.DeleteMessages(ctx, &bot.DeleteMessagesParams{ChatID: message.Chat.ID, MessageIDs: msgToDelete})
-			//TODO зарегать пользака и очистить диалог
-			h.dao.ActionRepo.Update(message.Chat.ID, "", "", message.ID)
+			//b.DeleteMessages(ctx, &bot.DeleteMessagesParams{ChatID: message.Chat.ID, MessageIDs: msgToDelete})
+			accType := dto.TG
+			// TODO отловаить ошибки -> RegisterUser
+			h.authServerClient.RegisterUser(dto.CreateAccountRequest{
+				AccountType: &accType,
+				Email:       &user.Email,
+				FirstName:   &user.FirstName,
+				LastName:    &user.LastName,
+				Login:       &user.Username,
+				TelegramId:  &message.Chat.ID,
+			})
+			//TODO очистить диалог
+			h.dao.ActionRepo.SaveOrUpdate(message.Chat.ID, "StateConfirm", false, message.ID, h.GetName())
 		}
 	default:
 		panic("unknown state")
@@ -121,12 +145,13 @@ func (h *StartCommandHandler) callback(ctx context.Context, b *bot.Bot, update *
 			ReplyMarkup: keyboard,
 		})
 	} else {
-		sendMessage, _ := b.SendMessage(ctx, &bot.SendMessageParams{
+		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:      message.Chat.ID,
 			Text:        text,
 			ReplyMarkup: keyboard,
+			ParseMode:   models.ParseModeHTML,
 		})
-		msgToDelete = append(msgToDelete, sendMessage.ID)
+		//msgToDelete = append(msgToDelete, sendMessage.ID)
 	}
 }
 

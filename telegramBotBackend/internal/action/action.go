@@ -2,10 +2,12 @@ package action
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/internal/dao"
 	"telegramCLient/internal/handler/command"
+	"telegramCLient/internal/handler/loader"
 	"telegramCLient/util"
 )
 
@@ -29,16 +31,27 @@ func NewAction(dao dao.TelegramBotDao, commands []command.BaseCommand) *Action {
 	return a
 }
 
+func (a *Action) getCommandHandlerByName(name string) command.BaseCommand {
+	return a.commands[name]
+}
+
 func (a *Action) Proceed(ctx context.Context, b *bot.Bot, update *models.Update) {
 	userId, _ := util.GetChatAndMsgId(update)
 	actionEntity := a.dao.ActionRepo.GetByTgId(userId)
-	if actionEntity.LastAction == "START_COMMAND" {
-		baseCommand := a.commands["START_COMMAND"]
-		baseCommand.ProceedMessage(ctx, b, update)
-	} else {
+	lastRunCommandHandler := a.getCommandHandlerByName(actionEntity.CommandName)
+	if !actionEntity.NeedUserAction {
+
+		text := fmt.Sprintf(
+			loader.UnnecessaryActionInfo,
+			actionEntity.CommandName,
+		)
 		b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID: userId,
-			Text:   "Сори я не знаю что это такое",
+			ChatID:    userId,
+			Text:      text,
+			ParseMode: models.ParseModeHTML,
 		})
+		//lastRunCommandHandler.ClearStatus(update)
+	} else {
+		lastRunCommandHandler.ProceedMessage(ctx, b, update)
 	}
 }
