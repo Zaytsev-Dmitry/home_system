@@ -1,6 +1,7 @@
 package command
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"github.com/go-telegram/bot"
@@ -51,7 +52,6 @@ func (h *StartCommandHandler) Init() []bot.Option {
 
 func (h *StartCommandHandler) StartCommand(ctx context.Context, b *bot.Bot, update *models.Update) {
 	chatId, msgId := util.GetChatAndMsgId(update)
-
 	//TODO проверить зареган ли пользак или нет
 	h.dao.ActionRepo.SaveOrUpdate(chatId, "StateDefault", false, msgId, h.GetName())
 	h.callback(ctx, b, update)
@@ -81,12 +81,14 @@ func (h *StartCommandHandler) buildKeyboard() models.ReplyMarkup {
 	return kb
 }
 
+// TODO отловить ошибки + оптимизация
 func (h *StartCommandHandler) callback(ctx context.Context, b *bot.Bot, update *models.Update) {
 	message := util.GetChatMessage(update)
 	user := tempMessageSlice[message.Chat.ID]
 	var keyboard models.ReplyMarkup
 	var text string
 	var isCanEdit = true
+	var isNeedSendMsg = true
 	switch user.State {
 	case StateDefault:
 		//b.DeleteMessage(ctx, &bot.DeleteMessageParams{ChatID: message.Chat.ID, MessageID: message.ID})
@@ -114,7 +116,18 @@ func (h *StartCommandHandler) callback(ctx context.Context, b *bot.Bot, update *
 		isCanEdit = false
 	case StateConfirm:
 		if update.CallbackQuery.Data == "register_callback_no" {
-			text = "Ну окэй поехали заново. Введи почту"
+			isNeedSendMsg = false
+			isCanEdit = false
+			fileData, errReadFile := loader.EnterEmailMistakeMem.ReadFile("files/ebat_ty_loh.jpg")
+			if errReadFile != nil {
+				fmt.Printf("error read file, %v\n", errReadFile)
+			}
+
+			b.SendPhoto(ctx, &bot.SendPhotoParams{
+				ChatID:  message.Chat.ID,
+				Photo:   &models.InputFileUpload{Filename: "ebat_ty_loh.jpg", Data: bytes.NewReader(fileData)},
+				Caption: "Ну окэй поехали заново. Введи почту",
+			})
 			user.State = StateAskEmail
 			h.dao.ActionRepo.SaveOrUpdate(message.Chat.ID, "StateAskEmail", true, message.ID, h.GetName())
 		} else {
@@ -144,7 +157,7 @@ func (h *StartCommandHandler) callback(ctx context.Context, b *bot.Bot, update *
 			Text:        text,
 			ReplyMarkup: keyboard,
 		})
-	} else {
+	} else if isNeedSendMsg {
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:      message.Chat.ID,
 			Text:        text,

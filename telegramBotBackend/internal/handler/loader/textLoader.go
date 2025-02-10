@@ -1,6 +1,9 @@
 package loader
 
-import _ "embed"
+import (
+	"embed"
+	_ "embed"
+)
 
 var (
 	//go:embed files/tutorial_start_text.txt
@@ -26,4 +29,10 @@ var (
 
 	//go:embed files/unnecessary_action_info.txt
 	UnnecessaryActionInfo string
+
+	//go:embed files/ebat_ty_loh.jpg
+	EnterEmailMistakeMem embed.FS
+
+	//go:embed files/ricardo_milos.gif
+	RicardoMilasMemGif embed.FS
 )
