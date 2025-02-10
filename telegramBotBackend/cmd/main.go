@@ -16,6 +16,7 @@ import (
 	"telegramCLient/internal/action"
 	"telegramCLient/internal/creater"
 	"telegramCLient/internal/dao"
+	"telegramCLient/internal/handler/command"
 )
 
 // ______________________________________________________________________
@@ -25,24 +26,24 @@ func main() {
 	defer cancel()
 
 	dao := dao.CreateDao(*appConfig)
-	defer dao.Close()
 
-	opts := creater.CreateHandlerStarter(appConfig).CreateCommandsHandlers(
+	opts, commands := creater.CreateHandlerStarter(appConfig).CreateCommandsHandlers(
 		external.NewNoteBackendClient(appConfig.Server.NoteBackendUrl),
 		external.NewAuthServerClient(appConfig.Server.AuthServerUrl),
 		*dao,
 	)
-	createAndStartBot(ctx, appConfig, opts)
+	createAndStartBot(ctx, appConfig, opts, *dao, commands)
+	defer dao.Close()
 }
 
 //______________________________________________________________________
 
-func createAndStartBot(ctx context.Context, appConfig *config.AppConfig, opts []bot.Option) {
+func createAndStartBot(ctx context.Context, appConfig *config.AppConfig, opts []bot.Option, d dao.TelegramBotDao, commands []command.BaseCommand) {
 	b, err := bot.New(appConfig.Server.BotToken, opts...)
 	if nil != err {
 		panic(err)
 	}
-	userAction := action.NewAction()
+	userAction := action.NewAction(d, commands)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "", bot.MatchTypeContains, func(ctx context.Context, b *bot.Bot, update *models.Update) {
 		userAction.Proceed(ctx, b, update)
 	})

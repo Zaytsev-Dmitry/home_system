@@ -29,33 +29,37 @@ func CreateHandlerStarter(conf *config.AppConfig) *HandlerCreater {
 }
 
 // TODO отловаить ошибки
-func (h *HandlerCreater) CreateCommandsHandlers(noteBackClient *external.NoteBackendClient, authServerClient *external.AuthServerClient, d dao.TelegramBotDao) []bot.Option {
+func (h *HandlerCreater) CreateCommandsHandlers(noteBackClient *external.NoteBackendClient, authServerClient *external.AuthServerClient, d dao.TelegramBotDao) ([]bot.Option, []command.BaseCommand) {
 	var result = []bot.Option{}
+	var commands = []command.BaseCommand{}
 	for i, value := range h.Config.Server.HandlersToInit {
+		var newCommand command.BaseCommand
 		log.Println(fmt.Sprintf("CreateHandlers handler : %s. With order: %x", value, i+1))
 		switch value {
 		case START_HANDLER:
 			{
-				result = append(result, command.NewStartCommandHandler(d).Init()...)
+				newCommand = command.NewStartCommandHandler(d)
+				result = append(result, newCommand.Init()...)
+				commands = append(commands, newCommand)
 			}
-		case TUTORIAL_HANDLER:
-			{
-				result = append(result, command.NewTutorialCommandHandler().Init()...)
-			}
-		case MENU_HANDLER:
-			{
-				result = append(result, command.NewMenuCommandHandler().Init()...)
-			}
-		case NOTE_HANDLER:
-			{
-				result = append(result, command.NewNoteCommandHandler(noteBackClient).Init()...)
-			}
-
-		case PROFILE_HANDLER:
-			{
-				result = append(result, command.NewProfileCommandHandler(authServerClient).Init()...)
-			}
+			//case TUTORIAL_HANDLER:
+			//	{
+			//		result = append(result, command.NewTutorialCommandHandler().Init()...)
+			//	}
+			//case MENU_HANDLER:
+			//	{
+			//		result = append(result, command.NewMenuCommandHandler().Init()...)
+			//	}
+			//case NOTE_HANDLER:
+			//	{
+			//		result = append(result, command.NewNoteCommandHandler(noteBackClient).Init()...)
+			//	}
+			//
+			//case PROFILE_HANDLER:
+			//	{
+			//		result = append(result, command.NewProfileCommandHandler(authServerClient).Init()...)
+			//	}
 		}
 	}
-	return result
+	return result, commands
 }

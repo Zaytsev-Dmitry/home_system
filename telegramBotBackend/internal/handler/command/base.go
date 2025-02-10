@@ -8,5 +8,7 @@ import (
 
 type BaseCommand interface {
 	Init() []bot.Option
-	Proceed(ctx context.Context, b *bot.Bot, update *models.Update)
+	StartCommand(ctx context.Context, b *bot.Bot, update *models.Update)
+	ProceedMessage(ctx context.Context, b *bot.Bot, update *models.Update)
+	GetName() string
 }

@@ -39,11 +39,25 @@ func NewStartCommandHandler(d dao.TelegramBotDao) *StartCommandHandler {
 
 func (h *StartCommandHandler) Init() []bot.Option {
 	return []bot.Option{
-		bot.WithMessageTextHandler("/start", bot.MatchTypeExact, h.callback),
+		bot.WithMessageTextHandler("/start", bot.MatchTypeExact, h.StartCommand),
 		bot.WithCallbackQueryDataHandler("start_callback", bot.MatchTypeExact, h.callback),
 		bot.WithCallbackQueryDataHandler("register_callback_yes", bot.MatchTypeExact, h.callback),
 		bot.WithCallbackQueryDataHandler("register_callback_no", bot.MatchTypeExact, h.callback),
 	}
+}
+
+func (h *StartCommandHandler) StartCommand(ctx context.Context, b *bot.Bot, update *models.Update) {
+	chatId, msgId := util.GetChatAndMsgId(update)
+	h.dao.ActionRepo.Save(chatId, "START_COMMAND", "", msgId)
+	h.callback(ctx, b, update)
+}
+
+func (h *StartCommandHandler) ProceedMessage(ctx context.Context, b *bot.Bot, update *models.Update) {
+	h.callback(ctx, b, update)
+}
+
+func (h *StartCommandHandler) GetName() string {
+	return "START_COMMAND"
 }
 
 func (h *StartCommandHandler) buildKeyboard() models.ReplyMarkup {
@@ -86,12 +100,13 @@ func (h *StartCommandHandler) callback(ctx context.Context, b *bot.Bot, update *
 			"Это она? "+"%s", user.Username, user.Email)
 		isCanEdit = false
 	case StateConfirm:
-		if update.CallbackQuery.Data == "register_callback_no_2" {
+		if update.CallbackQuery.Data == "register_callback_no" {
 			text = "Ну окэй поехали дальше. Введи почту"
 			user.State = StateAskEmail
 		} else {
 			b.DeleteMessages(ctx, &bot.DeleteMessagesParams{ChatID: message.Chat.ID, MessageIDs: msgToDelete})
 			//TODO зарегать пользака и очистить диалог
+			h.dao.ActionRepo.Update(message.Chat.ID, "", "", message.ID)
 		}
 	default:
 		panic("unknown state")

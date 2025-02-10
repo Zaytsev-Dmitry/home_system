@@ -7,4 +7,4 @@ CREATE TABLE user_action
     last_sent_message_id integer
 );
 grant all privileges on table user_action to telegram_bot_user;
-grant all privileges on sequence user_action to telegram_bot_user;
+grant all privileges on sequence user_action_id_seq to telegram_bot_user;
