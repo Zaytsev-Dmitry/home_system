@@ -13,8 +13,12 @@ type AuthServerApi struct {
 	profileController *accountController.ProfileController
 }
 
-func (api *AuthServerApi) GetProfileByTgId(c *gin.Context, telegramId int) {
-	api.profileController.GetProfileByTgId(c, int64(telegramId))
+func (api *AuthServerApi) GetAccountByTgId(c *gin.Context, telegramId int64) {
+	api.accController.GetAccountByTgId(c, telegramId)
+}
+
+func (api *AuthServerApi) GetProfileByTgId(c *gin.Context, telegramId int64) {
+	api.profileController.GetProfileByTgId(c, telegramId)
 }
 
 func (api *AuthServerApi) RegisterAccount(context *gin.Context) {

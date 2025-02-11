@@ -30,13 +30,32 @@ func (serverClient *AuthServerClient) RegisterUser(source authSpec.CreateAccount
 	var respDto authSpec.AccountResponse
 	util.ParseResponseToStruct(response, &respDto)
 	return dto.AccountDTO{
-		ID:         *respDto.Id,
-		FirstName:  *respDto.FirstName,
-		LastName:   *respDto.LastName,
-		Username:   *respDto.Username,
-		Email:      *respDto.Email,
-		TgUsername: *respDto.TelegramUserName,
-		TelegramId: *respDto.TelegramId,
+		ID:         respDto.Id,
+		FirstName:  respDto.FirstName,
+		LastName:   respDto.LastName,
+		Username:   respDto.Username,
+		Email:      respDto.Email,
+		TgUsername: respDto.TelegramUserName,
+		TelegramId: respDto.TelegramId,
+	}
+}
+
+// TODO отловаить ошибки
+func (serverClient *AuthServerClient) GetAccountByTgId(tgId int64) dto.AccountDTO {
+	response, err := get(serverClient.AuthServerUrl + "/account/" + strconv.FormatInt(tgId, 10))
+	if err != nil {
+		fmt.Println(err)
+	}
+	var respDto authSpec.AccountResponse
+	util.ParseResponseToStruct(response, &respDto)
+	return dto.AccountDTO{
+		ID:         respDto.Id,
+		FirstName:  respDto.FirstName,
+		LastName:   respDto.LastName,
+		Username:   respDto.Username,
+		Email:      respDto.Email,
+		TgUsername: respDto.TelegramUserName,
+		TelegramId: respDto.TelegramId,
 	}
 }
 

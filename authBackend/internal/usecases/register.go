@@ -10,28 +10,19 @@ import (
 	"net/http"
 )
 
-type AccountUseCase struct {
+type RegisterAccount struct {
 	Keycloak *keycloak.KeycloakClient
 	Repo     intefraces.AccountRepository
 }
 
-func (usecase *AccountUseCase) Register(request authSpec.CreateAccountRequest) (domain.Account, error, int) {
+func (usecase *RegisterAccount) Register(request authSpec.CreateAccountRequest) (domain.Account, error, int) {
 	var status = http.StatusOK
 	var result domain.Account
-
 	result, respErr := usecase.runBusinessLayout(request)
-	return result, respErr, usecase.getStatus(respErr, status)
+	return result, respErr, IfExistErrLogAndReturn500Http(respErr, status)
 }
 
-func (usecase *AccountUseCase) getStatus(respErr error, status int) int {
-	if respErr != nil {
-		utilities.GetLogger().Error(respErr.Error())
-		status = http.StatusInternalServerError
-	}
-	return status
-}
-
-func (usecase *AccountUseCase) runBusinessLayout(request authSpec.CreateAccountRequest) (domain.Account, error) {
+func (usecase *RegisterAccount) runBusinessLayout(request authSpec.CreateAccountRequest) (domain.Account, error) {
 	var result domain.Account
 	respErr, keycloakEntity := usecase.getKeycloakUser(request)
 	if respErr == nil {
@@ -40,7 +31,7 @@ func (usecase *AccountUseCase) runBusinessLayout(request authSpec.CreateAccountR
 	return result, respErr
 }
 
-func (usecase *AccountUseCase) getKeycloakUser(request authSpec.CreateAccountRequest) (error, keycloak.KeycloakEntity) {
+func (usecase *RegisterAccount) getKeycloakUser(request authSpec.CreateAccountRequest) (error, keycloak.KeycloakEntity) {
 	err, keycloakEntity := usecase.Keycloak.RegisterAccount(request)
 	if err != nil {
 		if errors.Is(err, keycloak.Conflict409) {
@@ -56,8 +47,4 @@ func (usecase *AccountUseCase) getKeycloakUser(request authSpec.CreateAccountReq
 		keycloakEntity, err = usecase.Keycloak.GetUser(*request.Email)
 	}
 	return err, keycloakEntity
-}
-
-func (usecase *AccountUseCase) GetAccountIdByTgId(tgId int64) (accId int64) {
-	return usecase.Repo.GetIdByTgId(tgId)
 }

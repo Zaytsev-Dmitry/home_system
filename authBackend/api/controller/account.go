@@ -4,6 +4,7 @@ import (
 	"authServer/api/presenter"
 	"authServer/external/keycloak"
 	daoImpl "authServer/internal/dao"
+	"authServer/internal/domain"
 	useCases "authServer/internal/usecases"
 	"authServer/pkg/utilities"
 	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
@@ -11,14 +12,24 @@ import (
 )
 
 type AccountController struct {
-	AccountUseCase *useCases.AccountUseCase
-	presenter      *presenter.AccountPresenter
+	registerAcc  *useCases.RegisterAccount
+	getAccByTgId *useCases.GetAccByTelegramId
+	presenter    *presenter.AccountPresenter
 }
 
 func (controller *AccountController) RegisterAccount(context *gin.Context) {
 	var requestEntity authSpec.CreateAccountRequest
 	utilities.CatchMarshallErr(context.BindJSON(&requestEntity), context)
-	entity, err, status := controller.AccountUseCase.Register(requestEntity)
+	entity, err, status := controller.registerAcc.Register(requestEntity)
+	controller.processAccountResult(context, err, status, entity)
+}
+
+func (controller *AccountController) GetAccountByTgId(context *gin.Context, telegramId int64) {
+	entity, err, status := controller.getAccByTgId.Get(telegramId)
+	controller.processAccountResult(context, err, status, entity)
+}
+
+func (controller *AccountController) processAccountResult(context *gin.Context, err error, status int, entity authServerDomain.Account) {
 	if err != nil {
 		utilities.SetResponseError(context, status)
 	} else {
@@ -32,9 +43,12 @@ func (controller *AccountController) RegisterAccount(context *gin.Context) {
 
 func CreateAccountController(keycloakClient keycloak.KeycloakClient, dao daoImpl.AuthDao) *AccountController {
 	return &AccountController{
-		AccountUseCase: &useCases.AccountUseCase{
+		registerAcc: &useCases.RegisterAccount{
 			Keycloak: &keycloakClient,
 			Repo:     dao.AccountRepo,
+		},
+		getAccByTgId: &useCases.GetAccByTelegramId{
+			Repo: dao.AccountRepo,
 		},
 		presenter: &presenter.AccountPresenter{},
 	}

@@ -30,29 +30,37 @@ func (h *StartCommandHandler) Init() []bot.Option {
 
 func (h *StartCommandHandler) StartCommand(ctx context.Context, b *bot.Bot, update *models.Update) {
 	chatId, msgId := util.GetChatAndMsgId(update)
-	////TODO проверить зареган ли пользак или нет
-	opts := []echo.Option{
-		echo.WithControlMessage(h.dao.ActionRepo),
-		echo.WithStartButtonText(loader.StartCommandText),
-		echo.WithConfirmKeyboardText(loader.RegisterConfirmText),
-		echo.WithCompleteText(loader.RegisterCompleteText),
-		echo.WithConfirmFunction(h.proceedResult),
-		echo.Questions([]echo.CollectItem{
-			{
-				FieldId:   "username",
-				FieldName: "Логин: ",
-				Content:   "Как мне к тебе обращаться?",
-			},
-			{
-				FieldId:   "email",
-				FieldName: "Почта: ",
-				Content:   "Введи свой Email",
-			},
-		}),
+	savedAccount := h.authServerClient.GetAccountByTgId(chatId)
+	if savedAccount.ID != nil {
+		message, _ := b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID: chatId,
+			Text:   "Упс...а ты уже зареган. Так что можешь пользоваться",
+		})
+		h.dao.ActionRepo.SaveOrUpdate(chatId, "Done", false, message.ID, h.GetName())
+	} else {
+		opts := []echo.Option{
+			echo.WithControlMessage(h.dao.ActionRepo),
+			echo.WithStartButtonText(loader.StartCommandText),
+			echo.WithConfirmKeyboardText(loader.RegisterConfirmText),
+			echo.WithCompleteText(loader.RegisterCompleteText),
+			echo.WithConfirmFunction(h.proceedResult),
+			echo.Questions([]echo.CollectItem{
+				{
+					FieldId:   "username",
+					FieldName: "Логин: ",
+					Content:   "Как мне к тебе обращаться?",
+				},
+				{
+					FieldId:   "email",
+					FieldName: "Почта: ",
+					Content:   "Введи свой Email",
+				},
+			}),
+		}
+		c := echo.NewEcho(ctx, b, chatId, msgId, opts, h.dao.ActionRepo, h.GetName())
+		h.echoComponent = c
+		c.StartCollect()
 	}
-	c := echo.NewEcho(ctx, b, chatId, msgId, opts, h.dao.ActionRepo, h.GetName())
-	h.echoComponent = c
-	c.StartCollect()
 }
 
 func (h *StartCommandHandler) ProceedMessage(ctx context.Context, b *bot.Bot, update *models.Update) {

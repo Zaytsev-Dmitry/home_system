@@ -4,6 +4,4 @@
  - oapi-codegen -package=generatedApi -generate "types,spec,gin" authServer/api/docs/auth-server-api.yml > authServer/api/docs/auth-server-api.gen.go
 
 
-go mod download github.com/Zaytsev-Dmitry/home_system_open_api
-go mod tidy
-go get github.com/Zaytsev-Dmitry/home_system_open_api 
+go get github.com/Zaytsev-Dmitry/home_system_open_api@v1.0.8
