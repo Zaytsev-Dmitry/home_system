@@ -1,2 +1,6 @@
-Дальше тебе необходмио подтвердить следующие данные введеные тобой
+<b>Все верно?</b>
+
+<b>Логин:</b><blockquote>login</blockquote>
+
+<b>Email:</b><blockquote>email</blockquote>
 

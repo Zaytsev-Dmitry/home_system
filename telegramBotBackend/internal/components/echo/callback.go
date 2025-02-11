@@ -51,6 +51,7 @@ func (echo *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Updat
 		} else {
 			text = echo.confirmProceedNo(&data, text)
 			isDoneCollect = true
+			echo.updateUserAction(true, "StateAskFields", message)
 		}
 	}
 
@@ -66,6 +67,7 @@ func (echo *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Updat
 			ChatID:    echo.chatId,
 			MessageID: echo.firstSentMsgId,
 			Text:      text,
+			ParseMode: models.ParseModeHTML,
 		})
 	} else {
 		sendMessage, _ := b.SendMessage(ctx, &bot.SendMessageParams{
@@ -88,9 +90,14 @@ func (echo *Echo) collectAnswer(data *dataCollect, message models.Message, text 
 func (echo *Echo) collectAnswersIsDone(keyboard models.ReplyMarkup, text string, data *dataCollect) (models.ReplyMarkup, string) {
 	//собрали все ответы
 	keyboard = echo.confirmKeyboard
-	text = echo.confirmKeyboardText + echo.collapseAnswers(data.answers)
+	keyboardText := echo.confirmKeyboardText
+	for i, answer := range data.answers {
+		id := answer.FieldId
+		content := data.answers[i].Content
+		keyboardText = strings.Replace(keyboardText, id, content, -1)
+	}
 	data.State = StateConfirm
-	return keyboard, text
+	return keyboard, keyboardText
 }
 
 func (echo *Echo) confirmProceedNo(data *dataCollect, text string) string {
@@ -113,14 +120,6 @@ func (echo *Echo) proceedConfirmYes(message models.Message, data dataCollect, te
 		b.UnregisterHandler(uid)
 	}
 	return text
-}
-
-func (echo *Echo) collapseAnswers(answers []CollectItem) string {
-	var result string
-	for i, answer := range answers {
-		result = result + "\n" + echo.questions[i].FieldName + ": " + answer.Content
-	}
-	return result
 }
 
 func (echo *Echo) restoreIterator() {
