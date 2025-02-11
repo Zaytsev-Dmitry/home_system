@@ -41,7 +41,7 @@ func (a *Action) Proceed(ctx context.Context, b *bot.Bot, update *models.Update)
 	lastRunCommandHandler := a.getCommandHandlerByName(actionEntity.CommandName)
 	if !actionEntity.NeedUserAction {
 		text := fmt.Sprintf(
-			loader.UnnecessaryActionInfo,
+			loader.UnnecessaryActionText,
 			actionEntity.CommandName,
 		)
 		message, _ := b.SendMessage(ctx, &bot.SendMessageParams{

@@ -60,9 +60,9 @@ func (h *StartCommandHandler) StartCommand(ctx context.Context, b *bot.Bot, upda
 
 	opts := []echo.Option{
 		echo.WithControlMessage(h.dao.ActionRepo),
-		echo.WithStartButtonText(loader.StartMsgDescText),
-		echo.WithConfirmKeyboardText(loader.RegisterConfirmDescText),
-		echo.WithCompleteText(loader.RegisterCompleteDescText),
+		echo.WithStartButtonText(loader.StartCommandText),
+		echo.WithConfirmKeyboardText(loader.RegisterConfirmText),
+		echo.WithCompleteText(loader.RegisterCompleteText),
 		echo.WithConfirmFunction(h.proceedResult),
 		echo.Questions([]echo.CollectItem{
 			{
@@ -134,7 +134,7 @@ func (h *StartCommandHandler) callback(ctx context.Context, b *bot.Bot, update *
 		//b.DeleteMessage(ctx, &bot.DeleteMessageParams{ChatID: message.Chat.ID, MessageID: message.ID})
 
 		user.State = StateDrawHelloKeyboard
-		text = loader.StartMsgDescText
+		text = loader.StartCommandText
 		keyboard = h.buildKeyboard()
 		isCanEdit = false
 		h.dao.ActionRepo.SaveOrUpdate(message.Chat.ID, "StateDrawHelloKeyboard", false, message.ID, h.GetName())

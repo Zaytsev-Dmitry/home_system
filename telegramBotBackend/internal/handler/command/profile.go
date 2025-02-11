@@ -54,7 +54,7 @@ func (h *ProfileCommandHandler) callback(ctx context.Context, b *bot.Bot, update
 	profile := h.AuthServerClient.GetProfileByTelegramId(tgId)
 
 	text := fmt.Sprintf(
-		loader.ProfileInfoDescText,
+		loader.ProfileCommandContentText,
 		*profile.TelegramUsername,
 		strconv.Itoa(tgId),
 		"Тут должен быть твой email, но его украли",
