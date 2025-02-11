@@ -8,6 +8,7 @@ import (
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/external"
 	"telegramCLient/external/dto"
+	"telegramCLient/internal/components/echo"
 	"telegramCLient/internal/dao"
 	"telegramCLient/internal/handler/loader"
 	"telegramCLient/util"
@@ -16,6 +17,7 @@ import (
 type StartCommandHandler struct {
 	dao              dao.TelegramBotDao
 	authServerClient external.AuthServerClient
+	echoComponent    echo.Echo
 }
 
 var tempMessageSlice = make(map[int64]TempUser)
@@ -44,21 +46,47 @@ func NewStartCommandHandler(d dao.TelegramBotDao) *StartCommandHandler {
 func (h *StartCommandHandler) Init() []bot.Option {
 	return []bot.Option{
 		bot.WithMessageTextHandler("/start", bot.MatchTypeExact, h.StartCommand),
-		bot.WithCallbackQueryDataHandler("start_callback", bot.MatchTypeExact, h.callback),
-		bot.WithCallbackQueryDataHandler("register_callback_yes", bot.MatchTypeExact, h.callback),
-		bot.WithCallbackQueryDataHandler("register_callback_no", bot.MatchTypeExact, h.callback),
+		//bot.WithCallbackQueryDataHandler("start_callback", bot.MatchTypeExact, h.callback),
+		//bot.WithCallbackQueryDataHandler("register_callback_yes", bot.MatchTypeExact, h.callback),
+		//bot.WithCallbackQueryDataHandler("register_callback_no", bot.MatchTypeExact, h.callback),
 	}
 }
 
 func (h *StartCommandHandler) StartCommand(ctx context.Context, b *bot.Bot, update *models.Update) {
 	chatId, msgId := util.GetChatAndMsgId(update)
-	//TODO проверить зареган ли пользак или нет
-	h.dao.ActionRepo.SaveOrUpdate(chatId, "StateDefault", false, msgId, h.GetName())
-	h.callback(ctx, b, update)
+	////TODO проверить зареган ли пользак или нет
+	//h.dao.ActionRepo.SaveOrUpdate(chatId, "StateDefault", false, msgId, h.GetName())
+	//h.callback(ctx, b, update)
+
+	opts := []echo.Option{
+		echo.WithStartButtonText(loader.StartMsgDescText),
+		echo.WithConfirmKeyboardText(loader.RegisterConfirmDescText),
+		echo.WithCompleteText(loader.RegisterCompleteDescText),
+		echo.WithConfirmFunction(h.proceedResult),
+		echo.Questions([]echo.CollectItem{
+			{
+				FieldId:   "login",
+				FieldName: "Логин: ",
+				Content:   "Как мне к тебе обращаться?",
+			},
+			{
+				FieldId:   "email",
+				FieldName: "Почта: ",
+				Content:   "Введи свой Email",
+			},
+		}),
+	}
+	c := echo.NewEcho(ctx, b, chatId, msgId, opts, h.dao.ActionRepo, "/start")
+	h.echoComponent = *c
+	c.StartCollect()
 }
 
 func (h *StartCommandHandler) ProceedMessage(ctx context.Context, b *bot.Bot, update *models.Update) {
-	h.callback(ctx, b, update)
+	h.echoComponent.ProceedAnswer(ctx, b, update)
+}
+
+func (h *StartCommandHandler) proceedResult(result echo.Result) {
+	h.dao.ActionRepo.SaveOrUpdate(result.ChatId, "StateConfirm", false, result.MsgId, "/start")
 }
 
 func (h *StartCommandHandler) GetName() string {
@@ -79,6 +107,14 @@ func (h *StartCommandHandler) buildKeyboard() models.ReplyMarkup {
 		},
 	}
 	return kb
+}
+
+func (h *StartCommandHandler) getButtonsForStartKeyboard() [][]models.InlineKeyboardButton {
+	return [][]models.InlineKeyboardButton{
+		{
+			{Text: "Да да...давай дальше"},
+		},
+	}
 }
 
 // TODO отловить ошибки + оптимизация

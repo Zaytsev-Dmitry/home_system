@@ -35,4 +35,10 @@ var (
 
 	//go:embed files/ricardo_milos.gif
 	RicardoMilasMemGif embed.FS
+
+	//go:embed files/register_confirm_text.txt
+	RegisterConfirmDescText string
+
+	//go:embed files/register_complete.txt
+	RegisterCompleteDescText string
 )
