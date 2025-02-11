@@ -36,6 +36,9 @@ var (
 	//go:embed files/register_complete_text.txt
 	RegisterCompleteText string
 
+	//go:embed files/note_command_content_text.txt
+	NoteCommandContentText string
+
 	//go:embed files/ebat_ty_loh.jpg
 	EnterEmailMistakeMem embed.FS
 

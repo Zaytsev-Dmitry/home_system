@@ -1,6 +1,7 @@
 package notePresenter
 
 import (
+	"fmt"
 	noteSpec "github.com/Zaytsev-Dmitry/home_system_open_api/noteServerBackend"
 	noteDomain "noteBackendApp/internal/domain"
 )
@@ -30,12 +31,14 @@ func (presenter *Presenter) ToEntity(requestEntity *noteSpec.CreateNoteRequest) 
 func (presenter *Presenter) ToListNoteResponse(entities []noteDomain.Note) noteSpec.NoteResponseList {
 	var result = make([]noteSpec.NoteResponse, len(entities))
 	for i, value := range entities {
+		id := fmt.Sprint(value.ID)
 		var response = noteSpec.NoteResponse{
 			AccountId:   &value.AccountId,
 			TgId:        &value.TelegramId,
 			Link:        value.Link,
 			Name:        &value.Name,
 			Description: value.Description,
+			Id:          &id,
 		}
 		result[i] = response
 	}

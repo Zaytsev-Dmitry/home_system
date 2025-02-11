@@ -7,9 +7,11 @@ import (
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/external"
 	"telegramCLient/internal/components/paginator"
+	"telegramCLient/internal/handler/loader"
 	"telegramCLient/util"
 )
 
+var noteStrFormat = "*%s* %s"
 var (
 	fakeData = []string{
 		"*1* Lorem ipsum dolor sit amet, consectetur adipiscing elit",
@@ -107,11 +109,17 @@ func (h *NoteCommandHandler) deleteNoteCallback(ctx context.Context, b *bot.Bot,
 
 func (h *NoteCommandHandler) showAllNoteCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
 	data := h.noteBackClient.GetAllNotesByAccount(update.CallbackQuery.From.ID)
-	for i, value := range *data.Objects {
-		fmt.Print(i)
-		fmt.Print(value)
+	var stringData []string
+	for _, value := range *data.Objects {
+		text := fmt.Sprintf(
+			loader.NoteCommandContentText,
+			*value.Id,
+			*value.Name,
+			*value.Description,
+		)
+		stringData = append(stringData, text)
 	}
-	paginator.NewPaginator().CreateAndRun(ctx, b, update, fakeData, 5, "Закрыть ❌")
+	paginator.NewPaginator().CreateAndRun(ctx, b, update, stringData, 5, "Закрыть ❌")
 }
 
 func (h *NoteCommandHandler) showNoteByNameCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
