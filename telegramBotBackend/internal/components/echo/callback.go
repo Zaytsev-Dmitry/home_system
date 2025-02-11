@@ -21,6 +21,8 @@ var confirmCallbackYes = "callback_yes"
 var confirmCallbackNo = "callback_no"
 var startKeyboardCallback = "start_callback"
 
+// todo вынести куда то стейты типо StateAskFields
+// todo echo.updateUserAction(true, "StateAskFields", message) - такое себе
 func (echo *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) {
 	message := util.GetChatMessage(update)
 	data := tempDataSlice[message.Chat.ID]
