@@ -25,6 +25,8 @@ func LoadConfig(env string) *noteConfig.AppConfig {
 		appProfile = fmt.Sprintf(appProfile, "dev")
 	case "test":
 		appProfile = fmt.Sprintf(appProfile, "test")
+	case "docker":
+		appProfile = fmt.Sprintf(appProfile, "docker")
 	}
 	log.Println(fmt.Sprintf("Run application in mode : %s", getenv))
 	f, err := os.Open(appProfile)
@@ -94,10 +96,11 @@ func initOrmPort(config *noteConfig.AppConfig) *noteDaoPorts.OrmNotePort {
 
 func initSqlxPort(config *noteConfig.AppConfig) *noteDaoPorts.SqlxAuthPort {
 	dbURL := fmt.Sprintf(
-		"postgres://%s:%s@%s:5432/%s?sslmode=disable",
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		config.Database.Username,
 		config.Database.Password,
 		config.Database.Host,
+		config.Database.Port,
 		config.Database.DataBaseName,
 	)
 
