@@ -6,7 +6,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"github.com/go-telegram/ui/dialog"
-	"telegramCLient/internal/components"
+	dialog2 "telegramCLient/internal/components/dialog"
 	"telegramCLient/internal/handler/loader"
 )
 
@@ -37,12 +37,12 @@ var (
 )
 
 type TutorialCommandHandler struct {
-	Dialog components.DialogInline
+	Dialog dialog2.DialogInline
 }
 
 func NewTutorialCommandHandler() *TutorialCommandHandler {
 	return &TutorialCommandHandler{
-		*components.NewDialogInline(),
+		*dialog2.NewDialogInline(),
 	}
 }
 

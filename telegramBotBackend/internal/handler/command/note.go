@@ -5,7 +5,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/external"
-	"telegramCLient/internal/components"
+	"telegramCLient/internal/components/paginator"
 	"telegramCLient/util"
 )
 
@@ -87,7 +87,7 @@ func (h *NoteCommandHandler) deleteNoteCallback(ctx context.Context, b *bot.Bot,
 
 func (h *NoteCommandHandler) showAllNoteCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
 	//data := h.noteBackClient.GetAllNotesByAccount(update.CallbackQuery.From.ID)
-	components.NewPaginator().CreateAndRun(ctx, b, update, fakeData, 5, "Закрыть ❌")
+	paginator.NewPaginator().CreateAndRun(ctx, b, update, fakeData, 5, "Закрыть ❌")
 }
 
 func (h *NoteCommandHandler) showNoteByNameCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
