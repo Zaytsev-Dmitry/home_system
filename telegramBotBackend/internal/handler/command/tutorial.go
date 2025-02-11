@@ -40,6 +40,30 @@ type TutorialCommandHandler struct {
 	Dialog dialog2.DialogInline
 }
 
+func (c *TutorialCommandHandler) StartCommand(ctx context.Context, b *bot.Bot, update *models.Update) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (c *TutorialCommandHandler) ProceedMessage(ctx context.Context, b *bot.Bot, update *models.Update) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (c *TutorialCommandHandler) GetName() string {
+	return "/tutorial"
+}
+
+func (c *TutorialCommandHandler) ClearStatus(update *models.Update) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (c *TutorialCommandHandler) AddToDelete(msg int) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func NewTutorialCommandHandler() *TutorialCommandHandler {
 	return &TutorialCommandHandler{
 		*dialog2.NewDialogInline(),

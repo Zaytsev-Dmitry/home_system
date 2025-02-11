@@ -11,6 +11,30 @@ import (
 type MenuCommandHandler struct {
 }
 
+func (c *MenuCommandHandler) StartCommand(ctx context.Context, b *bot.Bot, update *models.Update) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (c *MenuCommandHandler) ProceedMessage(ctx context.Context, b *bot.Bot, update *models.Update) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (c *MenuCommandHandler) GetName() string {
+	return "/menu"
+}
+
+func (c *MenuCommandHandler) ClearStatus(update *models.Update) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (c *MenuCommandHandler) AddToDelete(msg int) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func NewMenuCommandHandler() *MenuCommandHandler {
 	return &MenuCommandHandler{}
 }

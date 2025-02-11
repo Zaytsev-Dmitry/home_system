@@ -41,23 +41,23 @@ func (h *HandlerCreater) CreateCommandsHandlers(noteBackClient *external.NoteBac
 			{
 				newCommand = command.NewStartCommandHandler(d, *authServerClient)
 			}
-		//case TUTORIAL_HANDLER:
-		//	{
-		//		result = append(result, command.NewTutorialCommandHandler().Init()...)
-		//	}
-		//case MENU_HANDLER:
-		//	{
-		//		result = append(result, command.NewMenuCommandHandler().Init()...)
-		//	}
+		case TUTORIAL_HANDLER:
+			{
+				newCommand = command.NewTutorialCommandHandler()
+			}
+		case MENU_HANDLER:
+			{
+				newCommand = command.NewMenuCommandHandler()
+			}
 		case NOTE_HANDLER:
 			{
 				newCommand = command.NewNoteCommandHandler(noteBackClient)
 			}
-			//
-			//case PROFILE_HANDLER:
-			//	{
-			//		result = append(result, command.NewProfileCommandHandler(authServerClient).Init()...)
-			//	}
+
+		case PROFILE_HANDLER:
+			{
+				newCommand = command.NewProfileCommandHandler(authServerClient)
+			}
 		}
 		result = append(result, newCommand.Init()...)
 		commands = append(commands, newCommand)

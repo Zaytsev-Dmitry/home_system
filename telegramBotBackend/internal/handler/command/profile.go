@@ -14,6 +14,30 @@ type ProfileCommandHandler struct {
 	AuthServerClient *external.AuthServerClient
 }
 
+func (h *ProfileCommandHandler) StartCommand(ctx context.Context, b *bot.Bot, update *models.Update) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (h *ProfileCommandHandler) ProceedMessage(ctx context.Context, b *bot.Bot, update *models.Update) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (h *ProfileCommandHandler) GetName() string {
+	return "/profile"
+}
+
+func (h *ProfileCommandHandler) ClearStatus(update *models.Update) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (h *ProfileCommandHandler) AddToDelete(msg int) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func NewProfileCommandHandler(authServerClient *external.AuthServerClient) *ProfileCommandHandler {
 	return &ProfileCommandHandler{
 		AuthServerClient: authServerClient,
