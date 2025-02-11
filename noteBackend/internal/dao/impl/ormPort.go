@@ -11,24 +11,24 @@ type OrmNotePort struct {
 	db *gorm.DB
 }
 
-func (port *OrmNotePort) Save(entity noteDomain.TelegramAccount) noteDomain.TelegramAccount {
+func (port *OrmNotePort) Save(entity noteDomain.Note) noteDomain.Note {
 	port.db.Clauses(clause.Returning{}).Create(&entity)
 	return entity
 }
 
-func (port *OrmNotePort) DeleteNotesByAccountId(accountId int) {
-	port.db.Where("account_id = ?", accountId).Delete(&noteDomain.TelegramAccount{})
+func (port *OrmNotePort) DeleteNotesByTgId(tgId int64) {
+	port.db.Where("account_id = ?", tgId).Delete(&noteDomain.Note{})
 }
 
-func (port *OrmNotePort) GetNotesByAccountId(accountId int) []noteDomain.Note {
+func (port *OrmNotePort) GetNotesByTgId(tgId int64) []noteDomain.Note {
 	var result []noteDomain.Note
-	port.db.Where("account_id = ?", accountId).Find(&result)
+	port.db.Where("account_id = ?", tgId).Find(&result)
 	return result
 }
 
 func (port *OrmNotePort) ExistByName(name string) bool {
 	var exists bool
-	err := port.db.Model(&noteDomain.TelegramAccount{}).
+	err := port.db.Model(&noteDomain.Note{}).
 		Select("count(*) > 0").
 		Where("name = ?", name).
 		Find(&exists).
@@ -40,8 +40,8 @@ func (port *OrmNotePort) ExistByName(name string) bool {
 	return exists
 }
 
-func (port *OrmNotePort) GetByName(name string) noteDomain.TelegramAccount {
-	var result noteDomain.TelegramAccount
+func (port *OrmNotePort) GetByName(name string) noteDomain.Note {
+	var result noteDomain.Note
 	port.db.Where("name = ?", name).Find(&result)
 	return result
 }

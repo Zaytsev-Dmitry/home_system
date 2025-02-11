@@ -36,30 +36,31 @@ func (h *HandlerCreater) CreateCommandsHandlers(noteBackClient *external.NoteBac
 		var newCommand command.BaseCommand
 		log.Println(fmt.Sprintf("CreateHandlers handler : %s. With order: %x", value, i+1))
 		switch value {
+
 		case START_HANDLER:
 			{
 				newCommand = command.NewStartCommandHandler(d, *authServerClient)
-				result = append(result, newCommand.Init()...)
-				commands = append(commands, newCommand)
 			}
-			//case TUTORIAL_HANDLER:
-			//	{
-			//		result = append(result, command.NewTutorialCommandHandler().Init()...)
-			//	}
-			//case MENU_HANDLER:
-			//	{
-			//		result = append(result, command.NewMenuCommandHandler().Init()...)
-			//	}
-			//case NOTE_HANDLER:
-			//	{
-			//		result = append(result, command.NewNoteCommandHandler(noteBackClient).Init()...)
-			//	}
+		//case TUTORIAL_HANDLER:
+		//	{
+		//		result = append(result, command.NewTutorialCommandHandler().Init()...)
+		//	}
+		//case MENU_HANDLER:
+		//	{
+		//		result = append(result, command.NewMenuCommandHandler().Init()...)
+		//	}
+		case NOTE_HANDLER:
+			{
+				newCommand = command.NewNoteCommandHandler(noteBackClient)
+			}
 			//
 			//case PROFILE_HANDLER:
 			//	{
 			//		result = append(result, command.NewProfileCommandHandler(authServerClient).Init()...)
 			//	}
 		}
+		result = append(result, newCommand.Init()...)
+		commands = append(commands, newCommand)
 	}
 	return result, commands
 }

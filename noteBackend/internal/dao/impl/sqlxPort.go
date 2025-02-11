@@ -6,22 +6,22 @@ import (
 	noteDomain "noteBackendApp/internal/domain"
 )
 
-const SELECT_BY_NAME = "select * from notes where account_id=($1)"
+const SELECT_BY_TELEGRAM_ID = "select * from notes where telegram_id=($1)"
 
 type SqlxAuthPort struct {
 	Db *sqlx.DB
 }
 
-func (p *SqlxAuthPort) Save(entity noteDomain.TelegramAccount) noteDomain.TelegramAccount {
-	return noteDomain.TelegramAccount{}
+func (p *SqlxAuthPort) Save(entity noteDomain.Note) noteDomain.Note {
+	return noteDomain.Note{}
 }
-func (p *SqlxAuthPort) DeleteNotesByAccountId(accountId int) {
+func (p *SqlxAuthPort) DeleteNotesByTgId(tgId int64) {
 
 }
 
-func (p *SqlxAuthPort) GetNotesByAccountId(accountId int) []noteDomain.Note {
+func (p *SqlxAuthPort) GetNotesByTgId(tgId int64) []noteDomain.Note {
 	var resp []noteDomain.Note
-	err := p.Db.Select(&resp, SELECT_BY_NAME, accountId)
+	err := p.Db.Select(&resp, SELECT_BY_TELEGRAM_ID, tgId)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -32,8 +32,8 @@ func (p *SqlxAuthPort) ExistByName(name string) bool {
 	return false
 }
 
-func (p *SqlxAuthPort) GetByName(name string) noteDomain.TelegramAccount {
-	return noteDomain.TelegramAccount{}
+func (p *SqlxAuthPort) GetByName(name string) noteDomain.Note {
+	return noteDomain.Note{}
 }
 
 func (port *SqlxAuthPort) CloseConnection() {

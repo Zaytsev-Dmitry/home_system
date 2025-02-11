@@ -2,7 +2,7 @@ server:
   botToken: "7553203004:AAE7nqBQfz7sRzEDwg0L4VIbUzriDjDFL1I"
   handlersToInit: [StartCommandHandler,NoteCommandHandler]
   authServerUrl: "http://localhost:8081"
-  noteBackendUrl: "http://localhost:8080"
+  noteBackendUrl: "http://noteBackend:8080"
 
 database:
   host: "localhost"

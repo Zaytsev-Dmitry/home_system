@@ -14,12 +14,12 @@ func (api *NoteBackendApi) SaveNote(c *gin.Context) {
 	api.controller.SaveNote(c)
 }
 
-func (api *NoteBackendApi) DeleteNotesByAccountId(c *gin.Context, accountId int) {
-	api.controller.DeleteNotesByAccountId(c, accountId)
+func (api *NoteBackendApi) DeleteNotesByTgId(c *gin.Context, tgId int) {
+	api.controller.DeleteNotesByTgId(c, int64(tgId))
 }
 
-func (api *NoteBackendApi) GetNotesByAccountId(c *gin.Context, accountId int) {
-	api.controller.GetNotesByAccountId(c, accountId)
+func (api *NoteBackendApi) GetNotesByTgId(c *gin.Context, tgId int64) {
+	api.controller.GetNotesByTgId(c, tgId)
 }
 
 func NewNoteBackendApi(dao noteInterface.NoteDao) *NoteBackendApi {

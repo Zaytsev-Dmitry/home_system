@@ -8,21 +8,22 @@ import (
 type Presenter struct {
 }
 
-func (presenter *Presenter) ToNoteResponse(entity noteDomain.TelegramAccount) noteSpec.NoteResponse {
+func (presenter *Presenter) ToNoteResponse(entity noteDomain.Note) noteSpec.NoteResponse {
 	return noteSpec.NoteResponse{
 		Name:        &entity.Name,
 		Link:        entity.Link,
 		Description: entity.Description,
 		AccountId:   &entity.AccountId,
+		TgId:        &entity.TelegramId,
 	}
 }
 
-func (presenter *Presenter) ToEntity(requestEntity *noteSpec.CreateNoteRequest) noteDomain.TelegramAccount {
-	return noteDomain.TelegramAccount{
+func (presenter *Presenter) ToEntity(requestEntity *noteSpec.CreateNoteRequest) noteDomain.Note {
+	return noteDomain.Note{
 		Name:        *requestEntity.Name,
-		AccountId:   *requestEntity.AccountId,
 		Description: requestEntity.Description,
 		Link:        requestEntity.Link,
+		TelegramId:  *requestEntity.TgId,
 	}
 }
 
@@ -31,6 +32,7 @@ func (presenter *Presenter) ToListNoteResponse(entities []noteDomain.Note) noteS
 	for i, value := range entities {
 		var response = noteSpec.NoteResponse{
 			AccountId:   &value.AccountId,
+			TgId:        &value.TelegramId,
 			Link:        value.Link,
 			Name:        &value.Name,
 			Description: value.Description,

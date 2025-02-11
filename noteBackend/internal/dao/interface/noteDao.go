@@ -5,9 +5,9 @@ import (
 )
 
 type NoteDao interface {
-	Save(entity noteDomain.TelegramAccount) noteDomain.TelegramAccount
-	DeleteNotesByAccountId(accountId int)
-	GetNotesByAccountId(accountId int) []noteDomain.Note
+	Save(entity noteDomain.Note) noteDomain.Note
+	DeleteNotesByTgId(tgId int64)
+	GetNotesByTgId(tgId int64) []noteDomain.Note
 	ExistByName(name string) bool
-	GetByName(name string) noteDomain.TelegramAccount
+	GetByName(name string) noteDomain.Note
 }

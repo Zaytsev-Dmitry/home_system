@@ -19,6 +19,7 @@ services:
     build:
       context: noteBackend
       dockerfile: Dockerfile
+    container_name: noteBackend
     ports:
       - "8080:8080"
     environment:

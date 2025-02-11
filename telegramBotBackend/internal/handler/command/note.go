@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/external"
@@ -75,6 +76,25 @@ func (h *NoteCommandHandler) Init() []bot.Option {
 	}
 }
 
+func (h *NoteCommandHandler) StartCommand(ctx context.Context, b *bot.Bot, update *models.Update) {
+
+}
+
+func (h *NoteCommandHandler) ProceedMessage(ctx context.Context, b *bot.Bot, update *models.Update) {
+
+}
+
+func (h *NoteCommandHandler) GetName() string {
+	return "/notes"
+}
+
+func (h *NoteCommandHandler) ClearStatus(update *models.Update) {
+}
+
+func (h *NoteCommandHandler) AddToDelete(msg int) {
+
+}
+
 // TODO отловаить ошибки
 func (h *NoteCommandHandler) addNoteCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
 
@@ -86,7 +106,11 @@ func (h *NoteCommandHandler) deleteNoteCallback(ctx context.Context, b *bot.Bot,
 }
 
 func (h *NoteCommandHandler) showAllNoteCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
-	//data := h.noteBackClient.GetAllNotesByAccount(update.CallbackQuery.From.ID)
+	data := h.noteBackClient.GetAllNotesByAccount(update.CallbackQuery.From.ID)
+	for i, value := range *data.Objects {
+		fmt.Print(i)
+		fmt.Print(value)
+	}
 	paginator.NewPaginator().CreateAndRun(ctx, b, update, fakeData, 5, "Закрыть ❌")
 }
 
@@ -94,14 +118,13 @@ func (h *NoteCommandHandler) showNoteByNameCallback(ctx context.Context, b *bot.
 
 }
 
-// TODO отловаить ошибки
+// TODO добавить edit msg если приходят из меню
 func (h *NoteCommandHandler) showNotesKeyboardCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
-	chatId, msgId := util.GetChatAndMsgId(update)
-	b.EditMessageText(
+	chatId, _ := util.GetChatAndMsgId(update)
+	b.SendMessage(
 		ctx,
-		&bot.EditMessageTextParams{
+		&bot.SendMessageParams{
 			ChatID:      chatId,
-			MessageID:   msgId,
 			Text:        "Выбери действие",
 			ReplyMarkup: h.buildNotesKeyboard(),
 		})

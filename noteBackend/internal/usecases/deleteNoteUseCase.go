@@ -8,6 +8,6 @@ type DeleteNoteUseCase struct {
 	DAO noteInterface.NoteDao
 }
 
-func (deleteUse *DeleteNoteUseCase) DeleteNoteByAccountId(id int) {
-	deleteUse.DAO.DeleteNotesByAccountId(id)
+func (deleteUse *DeleteNoteUseCase) DeleteNoteByTgId(tgId int64) {
+	deleteUse.DAO.DeleteNotesByTgId(tgId)
 }

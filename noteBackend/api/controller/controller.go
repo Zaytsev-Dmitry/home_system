@@ -27,13 +27,13 @@ func (controller *NoteController) SaveNote(c *gin.Context) {
 	)
 }
 
-func (controller *NoteController) DeleteNotesByAccountId(context *gin.Context, accountId int) {
-	controller.DeleteUseCase.DeleteNoteByAccountId(accountId)
+func (controller *NoteController) DeleteNotesByTgId(context *gin.Context, tgId int64) {
+	controller.DeleteUseCase.DeleteNoteByTgId(tgId)
 	context.Status(http.StatusNoContent)
 }
 
-func (controller *NoteController) GetNotesByAccountId(context *gin.Context, accountId int) {
-	obj := controller.GetUseCase.GetNoteByAccountId(accountId)
+func (controller *NoteController) GetNotesByTgId(context *gin.Context, tgId int64) {
+	obj := controller.GetUseCase.GetNoteByTgId(tgId)
 	noteUtilities.SetResponse(
 		controller.presenter.ToListNoteResponse(obj),
 		context,
