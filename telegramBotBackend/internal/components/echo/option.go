@@ -3,6 +3,7 @@ package echo
 import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"telegramCLient/internal/dao/repository/intefraces"
 )
 
 type Option func(e *Echo)
@@ -27,6 +28,12 @@ func WithStartButtonText(text string) Option {
 func WithCompleteText(text string) Option {
 	return func(p *Echo) {
 		p.completeText = text
+	}
+}
+
+func WithControlMessage(repo intefraces.ActionRepository) Option {
+	return func(p *Echo) {
+		p.actionRepo = repo
 	}
 }
 

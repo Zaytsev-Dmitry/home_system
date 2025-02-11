@@ -5,6 +5,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/internal/dao/repository/intefraces"
+	"telegramCLient/util"
 )
 
 type Echo struct {
@@ -61,9 +62,22 @@ func (echo *Echo) StartCollect() {
 		ReplyMarkup: echo.startKeyboard,
 		ParseMode:   models.ParseModeHTML,
 	})
+	//ранее добавляли сообщение. Эта итерация означает что человек ввел данные когда это не требовалось
 	echo.firstSentMsgId = message.ID
+	echo.actionRepo.SaveOrUpdate(message.Chat.ID, "StateDrawStartKeyboard", false, message.ID, echo.commandName)
 }
 
 func (echo *Echo) ProceedAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
 	echo.callback(ctx, b, update)
+}
+
+func (echo *Echo) Clear(update *models.Update) {
+	chatId, msgId := util.GetChatAndMsgId(update)
+	tempDataSlice[chatId] = dataCollect{}
+	messagesToDelete = append(messagesToDelete, msgId)
+	messagesToDelete = append(messagesToDelete, echo.firstSentMsgId)
+}
+
+func (echo *Echo) AddToDelete(msgId int) {
+	messagesToDelete = append(messagesToDelete, msgId)
 }

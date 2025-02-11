@@ -17,7 +17,7 @@ import (
 type StartCommandHandler struct {
 	dao              dao.TelegramBotDao
 	authServerClient external.AuthServerClient
-	echoComponent    echo.Echo
+	echoComponent    *echo.Echo
 }
 
 var tempMessageSlice = make(map[int64]TempUser)
@@ -59,6 +59,7 @@ func (h *StartCommandHandler) StartCommand(ctx context.Context, b *bot.Bot, upda
 	//h.callback(ctx, b, update)
 
 	opts := []echo.Option{
+		echo.WithControlMessage(h.dao.ActionRepo),
 		echo.WithStartButtonText(loader.StartMsgDescText),
 		echo.WithConfirmKeyboardText(loader.RegisterConfirmDescText),
 		echo.WithCompleteText(loader.RegisterCompleteDescText),
@@ -77,7 +78,7 @@ func (h *StartCommandHandler) StartCommand(ctx context.Context, b *bot.Bot, upda
 		}),
 	}
 	c := echo.NewEcho(ctx, b, chatId, msgId, opts, h.dao.ActionRepo, "/start")
-	h.echoComponent = *c
+	h.echoComponent = c
 	c.StartCollect()
 }
 
@@ -94,8 +95,11 @@ func (h *StartCommandHandler) GetName() string {
 }
 
 func (h *StartCommandHandler) ClearStatus(update *models.Update) {
-	chatId, _ := util.GetChatAndMsgId(update)
-	tempMessageSlice[chatId] = TempUser{}
+	h.echoComponent.Clear(update)
+}
+
+func (h *StartCommandHandler) AddToDelete(msg int) {
+	h.echoComponent.AddToDelete(msg)
 }
 
 func (h *StartCommandHandler) buildKeyboard() models.ReplyMarkup {

@@ -32,12 +32,14 @@ func (echo *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Updat
 	case StateDrawStartKeyboard:
 		data.State = StateAskFields
 		text = "Итак начнем..." + echo.getQuestion()
+		echo.updateUserAction(true, "StateAskFields", message)
 	case StateAskFields:
 		//добавляем сообщения от пользователя чтобы потом их удалить
 		messagesToDelete = append(messagesToDelete, message.ID)
 		text = echo.collectAnswer(&data, message, text)
 		if len(data.answers) == len(echo.questions) {
 			keyboard, text = echo.collectAnswersIsDone(keyboard, text, &data)
+			echo.updateUserAction(false, "StateConfirm", message)
 		}
 	case StateConfirm:
 		//пользователь подтвердил введеные данные
@@ -45,6 +47,7 @@ func (echo *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Updat
 			//шлем результат в вызвавщий компонент
 			text = echo.proceedConfirmYes(message, data, text, b)
 			isDoneCollect = true
+			echo.updateUserAction(false, "done", message)
 		} else {
 			text = echo.confirmProceedNo(&data, text)
 			isDoneCollect = true
@@ -126,6 +129,10 @@ func (echo *Echo) restoreIterator() {
 
 func (echo *Echo) getQuestion() string {
 	return echo.questions[answerIteratorIndex].Content
+}
+
+func (echo *Echo) updateUserAction(needUserAction bool, state string, message models.Message) {
+	echo.actionRepo.SaveOrUpdate(message.Chat.ID, state, needUserAction, message.ID, echo.commandName)
 }
 
 func (echo *Echo) addAnswer(data *dataCollect, message models.Message) {

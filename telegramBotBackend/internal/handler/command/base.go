@@ -12,4 +12,5 @@ type BaseCommand interface {
 	ProceedMessage(ctx context.Context, b *bot.Bot, update *models.Update)
 	GetName() string
 	ClearStatus(update *models.Update)
+	AddToDelete(msg int)
 }
