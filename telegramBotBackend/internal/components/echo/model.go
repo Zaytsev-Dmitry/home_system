@@ -1,9 +1,12 @@
 package echo
 
 type Result struct {
-	MsgId   int
-	ChatId  int64
-	Answers []CollectItem
+	MsgId         int
+	ChatId        int64
+	UserFirstName string
+	UserLastname  string
+	UserTGName    string
+	Answers       []CollectItem
 }
 type CollectItem struct {
 	FieldId   string

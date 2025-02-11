@@ -35,7 +35,7 @@ func (usecase *AccountUseCase) runBusinessLayout(request authSpec.CreateAccountR
 	var result domain.Account
 	respErr, keycloakEntity := usecase.getKeycloakUser(request)
 	if respErr == nil {
-		result, respErr = usecase.Repo.CreateAccountAndProfile(keycloakEntity, *request.TelegramId)
+		result, respErr = usecase.Repo.CreateAccountAndProfile(keycloakEntity, *request.Username, *request.TelegramId)
 	}
 	return result, respErr
 }

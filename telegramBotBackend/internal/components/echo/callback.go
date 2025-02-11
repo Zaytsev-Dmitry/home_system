@@ -38,7 +38,7 @@ func (echo *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Updat
 		messagesToDelete = append(messagesToDelete, message.ID)
 		text = echo.collectAnswer(&data, message, text)
 		if len(data.answers) == len(echo.questions) {
-			keyboard, text = echo.collectAnswersIsDone(keyboard, text, &data)
+			keyboard, text = echo.collectAnswersIsDone(keyboard, &data)
 			echo.updateUserAction(false, "StateConfirm", message)
 		}
 	case StateConfirm:
@@ -87,7 +87,7 @@ func (echo *Echo) collectAnswer(data *dataCollect, message models.Message, text 
 	return text
 }
 
-func (echo *Echo) collectAnswersIsDone(keyboard models.ReplyMarkup, text string, data *dataCollect) (models.ReplyMarkup, string) {
+func (echo *Echo) collectAnswersIsDone(keyboard models.ReplyMarkup, data *dataCollect) (models.ReplyMarkup, string) {
 	//собрали все ответы
 	keyboard = echo.confirmKeyboard
 	keyboardText := echo.confirmKeyboardText
@@ -111,9 +111,12 @@ func (echo *Echo) confirmProceedNo(data *dataCollect, text string) string {
 
 func (echo *Echo) proceedConfirmYes(message models.Message, data dataCollect, text string, b *bot.Bot) string {
 	echo.confirmCallbackFunction(Result{
-		ChatId:  echo.chatId,
-		MsgId:   message.ID,
-		Answers: data.answers,
+		ChatId:        echo.chatId,
+		MsgId:         message.ID,
+		Answers:       data.answers,
+		UserFirstName: message.Chat.FirstName,
+		UserLastname:  message.Chat.LastName,
+		UserTGName:    message.Chat.Username,
 	})
 	text = echo.completeText
 	for _, uid := range echo.callbackHandlerIDs {

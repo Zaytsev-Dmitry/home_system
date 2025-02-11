@@ -22,18 +22,21 @@ func NewAuthServerClient(authServerUrl string) *AuthServerClient {
 }
 
 // TODO отловаить ошибки
-func (serverClient *AuthServerClient) RegisterUser(source dto.CreateAccountRequest) dto.AccountDTO {
+func (serverClient *AuthServerClient) RegisterUser(source authSpec.CreateAccountRequest) dto.AccountDTO {
 	response, err := post(source, serverClient.AuthServerUrl+"/account")
 	if err != nil {
 		fmt.Println(err)
 	}
-	var respDto dto.AccountResponse
+	var respDto authSpec.AccountResponse
 	util.ParseResponseToStruct(response, &respDto)
 	return dto.AccountDTO{
-		FirstName: *respDto.Login,
-		LastName:  *respDto.Login,
-		Login:     *respDto.Login,
-		Email:     *respDto.Login,
+		ID:         *respDto.Id,
+		FirstName:  *respDto.FirstName,
+		LastName:   *respDto.LastName,
+		Username:   *respDto.Username,
+		Email:      *respDto.Email,
+		TgUsername: *respDto.TelegramUserName,
+		TelegramId: *respDto.TelegramId,
 	}
 }
 

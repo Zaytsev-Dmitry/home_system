@@ -10,9 +10,13 @@ type AccountPresenter struct {
 
 func (presenter *AccountPresenter) ToAccountResponse(entity domain.Account) authSpec.AccountResponse {
 	return authSpec.AccountResponse{
-		Email:     &entity.Email,
-		FirstName: &entity.FirstName,
-		LastName:  &entity.LastName,
+		Email:            &entity.Email,
+		FirstName:        &entity.FirstName,
+		Id:               &entity.ID,
+		LastName:         &entity.LastName,
+		TelegramId:       &entity.TelegramId,
+		TelegramUserName: &entity.TelegramUserName,
+		Username:         &entity.Username,
 	}
 }
 

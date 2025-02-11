@@ -38,7 +38,7 @@ func (h *HandlerCreater) CreateCommandsHandlers(noteBackClient *external.NoteBac
 		switch value {
 		case START_HANDLER:
 			{
-				newCommand = command.NewStartCommandHandler(d)
+				newCommand = command.NewStartCommandHandler(d, *authServerClient)
 				result = append(result, newCommand.Init()...)
 				commands = append(commands, newCommand)
 			}

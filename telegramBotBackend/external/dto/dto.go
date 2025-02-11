@@ -7,28 +7,32 @@ const (
 	WEB CreateAccountRequestAccountType = "WEB"
 )
 
-type AccountResponse struct {
-	Email     *string `json:"email,omitempty"`
-	FirstName *string `json:"firstName,omitempty"`
-	LastName  *string `json:"lastName,omitempty"`
-	Login     *string `json:"login,omitempty"`
-}
-
-type CreateAccountRequest struct {
-	AccountType *CreateAccountRequestAccountType `json:"accountType,omitempty"`
-	Email       *string                          `json:"email,omitempty"`
-	FirstName   *string                          `json:"firstName,omitempty"`
-	LastName    *string                          `json:"lastName,omitempty"`
-	Login       *string                          `json:"login,omitempty"`
-	Password    *string                          `json:"password,omitempty"`
-	TelegramId  *int64                           `json:"telegramId,omitempty"`
-}
+//type AccountResponse struct {
+//	Id               *int64  `json:"id,omitempty"`
+//	Username         *string `json:"username,omitempty"`
+//	FirstName        *string `json:"firstName,omitempty"`
+//	LastName         *string `json:"lastName,omitempty"`
+//	Email            *string `json:"email,omitempty"`
+//	TelegramUserName *string `json:"telegramUserName,omitempty"`
+//	TelegramId       *int64  `json:"telegramId,omitempty"`
+//}
+//
+//type CreateAccountRequest struct {
+//	AccountType      *CreateAccountRequestAccountType `json:"accountType,omitempty"`
+//	Email            *string                          `json:"email,omitempty"`
+//	FirstName        *string                          `json:"firstName,omitempty"`
+//	LastName         *string                          `json:"lastName,omitempty"`
+//	Username         *string                          `json:"username,omitempty"`
+//	TelegramUserName *string                          `json:"telegramUserName,omitempty"`
+//	TelegramId       *int64                           `json:"telegramId,omitempty"`
+//}
 
 type AccountDTO struct {
-	ID        uint64 `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Login     string `json:"login"`
-	Email     string `json:"email"`
-	Type      string `json:"type"`
+	ID         int64  `json:"id"`
+	FirstName  string `json:"firstName"`
+	LastName   string `json:"lastName"`
+	Username   string `json:"username"`
+	TgUsername string `json:"telegramUsername"`
+	Email      string `json:"email"`
+	TelegramId int64  `json:"telegramId"`
 }

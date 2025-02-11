@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	INSERT_ACCOUNT     = "insert into accounts (first_name, last_name, username, email, telegram_id, keycloak_id, is_active) values($1, $2, $3, $4, $5, $6, $7) RETURNING id, first_name, last_name, username, email, telegram_id, keycloak_id, is_active"
+	INSERT_ACCOUNT     = "insert into accounts (first_name, last_name, username, telegram_user_name, email, telegram_id, keycloak_id, is_active) values($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id, first_name, last_name, username,telegram_user_name, email, telegram_id, keycloak_id, is_active"
 	SELECT_ID_BY_TG_ID = "select ac.id from accounts ac where ac.telegram_id = ($1) limit 1"
 	SELECT_BY_TG_ID    = "select ac.* from accounts ac where ac.telegram_id = ($1)"
 )
@@ -24,17 +24,17 @@ type SqlxAccountPort struct {
 	ProfileRepo intefraces.ProfileRepository
 }
 
-func (port *SqlxAccountPort) CreateAccountAndProfile(entity keycloak.KeycloakEntity, tgId int) (authServerDomain.Account, error) {
+func (port *SqlxAccountPort) CreateAccountAndProfile(entity keycloak.KeycloakEntity, username string, tgId int64) (authServerDomain.Account, error) {
 	var result authServerDomain.Account
 	var resultErr error
 
 	tx := port.Db.MustBegin()
 	defer tx.Rollback()
 
-	selectErr := tx.Get(&result, SELECT_BY_TG_ID, int64(tgId))
+	selectErr := tx.Get(&result, SELECT_BY_TG_ID, tgId)
 	if selectErr == sql.ErrNoRows {
 		//INSERT аккаунт
-		errInsertAcc := tx.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, entity.Username, entity.Email, tgId, entity.ID, true).StructScan(&result)
+		errInsertAcc := tx.QueryRowx(INSERT_ACCOUNT, entity.FirstName, entity.LastName, username, entity.Username, entity.Email, tgId, entity.ID, true).StructScan(&result)
 		if errInsertAcc != nil {
 			return authServerDomain.Account{}, repository.Fail(utilities.Error{
 				Msg: "CreateAccountAndProfile.INSERT_ACCOUNT fail",

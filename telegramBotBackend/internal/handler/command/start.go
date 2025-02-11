@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/external"
@@ -17,8 +18,8 @@ type StartCommandHandler struct {
 	echoComponent    *echo.Echo
 }
 
-func NewStartCommandHandler(d dao.TelegramBotDao) *StartCommandHandler {
-	return &StartCommandHandler{dao: d}
+func NewStartCommandHandler(d dao.TelegramBotDao, serverClient external.AuthServerClient) *StartCommandHandler {
+	return &StartCommandHandler{dao: d, authServerClient: serverClient}
 }
 
 func (h *StartCommandHandler) Init() []bot.Option {
@@ -38,7 +39,7 @@ func (h *StartCommandHandler) StartCommand(ctx context.Context, b *bot.Bot, upda
 		echo.WithConfirmFunction(h.proceedResult),
 		echo.Questions([]echo.CollectItem{
 			{
-				FieldId:   "login",
+				FieldId:   "username",
 				FieldName: "Логин: ",
 				Content:   "Как мне к тебе обращаться?",
 			},
@@ -60,7 +61,24 @@ func (h *StartCommandHandler) ProceedMessage(ctx context.Context, b *bot.Bot, up
 
 func (h *StartCommandHandler) proceedResult(result echo.Result) {
 	h.dao.ActionRepo.SaveOrUpdate(result.ChatId, "Done", false, result.MsgId, h.GetName())
-	//TODO вызвать сервис регистрации пользака
+	accType := authSpec.TG
+	request := authSpec.CreateAccountRequest{
+		AccountType:      &accType,
+		TelegramId:       &result.ChatId,
+		FirstName:        &result.UserFirstName,
+		LastName:         &result.UserLastname,
+		TelegramUserName: &result.UserTGName,
+	}
+	for i, answer := range result.Answers {
+		if answer.FieldId == "username" {
+			request.Username = &result.Answers[i].Content
+		}
+		if answer.FieldId == "email" {
+			request.Email = &result.Answers[i].Content
+		}
+	}
+	//TODO если не смог зарегать то надо отправлять ошибку и как бы банить выполнение команды
+	h.authServerClient.RegisterUser(request)
 }
 
 func (h *StartCommandHandler) GetName() string {

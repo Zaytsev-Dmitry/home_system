@@ -3,7 +3,7 @@ module authServer
 go 1.23.0
 
 require (
-	github.com/Zaytsev-Dmitry/home_system_open_api v1.0.4
+	github.com/Zaytsev-Dmitry/home_system_open_api v1.0.6
 	github.com/gin-gonic/gin v1.10.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/lib/pq v1.10.9

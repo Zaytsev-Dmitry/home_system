@@ -48,12 +48,12 @@ type KeycloakResponseError struct {
 
 func newKeycloakUserCreateRequest(request authSpec.CreateAccountRequest) *KeycloakUserCreateRequest {
 	credentials := make([]Credentials, 1)
-	credentials[0] = Credentials{
-		Type: "password", Value: *request.Password, Temporary: false,
-	}
+	//credentials[0] = Credentials{
+	//	Type: "password", Value: *request.Password, Temporary: false,
+	//}
 	return &KeycloakUserCreateRequest{
 		Enabled:     true,
-		Username:    *request.TelegramUsername,
+		Username:    *request.TelegramUserName,
 		Email:       *request.Email,
 		FirstName:   *request.FirstName,
 		LastName:    *request.LastName,

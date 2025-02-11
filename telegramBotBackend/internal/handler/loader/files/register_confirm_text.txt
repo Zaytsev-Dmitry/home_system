@@ -1,6 +1,6 @@
 <b>Все верно?</b>
 
-<b>Логин:</b><blockquote>login</blockquote>
+<b>Логин:</b><blockquote>username</blockquote>
 
 <b>Email:</b><blockquote>email</blockquote>
 
