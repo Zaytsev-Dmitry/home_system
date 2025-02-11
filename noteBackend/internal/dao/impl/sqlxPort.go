@@ -6,15 +6,25 @@ import (
 	noteDomain "noteBackendApp/internal/domain"
 )
 
-const SELECT_BY_TELEGRAM_ID = "select * from notes where telegram_id=($1)"
+const (
+	SELECT_BY_TELEGRAM_ID = "select * from notes where telegram_id=($1)"
+	INSERT                = "insert into notes (account_id, telegram_id, name, link, description) values ($1, $2, $3, $4, $5) RETURNING *"
+)
 
 type SqlxAuthPort struct {
 	Db *sqlx.DB
 }
 
+// TODO отловить ошибки
 func (p *SqlxAuthPort) Save(entity noteDomain.Note) noteDomain.Note {
-	return noteDomain.Note{}
+	var result noteDomain.Note
+	err := p.Db.QueryRowx(INSERT, entity.AccountId, entity.TelegramId, entity.Name, entity.Link, entity.Description).StructScan(&result)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return result
 }
+
 func (p *SqlxAuthPort) DeleteNotesByTgId(tgId int64) {
 
 }

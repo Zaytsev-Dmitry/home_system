@@ -51,7 +51,7 @@ func (h *HandlerCreater) CreateCommandsHandlers(noteBackClient *external.NoteBac
 			}
 		case NOTE_HANDLER:
 			{
-				newCommand = command.NewNoteCommandHandler(noteBackClient)
+				newCommand = command.NewNoteCommandHandler(d, noteBackClient)
 			}
 
 		case PROFILE_HANDLER:

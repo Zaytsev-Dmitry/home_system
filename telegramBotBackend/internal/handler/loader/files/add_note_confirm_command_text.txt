@@ -1,0 +1,7 @@
+<b>Все верно?</b>
+
+<b>Название:</b><blockquote>name</blockquote>
+
+<b>Содержимое:</b><blockquote>content</blockquote>
+
+<b>Ссылка:</b><blockquote>link</blockquote>

@@ -39,6 +39,15 @@ var (
 	//go:embed files/note_command_content_text.txt
 	NoteCommandContentText string
 
+	//go:embed files/add_note_start_command_text.txt
+	AddNoteStartCommandText string
+
+	//go:embed files/add_note_confirm_command_text.txt
+	AddNoteConfirmCommandText string
+
+	//go:embed files/add_note_complete_command_text.txt
+	AddNoteCompleteCommandText string
+
 	//go:embed files/ebat_ty_loh.jpg
 	EnterEmailMistakeMem embed.FS
 

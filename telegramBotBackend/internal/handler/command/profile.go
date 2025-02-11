@@ -77,9 +77,15 @@ func (h *ProfileCommandHandler) callback(ctx context.Context, b *bot.Bot, update
 	}
 	profile := h.AuthServerClient.GetProfileByTelegramId(tgId)
 
+	var username string
+	if profile.TelegramUsername == nil {
+		username = "Его украли но обещали скоро вернуть"
+	} else {
+		username = *profile.TelegramUsername
+	}
 	text := fmt.Sprintf(
 		loader.ProfileCommandContentText,
-		*profile.TelegramUsername,
+		username,
 		strconv.Itoa(tgId),
 		"Тут должен быть твой email, но его украли",
 		*profile.Role,

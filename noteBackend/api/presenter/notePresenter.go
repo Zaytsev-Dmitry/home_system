@@ -12,8 +12,8 @@ type Presenter struct {
 func (presenter *Presenter) ToNoteResponse(entity noteDomain.Note) noteSpec.NoteResponse {
 	return noteSpec.NoteResponse{
 		Name:        &entity.Name,
-		Link:        entity.Link,
-		Description: entity.Description,
+		Link:        &entity.Link,
+		Description: &entity.Description,
 		AccountId:   &entity.AccountId,
 		TgId:        &entity.TelegramId,
 	}
@@ -22,8 +22,8 @@ func (presenter *Presenter) ToNoteResponse(entity noteDomain.Note) noteSpec.Note
 func (presenter *Presenter) ToEntity(requestEntity *noteSpec.CreateNoteRequest) noteDomain.Note {
 	return noteDomain.Note{
 		Name:        *requestEntity.Name,
-		Description: requestEntity.Description,
-		Link:        requestEntity.Link,
+		Description: *requestEntity.Description,
+		Link:        *requestEntity.Link,
 		TelegramId:  *requestEntity.TgId,
 	}
 }
@@ -35,9 +35,9 @@ func (presenter *Presenter) ToListNoteResponse(entities []noteDomain.Note) noteS
 		var response = noteSpec.NoteResponse{
 			AccountId:   &value.AccountId,
 			TgId:        &value.TelegramId,
-			Link:        value.Link,
+			Link:        &value.Link,
 			Name:        &value.Name,
-			Description: value.Description,
+			Description: &value.Description,
 			Id:          &id,
 		}
 		result[i] = response
