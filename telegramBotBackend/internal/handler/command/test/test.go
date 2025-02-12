@@ -26,7 +26,13 @@ func NewTestCommand(action command.UserAction, st storage.Storage, bot *bot.Bot,
 		ctx:            ctx,
 		action:         action,
 	}
-	c.component = echo.NewEcho(bot, c.getQuestions(), c.proceedResult, c.LogCommandAction, "Тестовый start текст", "Тестовый конфирм текст", "Комплит тест текст")
+	textMeta := echo.TextMeta{
+		ConfirmText:  "Тестовый конфирм текст",
+		StartText:    "Тестовый start текст",
+		CompleteText: "Комплит тест текст",
+	}
+
+	c.component = echo.NewEcho(bot, c.getQuestions(), c.proceedResult, c.LogCommandAction, textMeta)
 	return c
 }
 

@@ -19,20 +19,22 @@ type Echo struct {
 	callbackHandlerID string
 	proceedResult     proceedResult
 	logCommand        logCommand
-	confirmText       string
-	startText         string
-	completeText      string
+	text              TextMeta
 }
 
-func NewEcho(b *bot.Bot, questions []CollectItem, pr proceedResult, lc logCommand, startText string, confirmText string, completeText string) *Echo {
+type TextMeta struct {
+	ConfirmText  string
+	StartText    string
+	CompleteText string
+}
+
+func NewEcho(b *bot.Bot, questions []CollectItem, pr proceedResult, lc logCommand, textP TextMeta) *Echo {
 	e := &Echo{
 		question:      questions,
 		prefix:        bot.RandomString(16),
 		proceedResult: pr,
 		logCommand:    lc,
-		startText:     startText,
-		confirmText:   confirmText,
-		completeText:  completeText,
+		text:          textP,
 	}
 	e.callbackHandlerID = b.RegisterHandler(bot.HandlerTypeCallbackQueryData, e.prefix, bot.MatchTypePrefix, e.callback)
 	return e
@@ -43,7 +45,7 @@ func (e *Echo) Collect(ctx context.Context, b *bot.Bot, update *models.Update) {
 	chatId, _ := util.GetChatAndMsgId(update)
 	message, err := b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:      chatId,
-		Text:        e.startText,
+		Text:        e.text.StartText,
 		ReplyMarkup: e.buildDefaultStartKeyboard(),
 		ParseMode:   models.ParseModeHTML,
 	})

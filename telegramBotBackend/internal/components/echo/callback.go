@@ -43,10 +43,10 @@ func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) 
 				status = Status{actualState: CONFIRM, questionIterator: 0}
 
 				for i, question := range e.question {
-					e.confirmText = strings.Replace(e.confirmText, "name_"+strconv.Itoa(i), question.FieldName, -1)
-					e.confirmText = strings.Replace(e.confirmText, "value_"+strconv.Itoa(i), question.Answer, -1)
+					e.text.ConfirmText = strings.Replace(e.text.ConfirmText, "name_"+strconv.Itoa(i), question.FieldName, -1)
+					e.text.ConfirmText = strings.Replace(e.text.ConfirmText, "value_"+strconv.Itoa(i), question.Answer, -1)
 				}
-				text = e.confirmText
+				text = e.text.ConfirmText
 				keyboard = e.buildDefaultConfirmKeyboard()
 			} else {
 				text = "Следующий вопрос: " + e.question[status.questionIterator].Content
@@ -58,7 +58,7 @@ func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) 
 			if cmd == CONFIRM_YES {
 				e.proceedResult(e.question)
 				e.logCommand(message.Chat.ID, "complete")
-				text = e.completeText
+				text = e.text.CompleteText
 			} else {
 				text = "Ну хорошо давай заново: " + e.question[0].Content
 				status = Status{actualState: ASK_FIELDS}

@@ -33,7 +33,12 @@ func NewStartCommand(action command.UserAction, st storage.Storage, bot *bot.Bot
 		ctx:              ctx,
 		action:           action,
 	}
-	s.component = echo.NewEcho(bot, s.getQuestions(), s.proceedResult, s.LogCommandAction, loader.StartCommandText, loader.RegisterConfirmText, loader.RegisterCompleteText)
+	textMeta := echo.TextMeta{
+		ConfirmText:  loader.RegisterConfirmText,
+		StartText:    loader.StartCommandText,
+		CompleteText: loader.RegisterCompleteText,
+	}
+	s.component = echo.NewEcho(bot, s.getQuestions(), s.proceedResult, s.LogCommandAction, textMeta)
 	return s
 }
 
