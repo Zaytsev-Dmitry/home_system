@@ -7,6 +7,5 @@ import (
 )
 
 func (s *StartCommand) callback(ctx context.Context, b *bot.Bot, update *models.Update) {
-	//TODO команда запущена
 	s.component.Collect(ctx, b, update)
 }

@@ -43,8 +43,7 @@ func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) 
 			if status.questionIterator == len(e.question) {
 				//получили все ответы - меняем статус
 				status = Status{actualState: CONFIRM, questionIterator: 0}
-				fillConfirmText(e.text.ConfirmText, e.question)
-				text = e.text.ConfirmText
+				text = fillConfirmText(e.text.ConfirmText, e.question)
 				keyboard = e.buildDefaultConfirmKeyboard()
 			} else {
 				text = "Следующий вопрос: " + e.question[status.questionIterator].Content
@@ -68,11 +67,13 @@ func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) 
 	e.sendResult(isComplete, message)
 }
 
-func fillConfirmText(confirmText string, question []CollectItem) {
+func fillConfirmText(confirmText string, question []CollectItem) string {
+	var result = confirmText
 	for i, value := range question {
-		confirmText = strings.Replace(confirmText, "name_"+strconv.Itoa(i), value.FieldName, -1)
-		confirmText = strings.Replace(confirmText, "value_"+strconv.Itoa(i), value.Answer, -1)
+		result = strings.Replace(result, "name_"+strconv.Itoa(i), value.FieldName, -1)
+		result = strings.Replace(result, "value_"+strconv.Itoa(i), value.Answer, -1)
 	}
+	return result
 }
 
 func (e *Echo) sendMsgToUser(ctx context.Context, b *bot.Bot, message models.Message, text string, keyboard models.ReplyMarkup) *models.Message {
@@ -93,9 +94,12 @@ func (e *Echo) sendResult(isComplete bool, message models.Message) {
 			ids[i] = value.Id
 		}
 		e.proceedResult(Result{
-			ChatId:      message.Chat.ID,
-			Question:    e.question,
-			MessagesIds: ids,
+			ChatId:        message.Chat.ID,
+			UserFirstName: message.Chat.FirstName,
+			UserLastname:  message.Chat.LastName,
+			Username:      message.Chat.Username,
+			Question:      e.question,
+			MessagesIds:   ids,
 		})
 		e.logCommand(message.Chat.ID, "end")
 	}

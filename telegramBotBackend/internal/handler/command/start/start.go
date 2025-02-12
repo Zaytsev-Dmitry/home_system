@@ -2,6 +2,7 @@ package start
 
 import (
 	"context"
+	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/external"
@@ -53,6 +54,25 @@ func (s *StartCommand) proceedUserAnswer(ctx context.Context, b *bot.Bot, update
 }
 
 func (s *StartCommand) proceedResult(result echo.Result) {
+	accType := authSpec.TG
+	request := authSpec.CreateAccountRequest{
+		AccountType:      &accType,
+		TelegramId:       &result.ChatId,
+		FirstName:        &result.UserFirstName,
+		LastName:         &result.UserLastname,
+		TelegramUserName: &result.Username,
+	}
+	for i, answer := range result.Question {
+		if answer.FieldId == "username" {
+			request.Username = &result.Question[i].Answer
+		}
+		if answer.FieldId == "email" {
+			request.Email = &result.Question[i].Answer
+		}
+	}
+	//TODO если не смог зарегать то надо отправлять ошибку и как бы банить выполнение команды
+	s.authServerClient.RegisterUser(request)
+
 	s.bot.DeleteMessages(
 		s.ctx, &bot.DeleteMessagesParams{
 			ChatID:     result.ChatId,
