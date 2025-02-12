@@ -83,7 +83,7 @@ func (s *StartCommand) proceedResult(result echo.Result) {
 		s.bot.DeleteMessages(
 			s.ctx, &bot.DeleteMessagesParams{
 				ChatID:     result.ChatId,
-				MessageIDs: result.MessagesIds[0 : len(result.MessagesIds)-1],
+				MessageIDs: result.MessagesIds[0:len(result.MessagesIds)],
 			},
 		)
 		s.messageStorage.ClearAll(result.ChatId)
