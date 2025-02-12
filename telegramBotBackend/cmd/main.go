@@ -61,22 +61,22 @@ func createAndRegisterCommands(ua *command.UserAction, conf *config.AppConfig, b
 		log.Println(fmt.Sprintf("Create command : %s. With order: %x", value, i+1))
 		switch value {
 		case TEST_COMMAND:
-			newCommand = test.NewTestCommand(storage, b, ctx)
+			newCommand = test.NewTestCommand(*ua, storage, b, ctx)
 
 		case MENU_COMMAND:
-			newCommand = menu.NewMenuCommand(storage, b, ctx)
+			newCommand = menu.NewMenuCommand(*ua, storage, b, ctx)
 
 		case TUTORIAL_COMMAND:
-			newCommand = tutorial.NewTutorialCommand(storage, b, ctx)
+			newCommand = tutorial.NewTutorialCommand(*ua, storage, b, ctx)
 
 		case PROFILE_COMMAND:
-			newCommand = profile.NewProfileCommand(storage, b, ctx, authServerClient)
+			newCommand = profile.NewProfileCommand(*ua, storage, b, ctx, authServerClient)
 
 		case NOTES_COMMAND:
-			newCommand = notes.NewNotesCommand(storage, b, ctx, dao, noteBackendClient)
+			newCommand = notes.NewNotesCommand(*ua, storage, b, ctx, dao, noteBackendClient)
 
 		case START_COMMAND:
-			newCommand = start.NewStartCommand(storage, b, ctx, dao, authServerClient)
+			newCommand = start.NewStartCommand(*ua, storage, b, ctx, dao, authServerClient)
 		default:
 			fmt.Println("Неизвестная команда")
 		}

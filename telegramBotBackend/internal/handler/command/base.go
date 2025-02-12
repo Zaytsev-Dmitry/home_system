@@ -10,4 +10,5 @@ type BaseCommand interface {
 	RegisterHandler()
 	ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update)
 	GetName() string
+	LogCommandAction(userId int64, status string)
 }

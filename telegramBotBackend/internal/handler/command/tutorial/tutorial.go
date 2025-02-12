@@ -7,6 +7,7 @@ import (
 	"github.com/go-telegram/bot/models"
 	"github.com/go-telegram/ui/dialog"
 	dialog2 "telegramCLient/internal/components/dialog"
+	"telegramCLient/internal/handler/command"
 	"telegramCLient/internal/handler/loader"
 	"telegramCLient/internal/storage"
 )
@@ -43,14 +44,16 @@ type TutorialCommand struct {
 	ctx               context.Context
 	bot               *bot.Bot
 	callbackHandlerID string
+	action            command.UserAction
 }
 
-func NewTutorialCommand(st storage.Storage, bot *bot.Bot, ctx context.Context) *TutorialCommand {
+func NewTutorialCommand(action command.UserAction, st storage.Storage, bot *bot.Bot, ctx context.Context) *TutorialCommand {
 	return &TutorialCommand{
 		component:      *dialog2.NewDialogInline(),
 		messageStorage: st,
 		bot:            bot,
 		ctx:            ctx,
+		action:         action,
 	}
 }
 
@@ -59,6 +62,10 @@ func (t *TutorialCommand) RegisterHandler() {
 }
 
 func (t *TutorialCommand) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
+}
+
+func (t *TutorialCommand) LogCommandAction(userId int64, status string) {
+	t.action.LogCommand(userId, status, t.GetName())
 }
 
 func (t *TutorialCommand) GetName() string {

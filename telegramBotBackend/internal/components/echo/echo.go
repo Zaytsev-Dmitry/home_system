@@ -10,6 +10,7 @@ import (
 )
 
 type proceedResult func(result []CollectItem)
+type logCommand func(userId int64, status string)
 
 type Echo struct {
 	question          []CollectItem
@@ -17,17 +18,21 @@ type Echo struct {
 	prefix            string
 	callbackHandlerID string
 	proceedResult     proceedResult
+	logCommand        logCommand
 	confirmText       string
 	startText         string
+	completeText      string
 }
 
-func NewEcho(b *bot.Bot, questions []CollectItem, pr proceedResult, startText string, confirmText string) *Echo {
+func NewEcho(b *bot.Bot, questions []CollectItem, pr proceedResult, lc logCommand, startText string, confirmText string, completeText string) *Echo {
 	e := &Echo{
 		question:      questions,
 		prefix:        bot.RandomString(16),
 		proceedResult: pr,
+		logCommand:    lc,
 		startText:     startText,
 		confirmText:   confirmText,
+		completeText:  completeText,
 	}
 	e.callbackHandlerID = b.RegisterHandler(bot.HandlerTypeCallbackQueryData, e.prefix, bot.MatchTypePrefix, e.callback)
 	return e
@@ -46,6 +51,7 @@ func (e *Echo) Collect(ctx context.Context, b *bot.Bot, update *models.Update) {
 		fmt.Print(err.Error())
 	}
 	e.addToStorage(chatId, message)
+	e.logCommand(chatId, "start")
 }
 
 func (e *Echo) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {

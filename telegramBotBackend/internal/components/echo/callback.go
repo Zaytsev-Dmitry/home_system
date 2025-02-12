@@ -57,6 +57,8 @@ func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) 
 			cmd := strings.TrimPrefix(update.CallbackQuery.Data, e.prefix)
 			if cmd == CONFIRM_YES {
 				e.proceedResult(e.question)
+				e.logCommand(message.Chat.ID, "complete")
+				text = e.completeText
 			} else {
 				text = "Ну хорошо давай заново: " + e.question[0].Content
 				status = Status{actualState: ASK_FIELDS}

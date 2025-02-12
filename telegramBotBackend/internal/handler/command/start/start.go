@@ -8,6 +8,7 @@ import (
 	"telegramCLient/external"
 	"telegramCLient/internal/components/echo"
 	"telegramCLient/internal/dao"
+	"telegramCLient/internal/handler/command"
 	"telegramCLient/internal/handler/loader"
 	"telegramCLient/internal/storage"
 )
@@ -20,17 +21,19 @@ type StartCommand struct {
 	ctx               context.Context
 	bot               *bot.Bot
 	callbackHandlerID string
+	action            command.UserAction
 }
 
-func NewStartCommand(st storage.Storage, bot *bot.Bot, ctx context.Context, d dao.TelegramBotDao, serverClient *external.AuthServerClient) *StartCommand {
+func NewStartCommand(action command.UserAction, st storage.Storage, bot *bot.Bot, ctx context.Context, d dao.TelegramBotDao, serverClient *external.AuthServerClient) *StartCommand {
 	s := &StartCommand{
 		dao:              d,
 		authServerClient: serverClient,
 		messageStorage:   st,
 		bot:              bot,
 		ctx:              ctx,
+		action:           action,
 	}
-	s.component = echo.NewEcho(bot, s.getQuestions(), s.proceedResult, loader.StartCommandText, loader.RegisterConfirmText)
+	s.component = echo.NewEcho(bot, s.getQuestions(), s.proceedResult, s.LogCommandAction, loader.StartCommandText, loader.RegisterConfirmText, loader.RegisterCompleteText)
 	return s
 }
 
@@ -48,6 +51,10 @@ func (s *StartCommand) proceedResult(result []echo.CollectItem) {
 
 func (s *StartCommand) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
 	s.component.ProceedUserAnswer(ctx, b, update)
+}
+
+func (s *StartCommand) LogCommandAction(userId int64, status string) {
+	s.action.LogCommand(userId, status, s.GetName())
 }
 
 func (s *StartCommand) GetName() string {
