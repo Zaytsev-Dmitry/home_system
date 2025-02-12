@@ -13,14 +13,14 @@ import (
 	"os/signal"
 	"telegramCLient/config"
 	"telegramCLient/external"
+	command2 "telegramCLient/internal/command"
+	"telegramCLient/internal/command/menu"
+	"telegramCLient/internal/command/notes"
+	"telegramCLient/internal/command/profile"
+	"telegramCLient/internal/command/start"
+	"telegramCLient/internal/command/test"
+	"telegramCLient/internal/command/tutorial"
 	"telegramCLient/internal/dao"
-	"telegramCLient/internal/handler/command"
-	"telegramCLient/internal/handler/command/menu"
-	"telegramCLient/internal/handler/command/notes"
-	"telegramCLient/internal/handler/command/profile"
-	"telegramCLient/internal/handler/command/start"
-	"telegramCLient/internal/handler/command/test"
-	"telegramCLient/internal/handler/command/tutorial"
 	"telegramCLient/internal/storage"
 )
 
@@ -45,19 +45,19 @@ func main() {
 		panic(err)
 	}
 
-	ua := command.NewAction(*dao)
+	ua := command2.NewAction(*dao)
 	createAndRegisterCommands(ua, appConfig, bot, ctx, *dao)
 	bot.Start(ctx)
 	defer dao.Close()
 }
 
-func createAndRegisterCommands(a *command.Action, conf *config.AppConfig, b *bot.Bot, ctx context.Context, dao dao.TelegramBotDao) {
+func createAndRegisterCommands(a *command2.Action, conf *config.AppConfig, b *bot.Bot, ctx context.Context, dao dao.TelegramBotDao) {
 	storage := *storage.NewStorage()
 	authServerClient := external.NewAuthServerClient(conf.Server.AuthServerUrl)
 	noteBackendClient := external.NewNoteBackendClient(conf.Server.NoteBackendUrl)
 
 	for i, value := range conf.Server.CommandsToInit {
-		var newCommand command.BaseCommand
+		var newCommand command2.BaseCommand
 		log.Println(fmt.Sprintf("Create command : %s. With order: %x", value, i+1))
 		switch value {
 		case TEST_COMMAND:

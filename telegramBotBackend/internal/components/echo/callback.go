@@ -6,6 +6,7 @@ import (
 	"github.com/go-telegram/bot/models"
 	"strconv"
 	"strings"
+	"telegramCLient/internal/storage"
 	"telegramCLient/util"
 )
 
@@ -26,7 +27,11 @@ const (
 
 func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) {
 	message := util.GetChatMessage(update)
-	e.addToStorage(message.Chat.ID, &message)
+	messageType := storage.BOT
+	if update.CallbackQuery == nil {
+		messageType = storage.USER
+	}
+	e.addToStorage(message.Chat.ID, &message, messageType)
 	status := ActualStatus[message.Chat.ID]
 	var text string
 	var keyboard models.ReplyMarkup
@@ -70,7 +75,7 @@ func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) 
 			ReplyMarkup: keyboard,
 			ParseMode:   models.ParseModeHTML,
 		})
-		e.addToStorage(sendMessage.Chat.ID, sendMessage)
+		e.addToStorage(sendMessage.Chat.ID, sendMessage, messageType)
 	} else {
 		e.sendResult(isComplete, message)
 	}

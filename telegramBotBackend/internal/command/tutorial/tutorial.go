@@ -6,9 +6,9 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"github.com/go-telegram/ui/dialog"
+	"telegramCLient/internal/command"
+	"telegramCLient/internal/command/loader"
 	dialog2 "telegramCLient/internal/components/dialog"
-	"telegramCLient/internal/handler/command"
-	"telegramCLient/internal/handler/loader"
 	"telegramCLient/internal/storage"
 )
 

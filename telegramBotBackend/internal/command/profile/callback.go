@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
-	"telegramCLient/internal/handler/loader"
+	"telegramCLient/internal/command/loader"
 	"telegramCLient/util"
 )
 

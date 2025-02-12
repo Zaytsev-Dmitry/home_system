@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"telegramCLient/internal/command/loader"
 	"telegramCLient/internal/components/paginator"
-	"telegramCLient/internal/handler/loader"
 	"telegramCLient/internal/storage"
 	"telegramCLient/util"
 )
@@ -46,5 +46,5 @@ func (n *NoteCommand) showNotesKeyboardCallback(ctx context.Context, b *bot.Bot,
 			ReplyMarkup: n.buildNotesKeyboard(),
 		})
 	n.action.Log(message.Chat.ID, n.GetName(), false, true)
-	n.messageStorage.Add(chatId, *storage.NewMessage(message.ID, message.Text, 0, storage.BOT))
+	n.messageStorage.Add(chatId, *storage.NewMessage(message.ID, message.Text, storage.BOT))
 }

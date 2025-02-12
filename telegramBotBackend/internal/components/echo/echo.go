@@ -55,21 +55,20 @@ func (e *Echo) Collect(ctx context.Context, b *bot.Bot, update *models.Update) {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
-	e.addToStorage(sourceMessage.Chat.ID, &sourceMessage)
-	e.addToStorage(sourceMessage.Chat.ID, message)
+	e.addToStorage(sourceMessage.Chat.ID, &sourceMessage, storage.USER)
+	e.addToStorage(sourceMessage.Chat.ID, message, storage.BOT)
 }
 
 func (e *Echo) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
 	e.callback(ctx, b, update)
 }
 
-func (e *Echo) addToStorage(chatId int64, message *models.Message) {
+func (e *Echo) addToStorage(chatId int64, message *models.Message, messageType storage.MsgType) {
 	if &e.messageStorage != nil {
 		m := *storage.NewMessage(
 			message.ID,
 			message.Text,
-			0,
-			storage.BOT,
+			messageType,
 		)
 		e.messageStorage.Add(chatId, m)
 	}

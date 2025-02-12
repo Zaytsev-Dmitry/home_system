@@ -6,10 +6,10 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/external"
+	"telegramCLient/internal/command"
+	"telegramCLient/internal/command/loader"
 	"telegramCLient/internal/components/echo"
 	"telegramCLient/internal/dao"
-	"telegramCLient/internal/handler/command"
-	"telegramCLient/internal/handler/loader"
 	"telegramCLient/internal/storage"
 )
 

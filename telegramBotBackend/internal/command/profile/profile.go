@@ -5,7 +5,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/external"
-	"telegramCLient/internal/handler/command"
+	"telegramCLient/internal/command"
 	"telegramCLient/internal/storage"
 )
 
