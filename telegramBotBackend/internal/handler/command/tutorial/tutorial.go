@@ -1,13 +1,13 @@
-package command
+package tutorial
 
 import (
 	"context"
 	_ "embed"
 	"github.com/go-telegram/bot"
-	"github.com/go-telegram/bot/models"
 	"github.com/go-telegram/ui/dialog"
 	dialog2 "telegramCLient/internal/components/dialog"
 	"telegramCLient/internal/handler/loader"
+	"telegramCLient/internal/storage"
 )
 
 const (
@@ -36,46 +36,23 @@ var (
 	}
 )
 
-type TutorialCommandHandler struct {
-	Dialog dialog2.DialogInline
+type TutorialCommand struct {
+	component         dialog2.DialogInline
+	messageStorage    storage.Storage
+	ctx               context.Context
+	bot               *bot.Bot
+	callbackHandlerID string
 }
 
-func (c *TutorialCommandHandler) StartCommand(ctx context.Context, b *bot.Bot, update *models.Update) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (c *TutorialCommandHandler) ProceedMessage(ctx context.Context, b *bot.Bot, update *models.Update) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (c *TutorialCommandHandler) GetName() string {
-	return "/tutorial"
-}
-
-func (c *TutorialCommandHandler) ClearStatus(update *models.Update) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (c *TutorialCommandHandler) AddToDelete(msg int) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func NewTutorialCommandHandler() *TutorialCommandHandler {
-	return &TutorialCommandHandler{
-		*dialog2.NewDialogInline(),
+func NewTutorialCommand(st storage.Storage, bot *bot.Bot, ctx context.Context) *TutorialCommand {
+	return &TutorialCommand{
+		component:      *dialog2.NewDialogInline(),
+		messageStorage: st,
+		bot:            bot,
+		ctx:            ctx,
 	}
 }
 
-func (c *TutorialCommandHandler) Init() []bot.Option {
-	return []bot.Option{
-		bot.WithMessageTextHandler("/tutorial", bot.MatchTypeExact, c.tutorialCallback),
-	}
-}
-
-func (c *TutorialCommandHandler) tutorialCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
-	c.Dialog.CreateAndRun(dialogNodes, ctx, b, update)
+func (c *TutorialCommand) RegisterHandler() {
+	c.callbackHandlerID = c.bot.RegisterHandler(bot.HandlerTypeMessageText, "/tutorial", bot.MatchTypeExact, c.callback)
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"strings"
+	"telegramCLient/internal/storage"
 	"telegramCLient/util"
 )
 
@@ -36,7 +37,7 @@ func (echo *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Updat
 		text = "Итак начнем..." + echo.getQuestion()
 		echo.updateUserAction(true, "StateAskFields", message)
 	case StateAskFields:
-		//добавляем сообщения от пользователя чтобы потом их удалить
+		echo.Storage.Add(message.Chat.ID, *storage.NewMessage(message.ID, message.Text, MessageIndex+1, storage.USER))
 		messagesToDelete = append(messagesToDelete, message.ID)
 		text = echo.collectAnswer(&data, message, text)
 		if len(data.answers) == len(echo.questions) {
@@ -78,6 +79,7 @@ func (echo *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Updat
 			ReplyMarkup: keyboard,
 			ParseMode:   models.ParseModeHTML,
 		})
+		echo.Storage.Add(sendMessage.Chat.ID, *storage.NewMessage(sendMessage.ID, sendMessage.Text, MessageIndex+1, storage.BOT))
 		messagesToDelete = append(messagesToDelete, sendMessage.ID)
 	}
 }
@@ -119,6 +121,7 @@ func (echo *Echo) proceedConfirmYes(message models.Message, data dataCollect, te
 		UserFirstName: message.Chat.FirstName,
 		UserLastname:  message.Chat.LastName,
 		UserTGName:    message.Chat.Username,
+		Messages:      echo.Storage.Get(echo.chatId),
 	})
 	text = echo.completeText
 	for _, uid := range echo.callbackHandlerIDs {

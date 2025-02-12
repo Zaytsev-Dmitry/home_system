@@ -5,6 +5,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/internal/dao/repository/intefraces"
+	"telegramCLient/internal/storage"
 	"telegramCLient/util"
 )
 
@@ -24,8 +25,10 @@ type Echo struct {
 	confirmCallbackFunction func(result Result)
 	actionRepo              intefraces.ActionRepository
 	commandName             string
+	Storage                 storage.Storage
 }
 
+var MessageIndex = 0
 var messagesToDelete []int
 var tempDataSlice = make(map[int64]dataCollect)
 
@@ -62,7 +65,7 @@ func (echo *Echo) StartCollect() {
 		ReplyMarkup: echo.startKeyboard,
 		ParseMode:   models.ParseModeHTML,
 	})
-	//ранее добавляли сообщение. Эта итерация означает что человек ввел данные когда это не требовалось
+	echo.Storage.Add(message.Chat.ID, *storage.NewMessage(message.ID, message.Text, MessageIndex+1, storage.BOT))
 	echo.firstSentMsgId = message.ID
 	echo.actionRepo.SaveOrUpdate(message.Chat.ID, "StateDrawStartKeyboard", false, message.ID, echo.commandName)
 }

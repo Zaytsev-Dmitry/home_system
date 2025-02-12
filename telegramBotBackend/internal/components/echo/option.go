@@ -4,9 +4,16 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/internal/dao/repository/intefraces"
+	"telegramCLient/internal/storage"
 )
 
 type Option func(e *Echo)
+
+func WithStorage(storage storage.Storage) Option {
+	return func(p *Echo) {
+		p.Storage = storage
+	}
+}
 
 func WithStartButtonText(text string) Option {
 	return func(p *Echo) {
