@@ -23,9 +23,8 @@ type Echo struct {
 }
 
 type TextMeta struct {
-	ConfirmText  string
-	StartText    string
-	CompleteText string
+	ConfirmText string
+	StartText   string
 }
 
 func NewEcho(b *bot.Bot, questions []CollectItem, pr proceedResult, lc logCommand, textP TextMeta, opts []Option) *Echo {

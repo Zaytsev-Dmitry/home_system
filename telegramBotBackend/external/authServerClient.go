@@ -22,7 +22,7 @@ func NewAuthServerClient(authServerUrl string) *AuthServerClient {
 }
 
 // TODO отловаить ошибки
-func (serverClient *AuthServerClient) RegisterUser(source authSpec.CreateAccountRequest) dto.AccountDTO {
+func (serverClient *AuthServerClient) RegisterUser(source authSpec.CreateAccountRequest) (dto.AccountDTO, error) {
 	response, err := post(source, serverClient.AuthServerUrl+"/account")
 	if err != nil {
 		fmt.Println(err)
@@ -37,7 +37,7 @@ func (serverClient *AuthServerClient) RegisterUser(source authSpec.CreateAccount
 		Email:      respDto.Email,
 		TgUsername: respDto.TelegramUserName,
 		TelegramId: respDto.TelegramId,
-	}
+	}, err
 }
 
 // TODO отловаить ошибки

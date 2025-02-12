@@ -53,7 +53,6 @@ func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) 
 		{
 			cmd := strings.TrimPrefix(update.CallbackQuery.Data, e.prefix)
 			if cmd == CONFIRM_YES {
-				text = e.text.CompleteText
 				isComplete = true
 			} else {
 				text = "Ну хорошо давай заново: " + e.question[0].Content
@@ -62,9 +61,17 @@ func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) 
 		}
 	}
 	actualStatus[message.Chat.ID] = status
-	sendMessage := e.sendMsgToUser(ctx, b, message, text, keyboard)
-	e.addToStorage(sendMessage.Chat.ID, sendMessage)
-	e.sendResult(isComplete, message)
+	if !isComplete {
+		sendMessage, _ := b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID:      message.Chat.ID,
+			Text:        text,
+			ReplyMarkup: keyboard,
+			ParseMode:   models.ParseModeHTML,
+		})
+		e.addToStorage(sendMessage.Chat.ID, sendMessage)
+	} else {
+		e.sendResult(isComplete, message)
+	}
 }
 
 func fillConfirmText(confirmText string, question []CollectItem) string {
@@ -74,16 +81,6 @@ func fillConfirmText(confirmText string, question []CollectItem) string {
 		result = strings.Replace(result, "value_"+strconv.Itoa(i), value.Answer, -1)
 	}
 	return result
-}
-
-func (e *Echo) sendMsgToUser(ctx context.Context, b *bot.Bot, message models.Message, text string, keyboard models.ReplyMarkup) *models.Message {
-	sendMessage, _ := b.SendMessage(ctx, &bot.SendMessageParams{
-		ChatID:      message.Chat.ID,
-		Text:        text,
-		ReplyMarkup: keyboard,
-		ParseMode:   models.ParseModeHTML,
-	})
-	return sendMessage
 }
 
 func (e *Echo) sendResult(isComplete bool, message models.Message) {

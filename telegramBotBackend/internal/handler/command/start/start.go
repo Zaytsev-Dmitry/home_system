@@ -34,9 +34,8 @@ func NewStartCommand(action command.UserAction, st storage.Storage, bot *bot.Bot
 		action:           action,
 	}
 	textMeta := echo.TextMeta{
-		ConfirmText:  loader.RegisterConfirmText,
-		StartText:    loader.StartCommandText,
-		CompleteText: loader.RegisterCompleteText,
+		ConfirmText: loader.RegisterConfirmText,
+		StartText:   loader.StartCommandText,
 	}
 	options := []echo.Option{
 		echo.WithMessageStorage(st),
@@ -71,15 +70,24 @@ func (s *StartCommand) proceedResult(result echo.Result) {
 		}
 	}
 	//TODO если не смог зарегать то надо отправлять ошибку и как бы банить выполнение команды
-	s.authServerClient.RegisterUser(request)
-
-	s.bot.DeleteMessages(
-		s.ctx, &bot.DeleteMessagesParams{
-			ChatID:     result.ChatId,
-			MessageIDs: result.MessagesIds[0 : len(result.MessagesIds)-1],
-		},
-	)
-	s.messageStorage.ClearAll(result.ChatId)
+	_, err := s.authServerClient.RegisterUser(request)
+	if err != nil {
+		//TODO отправить ошибку в чат
+	} else {
+		s.bot.SendMessage(
+			s.ctx, &bot.SendMessageParams{
+				Text:      loader.RegisterCompleteText,
+				ChatID:    result.ChatId,
+				ParseMode: models.ParseModeHTML,
+			})
+		s.bot.DeleteMessages(
+			s.ctx, &bot.DeleteMessagesParams{
+				ChatID:     result.ChatId,
+				MessageIDs: result.MessagesIds[0 : len(result.MessagesIds)-1],
+			},
+		)
+		s.messageStorage.ClearAll(result.ChatId)
+	}
 }
 
 func (s *StartCommand) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
