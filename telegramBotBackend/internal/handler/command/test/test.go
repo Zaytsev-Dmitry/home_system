@@ -32,7 +32,7 @@ func NewTestCommand(action command.UserAction, st storage.Storage, bot *bot.Bot,
 		CompleteText: "Комплит тест текст",
 	}
 
-	c.component = echo.NewEcho(bot, c.getQuestions(), c.proceedResult, c.LogCommandAction, textMeta)
+	c.component = echo.NewEcho(bot, c.getQuestions(), c.proceedResult, c.LogCommandAction, textMeta, []echo.Option{})
 	return c
 }
 
@@ -40,7 +40,7 @@ func (c *TestCommand) RegisterHandler() {
 	c.callbackHandlerID = c.bot.RegisterHandler(bot.HandlerTypeMessageText, c.GetName(), bot.MatchTypeExact, c.callback)
 }
 
-func (T *TestCommand) proceedResult(result []echo.CollectItem) {
+func (T *TestCommand) proceedResult(result echo.Result) {
 	fmt.Print(result)
 }
 

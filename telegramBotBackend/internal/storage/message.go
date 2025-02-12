@@ -9,7 +9,7 @@ const (
 )
 
 type Message struct {
-	id      int
+	Id      int
 	text    string
 	msgType msgType
 	index   int
@@ -17,7 +17,7 @@ type Message struct {
 
 func NewMessage(id int, text string, index int, msgType msgType) *Message {
 	return &Message{
-		id:      id,
+		Id:      id,
 		text:    text,
 		msgType: msgType,
 		index:   index,

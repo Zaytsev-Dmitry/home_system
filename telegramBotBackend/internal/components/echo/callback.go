@@ -26,9 +26,11 @@ const (
 
 func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) {
 	message := util.GetChatMessage(update)
+	e.addToStorage(message.Chat.ID, &message)
 	status := actualStatus[message.Chat.ID]
 	var text string
 	var keyboard models.ReplyMarkup
+	var isComplete = false
 	switch status.actualState {
 	case DEFAULT:
 		text = "Первый вопрос: " + e.question[status.questionIterator].Content
@@ -41,11 +43,7 @@ func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) 
 			if status.questionIterator == len(e.question) {
 				//получили все ответы - меняем статус
 				status = Status{actualState: CONFIRM, questionIterator: 0}
-
-				for i, question := range e.question {
-					e.text.ConfirmText = strings.Replace(e.text.ConfirmText, "name_"+strconv.Itoa(i), question.FieldName, -1)
-					e.text.ConfirmText = strings.Replace(e.text.ConfirmText, "value_"+strconv.Itoa(i), question.Answer, -1)
-				}
+				fillConfirmText(e.text.ConfirmText, e.question)
 				text = e.text.ConfirmText
 				keyboard = e.buildDefaultConfirmKeyboard()
 			} else {
@@ -56,23 +54,49 @@ func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) 
 		{
 			cmd := strings.TrimPrefix(update.CallbackQuery.Data, e.prefix)
 			if cmd == CONFIRM_YES {
-				e.proceedResult(e.question)
-				e.logCommand(message.Chat.ID, "complete")
 				text = e.text.CompleteText
+				isComplete = true
 			} else {
 				text = "Ну хорошо давай заново: " + e.question[0].Content
 				status = Status{actualState: ASK_FIELDS}
 			}
-
 		}
 	}
-
 	actualStatus[message.Chat.ID] = status
+	sendMessage := e.sendMsgToUser(ctx, b, message, text, keyboard)
+	e.addToStorage(sendMessage.Chat.ID, sendMessage)
+	e.sendResult(isComplete, message)
+}
 
-	b.SendMessage(ctx, &bot.SendMessageParams{
+func fillConfirmText(confirmText string, question []CollectItem) {
+	for i, value := range question {
+		confirmText = strings.Replace(confirmText, "name_"+strconv.Itoa(i), value.FieldName, -1)
+		confirmText = strings.Replace(confirmText, "value_"+strconv.Itoa(i), value.Answer, -1)
+	}
+}
+
+func (e *Echo) sendMsgToUser(ctx context.Context, b *bot.Bot, message models.Message, text string, keyboard models.ReplyMarkup) *models.Message {
+	sendMessage, _ := b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:      message.Chat.ID,
 		Text:        text,
 		ReplyMarkup: keyboard,
 		ParseMode:   models.ParseModeHTML,
 	})
+	return sendMessage
+}
+
+func (e *Echo) sendResult(isComplete bool, message models.Message) {
+	if isComplete {
+		all := e.messageStorage.GetAll(message.Chat.ID)
+		ids := make([]int, len(all))
+		for i, value := range all {
+			ids[i] = value.Id
+		}
+		e.proceedResult(Result{
+			ChatId:      message.Chat.ID,
+			Question:    e.question,
+			MessagesIds: ids,
+		})
+		e.logCommand(message.Chat.ID, "end")
+	}
 }

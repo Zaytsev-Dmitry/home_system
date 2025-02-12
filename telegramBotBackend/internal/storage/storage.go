@@ -13,6 +13,10 @@ func (s *Storage) Add(tgID int64, message Message) {
 	messages[tgID] = append(messages[tgID], message)
 }
 
+func (s *Storage) GetAll(tgID int64) []Message {
+	return messages[tgID]
+}
+
 func (s *Storage) Get(tgID int64) []Message {
 	return messages[tgID]
 }

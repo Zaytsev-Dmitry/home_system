@@ -9,7 +9,7 @@ import (
 	"telegramCLient/util"
 )
 
-type proceedResult func(result []CollectItem)
+type proceedResult func(result Result)
 type logCommand func(userId int64, status string)
 
 type Echo struct {
@@ -28,7 +28,7 @@ type TextMeta struct {
 	CompleteText string
 }
 
-func NewEcho(b *bot.Bot, questions []CollectItem, pr proceedResult, lc logCommand, textP TextMeta) *Echo {
+func NewEcho(b *bot.Bot, questions []CollectItem, pr proceedResult, lc logCommand, textP TextMeta, opts []Option) *Echo {
 	e := &Echo{
 		question:      questions,
 		prefix:        bot.RandomString(16),
@@ -36,15 +36,19 @@ func NewEcho(b *bot.Bot, questions []CollectItem, pr proceedResult, lc logComman
 		logCommand:    lc,
 		text:          textP,
 	}
+	for _, opt := range opts {
+		opt(e)
+	}
+
 	e.callbackHandlerID = b.RegisterHandler(bot.HandlerTypeCallbackQueryData, e.prefix, bot.MatchTypePrefix, e.callback)
 	return e
 }
 
 // TODO отловить ошибки
 func (e *Echo) Collect(ctx context.Context, b *bot.Bot, update *models.Update) {
-	chatId, _ := util.GetChatAndMsgId(update)
+	sourceMessage := util.GetChatMessage(update)
 	message, err := b.SendMessage(ctx, &bot.SendMessageParams{
-		ChatID:      chatId,
+		ChatID:      sourceMessage.Chat.ID,
 		Text:        e.text.StartText,
 		ReplyMarkup: e.buildDefaultStartKeyboard(),
 		ParseMode:   models.ParseModeHTML,
@@ -52,8 +56,9 @@ func (e *Echo) Collect(ctx context.Context, b *bot.Bot, update *models.Update) {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
-	e.addToStorage(chatId, message)
-	e.logCommand(chatId, "start")
+	e.addToStorage(sourceMessage.Chat.ID, &sourceMessage)
+	e.addToStorage(sourceMessage.Chat.ID, message)
+	e.logCommand(sourceMessage.Chat.ID, "start")
 }
 
 func (e *Echo) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {

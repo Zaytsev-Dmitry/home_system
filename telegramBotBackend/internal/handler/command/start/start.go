@@ -2,7 +2,6 @@ package start
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/external"
@@ -38,7 +37,10 @@ func NewStartCommand(action command.UserAction, st storage.Storage, bot *bot.Bot
 		StartText:    loader.StartCommandText,
 		CompleteText: loader.RegisterCompleteText,
 	}
-	s.component = echo.NewEcho(bot, s.getQuestions(), s.proceedResult, s.LogCommandAction, textMeta)
+	options := []echo.Option{
+		echo.WithMessageStorage(st),
+	}
+	s.component = echo.NewEcho(bot, s.getQuestions(), s.proceedResult, s.LogCommandAction, textMeta, options)
 	return s
 }
 
@@ -50,8 +52,14 @@ func (s *StartCommand) proceedUserAnswer(ctx context.Context, b *bot.Bot, update
 	s.component.ProceedUserAnswer(ctx, b, update)
 }
 
-func (s *StartCommand) proceedResult(result []echo.CollectItem) {
-	fmt.Print(result)
+func (s *StartCommand) proceedResult(result echo.Result) {
+	s.bot.DeleteMessages(
+		s.ctx, &bot.DeleteMessagesParams{
+			ChatID:     result.ChatId,
+			MessageIDs: result.MessagesIds[0 : len(result.MessagesIds)-1],
+		},
+	)
+	s.messageStorage.ClearAll(result.ChatId)
 }
 
 func (s *StartCommand) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {

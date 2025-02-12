@@ -1,10 +1,9 @@
 package echo
 
-import "telegramCLient/internal/storage"
-
 type Result struct {
-	Answers  []CollectItem
-	Messages []storage.Message
+	ChatId      int64
+	Question    []CollectItem
+	MessagesIds []int
 }
 
 type CollectItem struct {
