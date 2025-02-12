@@ -13,10 +13,24 @@ import (
 	"os/signal"
 	"telegramCLient/config"
 	"telegramCLient/external"
-	"telegramCLient/internal/action"
-	"telegramCLient/internal/creater"
 	"telegramCLient/internal/dao"
 	"telegramCLient/internal/handler/command"
+	"telegramCLient/internal/handler/command/menu"
+	"telegramCLient/internal/handler/command/notes"
+	"telegramCLient/internal/handler/command/profile"
+	"telegramCLient/internal/handler/command/start"
+	"telegramCLient/internal/handler/command/test"
+	"telegramCLient/internal/handler/command/tutorial"
+	"telegramCLient/internal/storage"
+)
+
+const (
+	TEST_COMMAND     string = "TEST"
+	MENU_COMMAND     string = "MENU"
+	TUTORIAL_COMMAND string = "TUTORIAL"
+	PROFILE_COMMAND  string = "PROFILE"
+	NOTES_COMMAND    string = "NOTES"
+	START_COMMAND    string = "START"
 )
 
 // ______________________________________________________________________
@@ -24,30 +38,55 @@ func main() {
 	appConfig := loadConfig("MODE")
 	ctx, cancel := getContext()
 	defer cancel()
-
 	dao := dao.CreateDao(*appConfig)
 
-	opts, commands := creater.CreateHandlerStarter(appConfig).CreateCommandsHandlers(
-		external.NewNoteBackendClient(appConfig.Server.NoteBackendUrl),
-		external.NewAuthServerClient(appConfig.Server.AuthServerUrl),
-		*dao,
-	)
-	createAndStartBot(ctx, appConfig, opts, *dao, commands)
-	defer dao.Close()
-}
-
-//______________________________________________________________________
-
-func createAndStartBot(ctx context.Context, appConfig *config.AppConfig, opts []bot.Option, d dao.TelegramBotDao, commands []command.BaseCommand) {
-	b, err := bot.New(appConfig.Server.BotToken, opts...)
+	bot, err := bot.New(appConfig.Server.BotToken)
 	if nil != err {
 		panic(err)
 	}
-	userAction := action.NewAction(d, commands)
+
+	ua := command.NewAction(*dao)
+	createAndRegisterCommands(ua, appConfig, bot, ctx, *dao)
+	bot.Start(ctx)
+	defer dao.Close()
+}
+
+func createAndRegisterCommands(a *command.Action, conf *config.AppConfig, b *bot.Bot, ctx context.Context, dao dao.TelegramBotDao) {
+	storage := *storage.NewStorage()
+	authServerClient := external.NewAuthServerClient(conf.Server.AuthServerUrl)
+	noteBackendClient := external.NewNoteBackendClient(conf.Server.NoteBackendUrl)
+
+	for i, value := range conf.Server.CommandsToInit {
+		var newCommand command.BaseCommand
+		log.Println(fmt.Sprintf("Create command : %s. With order: %x", value, i+1))
+		switch value {
+		case TEST_COMMAND:
+			newCommand = test.NewTestCommand(*a, storage, b, ctx)
+
+		case MENU_COMMAND:
+			newCommand = menu.NewMenuCommand(*a, storage, b, ctx)
+
+		case TUTORIAL_COMMAND:
+			newCommand = tutorial.NewTutorialCommand(*a, storage, b, ctx)
+
+		case PROFILE_COMMAND:
+			newCommand = profile.NewProfileCommand(*a, storage, b, ctx, authServerClient)
+
+		case NOTES_COMMAND:
+			newCommand = notes.NewNotesCommand(*a, storage, b, ctx, dao, noteBackendClient)
+
+		case START_COMMAND:
+			newCommand = start.NewStartCommand(*a, storage, b, ctx, dao, authServerClient)
+		default:
+			fmt.Println("Неизвестная команда")
+		}
+		newCommand.RegisterHandler()
+		a.AddCommand(newCommand)
+	}
+
 	b.RegisterHandler(bot.HandlerTypeMessageText, "", bot.MatchTypeContains, func(ctx context.Context, b *bot.Bot, update *models.Update) {
-		userAction.Proceed(ctx, b, update)
+		a.Proceed(ctx, b, update)
 	})
-	b.Start(ctx)
 }
 
 func getContext() (ctx context.Context, stop context.CancelFunc) {

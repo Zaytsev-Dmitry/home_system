@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	INSERT_ACTION   = "insert into user_action (telegram_user_id, command_state, need_user_action, last_sent_message_id,command_name) values($1, $2, $3, $4, $5) RETURNING id, telegram_user_id, command_state, need_user_action, last_sent_message_id, command_name"
+	INSERT_ACTION   = "insert into user_action (telegram_user_id, need_user_input, last_sent_message_id,command_name, is_running) values($1, $2, $3, $4, $5) RETURNING id, telegram_user_id, need_user_input, last_sent_message_id, command_name, is_running"
 	SELECT_BY_TG_ID = "select uc.* from user_action uc where uc.telegram_user_id = ($1)"
-	UPDATE_BY_TG_ID = "update user_action set command_state = ($1), need_user_action = ($2), last_sent_message_id = ($3), command_name = ($4) where telegram_user_id = ($5)"
+	UPDATE_BY_TG_ID = "update user_action set need_user_input = ($1), last_sent_message_id = ($2), command_name = ($3), is_running = ($4) where telegram_user_id = ($5)"
 )
 
 type SqlxActionPort struct {
@@ -21,21 +21,24 @@ func CreateSqlxActionPort(db *sqlx.DB) *SqlxActionPort {
 }
 
 // TODO отловаить ошибки
-func (port *SqlxActionPort) SaveOrUpdate(telegramUserId int64, commandState string, needUserAction bool, lastSentMessageId int, commandName string) {
+func (port *SqlxActionPort) SaveOrUpdate(telegramUserId int64, userInput bool, lastSentMessageId int, commandName string, isRunning bool) {
 	var result domain.UserAction
 	//var resultErr error
 
 	tx := port.Db.MustBegin()
 	defer tx.Rollback()
 
-	tx.Get(&result, SELECT_BY_TG_ID, telegramUserId)
+	err := tx.Get(&result, SELECT_BY_TG_ID, telegramUserId)
+	if err != nil {
+		fmt.Println(err)
+	}
 	if result.ID != 0 {
-		err := tx.QueryRowx(UPDATE_BY_TG_ID, commandState, needUserAction, lastSentMessageId, commandName, telegramUserId)
+		err := tx.QueryRowx(UPDATE_BY_TG_ID, userInput, lastSentMessageId, commandName, isRunning, telegramUserId)
 		if err.Err() != nil {
 			fmt.Println(err)
 		}
 	} else {
-		err := tx.QueryRowx(INSERT_ACTION, telegramUserId, commandState, needUserAction, lastSentMessageId, commandName).StructScan(&result)
+		err := tx.QueryRowx(INSERT_ACTION, telegramUserId, userInput, lastSentMessageId, commandName, isRunning).StructScan(&result)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -51,8 +54,8 @@ func (port *SqlxActionPort) GetByTgId(telegramUserId int64) domain.UserAction {
 }
 
 // TODO отловаить ошибки
-func (port *SqlxActionPort) Update(telegramUserId int64, commandState string, needUserAction bool, lastSentMessageId int) {
-	port.Db.QueryRowx(UPDATE_BY_TG_ID, commandState, needUserAction, lastSentMessageId, telegramUserId)
+func (port *SqlxActionPort) Update(telegramUserId int64, needUserAction bool, lastSentMessageId int, isRunning bool) {
+	port.Db.QueryRowx(UPDATE_BY_TG_ID, needUserAction, lastSentMessageId, telegramUserId, isRunning)
 }
 
 func (p *SqlxActionPort) CloseConnection() {

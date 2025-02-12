@@ -1,4 +1,4 @@
-package action
+package command
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/internal/dao"
-	"telegramCLient/internal/handler/command"
 	"telegramCLient/internal/handler/loader"
 	"telegramCLient/util"
 )
@@ -17,21 +16,26 @@ type ActionItem struct {
 	LastUserSentMessageId int
 }
 type Action struct {
-	commands map[string]command.BaseCommand
+	commands map[string]BaseCommand
 	dao      dao.TelegramBotDao
 }
 
-func NewAction(dao dao.TelegramBotDao, commands []command.BaseCommand) *Action {
-	a := &Action{dao: dao}
-	comList := make(map[string]command.BaseCommand)
-	for _, value := range commands {
-		comList[value.GetName()] = value
+func NewAction(dao dao.TelegramBotDao) *Action {
+	return &Action{
+		dao:      dao,
+		commands: map[string]BaseCommand{},
 	}
-	a.commands = comList
-	return a
 }
 
-func (a *Action) getCommandHandlerByName(name string) command.BaseCommand {
+func (a *Action) AddCommand(c BaseCommand) {
+	a.commands[c.GetName()] = c
+}
+
+func (a *Action) Log(tgId int64, cName string, userInput bool, isRunning bool) {
+	a.dao.ActionRepo.SaveOrUpdate(tgId, userInput, 0, cName, isRunning)
+}
+
+func (a *Action) getCommandHandlerByName(name string) BaseCommand {
 	return a.commands[name]
 }
 
@@ -39,19 +43,20 @@ func (a *Action) Proceed(ctx context.Context, b *bot.Bot, update *models.Update)
 	userId, _ := util.GetChatAndMsgId(update)
 	actionEntity := a.dao.ActionRepo.GetByTgId(userId)
 	lastRunCommandHandler := a.getCommandHandlerByName(actionEntity.CommandName)
-	if !actionEntity.NeedUserAction {
+	if !actionEntity.NeedUserInput {
 		text := fmt.Sprintf(
 			loader.UnnecessaryActionText,
 			actionEntity.CommandName,
 		)
-		message, _ := b.SendMessage(ctx, &bot.SendMessageParams{
+		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:    userId,
 			Text:      text,
 			ParseMode: models.ParseModeHTML,
 		})
-		lastRunCommandHandler.ClearStatus(update)
-		lastRunCommandHandler.AddToDelete(message.ID)
+		a.Log(userId, lastRunCommandHandler.GetName(), false, false)
+		lastRunCommandHandler.ClearState(userId)
+		//TODO заюзать message storage для update
 	} else {
-		lastRunCommandHandler.ProceedMessage(ctx, b, update)
+		lastRunCommandHandler.ProceedUserAnswer(ctx, b, update)
 	}
 }

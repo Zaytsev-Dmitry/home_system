@@ -2,82 +2,80 @@ package echo
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
-	"telegramCLient/internal/dao/repository/intefraces"
+	"telegramCLient/internal/storage"
 	"telegramCLient/util"
 )
 
+type proceedResult func(result Result)
+type setUserInput func(userInput bool, chatId int64)
+
 type Echo struct {
-	bot                     *bot.Bot
-	ctx                     context.Context
-	chatId                  int64
-	firstSentMsgId          int
-	prefix                  string
-	callbackHandlerIDs      []string
-	startKeyboard           models.ReplyMarkup
-	confirmKeyboard         models.ReplyMarkup
-	startKeyboardText       string
-	confirmKeyboardText     string
-	completeText            string
-	questions               []CollectItem
-	confirmCallbackFunction func(result Result)
-	actionRepo              intefraces.ActionRepository
-	commandName             string
+	question          []CollectItem
+	messageStorage    storage.Storage
+	prefix            string
+	callbackHandlerID string
+	proceedResult     proceedResult
+	setUserInput      setUserInput
+	text              TextMeta
 }
 
-var messagesToDelete []int
-var tempDataSlice = make(map[int64]dataCollect)
+type TextMeta struct {
+	ConfirmText string
+	StartText   string
+}
 
-func NewEcho(
-	ctx context.Context,
-	b *bot.Bot,
-	chatId int64,
-	startMsgId int,
-	opts []Option,
-	actionRepo intefraces.ActionRepository,
-	commandName string,
-) *Echo {
-	p := &Echo{
-		bot:         b,
-		ctx:         ctx,
-		chatId:      chatId,
-		prefix:      bot.RandomString(16),
-		actionRepo:  actionRepo,
-		commandName: commandName,
+func NewEcho(b *bot.Bot, questions []CollectItem, pr proceedResult, ui setUserInput, textP TextMeta, opts []Option) *Echo {
+	e := &Echo{
+		question:      questions,
+		prefix:        bot.RandomString(16),
+		proceedResult: pr,
+		setUserInput:  ui,
+		text:          textP,
 	}
-	messagesToDelete = append(messagesToDelete, startMsgId)
 	for _, opt := range opts {
-		opt(p)
+		opt(e)
 	}
-	return p
+
+	e.callbackHandlerID = b.RegisterHandler(bot.HandlerTypeCallbackQueryData, e.prefix, bot.MatchTypePrefix, e.callback)
+	return e
 }
 
-func (echo *Echo) StartCollect() {
-	data := tempDataSlice[echo.chatId]
-	data.State = StateDrawStartKeyboard
-	message, _ := echo.bot.SendMessage(echo.ctx, &bot.SendMessageParams{
-		ChatID:      echo.chatId,
-		Text:        echo.startKeyboardText,
-		ReplyMarkup: echo.startKeyboard,
+// TODO отловить ошибки
+func (e *Echo) Collect(ctx context.Context, b *bot.Bot, update *models.Update) {
+	sourceMessage := util.GetChatMessage(update)
+	message, err := b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID:      sourceMessage.Chat.ID,
+		Text:        e.text.StartText,
+		ReplyMarkup: e.buildDefaultStartKeyboard(),
 		ParseMode:   models.ParseModeHTML,
 	})
-	//ранее добавляли сообщение. Эта итерация означает что человек ввел данные когда это не требовалось
-	echo.firstSentMsgId = message.ID
-	echo.actionRepo.SaveOrUpdate(message.Chat.ID, "StateDrawStartKeyboard", false, message.ID, echo.commandName)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+	e.addToStorage(sourceMessage.Chat.ID, &sourceMessage)
+	e.addToStorage(sourceMessage.Chat.ID, message)
 }
 
-func (echo *Echo) ProceedAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
-	echo.callback(ctx, b, update)
+func (e *Echo) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
+	e.callback(ctx, b, update)
 }
 
-func (echo *Echo) Clear(update *models.Update) {
-	chatId, msgId := util.GetChatAndMsgId(update)
-	tempDataSlice[chatId] = dataCollect{}
-	messagesToDelete = append(messagesToDelete, msgId)
-	messagesToDelete = append(messagesToDelete, echo.firstSentMsgId)
+func (e *Echo) addToStorage(chatId int64, message *models.Message) {
+	if &e.messageStorage != nil {
+		m := *storage.NewMessage(
+			message.ID,
+			message.Text,
+			0,
+			storage.BOT,
+		)
+		e.messageStorage.Add(chatId, m)
+	}
 }
 
-func (echo *Echo) AddToDelete(msgId int) {
-	messagesToDelete = append(messagesToDelete, msgId)
+func (e *Echo) ClearState(chatId int64) {
+	e.question = []CollectItem{}
+	delete(ActualStatus, chatId)
 }

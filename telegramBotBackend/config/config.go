@@ -3,7 +3,7 @@ package config
 type AppConfig struct {
 	Server struct {
 		BotToken       string   `yaml:"botToken"`
-		HandlersToInit []string `yaml:"handlersToInit"`
+		CommandsToInit []string `yaml:"commandsToInit"`
 		AuthServerUrl  string   `yaml:"authServerUrl"`
 		NoteBackendUrl string   `yaml:"noteBackendUrl"`
 	} `yaml:"server"`
