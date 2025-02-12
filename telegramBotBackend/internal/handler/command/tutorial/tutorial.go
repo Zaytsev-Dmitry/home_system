@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"github.com/go-telegram/bot"
+	"github.com/go-telegram/bot/models"
 	"github.com/go-telegram/ui/dialog"
 	dialog2 "telegramCLient/internal/components/dialog"
 	"telegramCLient/internal/handler/loader"
@@ -53,6 +54,13 @@ func NewTutorialCommand(st storage.Storage, bot *bot.Bot, ctx context.Context) *
 	}
 }
 
-func (c *TutorialCommand) RegisterHandler() {
-	c.callbackHandlerID = c.bot.RegisterHandler(bot.HandlerTypeMessageText, "/tutorial", bot.MatchTypeExact, c.callback)
+func (t *TutorialCommand) RegisterHandler() {
+	t.callbackHandlerID = t.bot.RegisterHandler(bot.HandlerTypeMessageText, t.GetName(), bot.MatchTypeExact, t.callback)
+}
+
+func (t *TutorialCommand) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
+}
+
+func (t *TutorialCommand) GetName() string {
+	return "/tutorial"
 }

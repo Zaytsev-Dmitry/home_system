@@ -9,5 +9,5 @@ import (
 
 func (comm *TestCommand) callback(ctx context.Context, b *bot.Bot, update *models.Update) {
 	fmt.Print("run TestCommand callback")
-	comm.component.Collect()
+	comm.component.Collect(ctx, b, update)
 }

@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/go-telegram/bot"
+	"github.com/go-telegram/bot/models"
 	_ "github.com/lib/pq"
 	"gopkg.in/yaml.v3"
 	"log"
@@ -44,41 +45,48 @@ func main() {
 		panic(err)
 	}
 
-	createAndRegisterCommands(appConfig, bot, ctx, *dao)
+	ua := command.NewUserAction()
+	createAndRegisterCommands(ua, appConfig, bot, ctx, *dao)
 	bot.Start(ctx)
 	defer dao.Close()
 }
 
-func createAndRegisterCommands(conf *config.AppConfig, bot *bot.Bot, ctx context.Context, dao dao.TelegramBotDao) {
+func createAndRegisterCommands(ua *command.UserAction, conf *config.AppConfig, b *bot.Bot, ctx context.Context, dao dao.TelegramBotDao) {
 	storage := *storage.NewStorage()
 	authServerClient := external.NewAuthServerClient(conf.Server.AuthServerUrl)
 	noteBackendClient := external.NewNoteBackendClient(conf.Server.NoteBackendUrl)
+
 	for i, value := range conf.Server.CommandsToInit {
 		var newCommand command.BaseCommand
 		log.Println(fmt.Sprintf("Create command : %s. With order: %x", value, i+1))
 		switch value {
 		case TEST_COMMAND:
-			{
-				newCommand = test.NewTestCommand(storage, bot, ctx)
-			}
+			newCommand = test.NewTestCommand(storage, b, ctx)
+
 		case MENU_COMMAND:
-			newCommand = menu.NewMenuCommand(storage, bot, ctx)
+			newCommand = menu.NewMenuCommand(storage, b, ctx)
 
 		case TUTORIAL_COMMAND:
-			newCommand = tutorial.NewTutorialCommand(storage, bot, ctx)
+			newCommand = tutorial.NewTutorialCommand(storage, b, ctx)
 
 		case PROFILE_COMMAND:
-			newCommand = profile.NewProfileCommand(storage, bot, ctx, authServerClient)
+			newCommand = profile.NewProfileCommand(storage, b, ctx, authServerClient)
 
 		case NOTES_COMMAND:
-			newCommand = notes.NewNotesCommand(storage, bot, ctx, dao, noteBackendClient)
+			newCommand = notes.NewNotesCommand(storage, b, ctx, dao, noteBackendClient)
+
 		case START_COMMAND:
-			newCommand = start.NewStartCommand(storage, bot, ctx, dao, authServerClient)
+			newCommand = start.NewStartCommand(storage, b, ctx, dao, authServerClient)
 		default:
 			fmt.Println("Неизвестная команда")
 		}
 		newCommand.RegisterHandler()
+		ua.AddCommand(newCommand)
 	}
+
+	b.RegisterHandler(bot.HandlerTypeMessageText, "", bot.MatchTypeContains, func(ctx context.Context, b *bot.Bot, update *models.Update) {
+		ua.Proceed(ctx, b, update)
+	})
 }
 
 func getContext() (ctx context.Context, stop context.CancelFunc) {

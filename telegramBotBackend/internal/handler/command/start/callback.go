@@ -9,5 +9,5 @@ import (
 
 func (s *StartCommand) callback(ctx context.Context, b *bot.Bot, update *models.Update) {
 	util.GetChatAndMsgId(update)
-
+	s.component.Collect(ctx, b, update)
 }

@@ -4,151 +4,73 @@ import (
 	"context"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"strconv"
 	"strings"
-	"telegramCLient/internal/storage"
 	"telegramCLient/util"
 )
 
+type Status struct {
+	actualState      State
+	questionIterator int
+}
+
 type State uint
 
+var actualStatus = map[int64]Status{}
+
 const (
-	StateDrawStartKeyboard State = iota
-	StateAskFields
-	StateConfirm
+	DEFAULT State = iota
+	ASK_FIELDS
+	CONFIRM
 )
 
-var answerIteratorIndex int = 0
-var confirmCallbackYes = "callback_yes"
-var confirmCallbackNo = "callback_no"
-var startKeyboardCallback = "start_callback"
-
-// todo вынести куда то стейты типо StateAskFields
-// todo echo.updateUserAction(true, "StateAskFields", message) - такое себе
-func (echo *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) {
+func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) {
 	message := util.GetChatMessage(update)
-	data := tempDataSlice[message.Chat.ID]
-
-	var keyboard models.ReplyMarkup
+	status := actualStatus[message.Chat.ID]
 	var text string
-	var isDoneCollect = false
-	switch data.State {
-	case StateDrawStartKeyboard:
-		data.State = StateAskFields
-		text = "Итак начнем..." + echo.getQuestion()
-		echo.updateUserAction(true, "StateAskFields", message)
-	case StateAskFields:
-		echo.Storage.Add(message.Chat.ID, *storage.NewMessage(message.ID, message.Text, MessageIndex+1, storage.USER))
-		messagesToDelete = append(messagesToDelete, message.ID)
-		text = echo.collectAnswer(&data, message, text)
-		if len(data.answers) == len(echo.questions) {
-			keyboard, text = echo.collectAnswersIsDone(keyboard, &data)
-			echo.updateUserAction(false, "StateConfirm", message)
+	var keyboard models.ReplyMarkup
+	switch status.actualState {
+	case DEFAULT:
+		text = "Первый вопрос: " + e.question[status.questionIterator].Content
+		status = Status{actualState: ASK_FIELDS}
+	case ASK_FIELDS:
+		{
+			e.question[status.questionIterator].Answer = message.Text
+			status = Status{actualState: ASK_FIELDS, questionIterator: status.questionIterator + 1}
+
+			if status.questionIterator == len(e.question) {
+				//получили все ответы - меняем статус
+				status = Status{actualState: CONFIRM, questionIterator: 0}
+
+				for i, question := range e.question {
+					e.confirmText = strings.Replace(e.confirmText, "name_"+strconv.Itoa(i), question.FieldName, -1)
+					e.confirmText = strings.Replace(e.confirmText, "value_"+strconv.Itoa(i), question.Answer, -1)
+				}
+				text = e.confirmText
+				keyboard = e.buildDefaultConfirmKeyboard()
+			} else {
+				text = "Следующий вопрос: " + e.question[status.questionIterator].Content
+			}
 		}
-	case StateConfirm:
-		//пользователь подтвердил введеные данные
-		if strings.TrimPrefix(update.CallbackQuery.Data, echo.prefix) == confirmCallbackYes {
-			//шлем результат в вызвавщий компонент
-			text = echo.proceedConfirmYes(message, data, text, b)
-			isDoneCollect = true
-			echo.updateUserAction(false, "done", message)
-		} else {
-			text = echo.confirmProceedNo(&data, text)
-			isDoneCollect = true
-			echo.updateUserAction(true, "StateAskFields", message)
+	case CONFIRM:
+		{
+			cmd := strings.TrimPrefix(update.CallbackQuery.Data, e.prefix)
+			if cmd == CONFIRM_YES {
+				e.proceedResult(e.question)
+			} else {
+				text = "Ну хорошо давай заново: " + e.question[0].Content
+				status = Status{actualState: ASK_FIELDS}
+			}
+
 		}
 	}
 
-	tempDataSlice[message.Chat.ID] = data
-	if isDoneCollect {
-		//удалить ранее отправленные
-		b.DeleteMessages(echo.ctx, &bot.DeleteMessagesParams{
-			ChatID:     echo.chatId,
-			MessageIDs: messagesToDelete,
-		})
-		//редактирую самое первое сообщение
-		b.EditMessageText(echo.ctx, &bot.EditMessageTextParams{
-			ChatID:    echo.chatId,
-			MessageID: echo.firstSentMsgId,
-			Text:      text,
-			ParseMode: models.ParseModeHTML,
-		})
-	} else {
-		sendMessage, _ := b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID:      message.Chat.ID,
-			Text:        text,
-			ReplyMarkup: keyboard,
-			ParseMode:   models.ParseModeHTML,
-		})
-		echo.Storage.Add(sendMessage.Chat.ID, *storage.NewMessage(sendMessage.ID, sendMessage.Text, MessageIndex+1, storage.BOT))
-		messagesToDelete = append(messagesToDelete, sendMessage.ID)
-	}
-}
+	actualStatus[message.Chat.ID] = status
 
-func (echo *Echo) collectAnswer(data *dataCollect, message models.Message, text string) string {
-	//продолжаем собирать ответы
-	echo.addAnswer(data, message)
-	text = echo.getQuestion()
-	return text
-}
-
-func (echo *Echo) collectAnswersIsDone(keyboard models.ReplyMarkup, data *dataCollect) (models.ReplyMarkup, string) {
-	//собрали все ответы
-	keyboard = echo.confirmKeyboard
-	keyboardText := echo.confirmKeyboardText
-	for i, answer := range data.answers {
-		id := answer.FieldId
-		content := data.answers[i].Content
-		keyboardText = strings.Replace(keyboardText, id, content, -1)
-	}
-	data.State = StateConfirm
-	return keyboard, keyboardText
-}
-
-func (echo *Echo) confirmProceedNo(data *dataCollect, text string) string {
-	//ретрай опрашивания данных
-	data.State = StateAskFields
-	data.answers = []CollectItem{}
-	echo.restoreIterator()
-	text = "Ну окей...давай заново: " + echo.getQuestion()
-	return text
-}
-
-func (echo *Echo) proceedConfirmYes(message models.Message, data dataCollect, text string, b *bot.Bot) string {
-	echo.confirmCallbackFunction(Result{
-		ChatId:        echo.chatId,
-		MsgId:         message.ID,
-		Answers:       data.answers,
-		UserFirstName: message.Chat.FirstName,
-		UserLastname:  message.Chat.LastName,
-		UserTGName:    message.Chat.Username,
-		Messages:      echo.Storage.Get(echo.chatId),
+	b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID:      message.Chat.ID,
+		Text:        text,
+		ReplyMarkup: keyboard,
+		ParseMode:   models.ParseModeHTML,
 	})
-	text = echo.completeText
-	for _, uid := range echo.callbackHandlerIDs {
-		b.UnregisterHandler(uid)
-	}
-	return text
-}
-
-func (echo *Echo) restoreIterator() {
-	answerIteratorIndex = 0
-}
-
-func (echo *Echo) getQuestion() string {
-	return echo.questions[answerIteratorIndex].Content
-}
-
-func (echo *Echo) updateUserAction(needUserAction bool, state string, message models.Message) {
-	echo.actionRepo.SaveOrUpdate(message.Chat.ID, state, needUserAction, message.ID, echo.commandName)
-}
-
-func (echo *Echo) addAnswer(data *dataCollect, message models.Message) {
-	data.answers = append(data.answers, CollectItem{
-		FieldId:   echo.questions[answerIteratorIndex].FieldId,
-		FieldName: echo.questions[answerIteratorIndex].FieldName,
-		Content:   message.Text,
-	})
-	if answerIteratorIndex+1 != len(echo.questions) {
-		answerIteratorIndex = answerIteratorIndex + 1
-	}
 }

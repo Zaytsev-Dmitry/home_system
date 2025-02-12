@@ -1,6 +1,6 @@
-<b>Все верно?</b>
+<b>Проверь данные?</b>
 
-<b>Логин:</b><blockquote>username</blockquote>
+<b>name_0</b><blockquote>value_0</blockquote>
 
-<b>Email:</b><blockquote>email</blockquote>
+<b>name_1</b><blockquote>value_1</blockquote>
 

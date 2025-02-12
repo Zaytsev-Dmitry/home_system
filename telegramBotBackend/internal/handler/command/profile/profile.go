@@ -3,6 +3,7 @@ package profile
 import (
 	"context"
 	"github.com/go-telegram/bot"
+	"github.com/go-telegram/bot/models"
 	"telegramCLient/external"
 	"telegramCLient/internal/storage"
 )
@@ -25,5 +26,12 @@ func NewProfileCommand(st storage.Storage, bot *bot.Bot, ctx context.Context, au
 }
 
 func (p *ProfileCommand) RegisterHandler() {
-	p.callbackHandlerID = p.bot.RegisterHandler(bot.HandlerTypeMessageText, "/profile", bot.MatchTypeExact, p.callback)
+	p.callbackHandlerID = p.bot.RegisterHandler(bot.HandlerTypeMessageText, p.GetName(), bot.MatchTypeExact, p.callback)
+}
+
+func (p *ProfileCommand) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
+}
+
+func (p *ProfileCommand) GetName() string {
+	return "/profile"
 }

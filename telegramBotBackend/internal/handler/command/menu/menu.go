@@ -3,6 +3,7 @@ package menu
 import (
 	"context"
 	"github.com/go-telegram/bot"
+	"github.com/go-telegram/bot/models"
 	"telegramCLient/internal/storage"
 )
 
@@ -22,5 +23,12 @@ func NewMenuCommand(st storage.Storage, bot *bot.Bot, ctx context.Context) *Menu
 }
 
 func (m *MenuCommand) RegisterHandler() {
-	m.callbackHandlerID = m.bot.RegisterHandler(bot.HandlerTypeMessageText, "/menu", bot.MatchTypeExact, m.callback)
+	m.callbackHandlerID = m.bot.RegisterHandler(bot.HandlerTypeMessageText, m.GetName(), bot.MatchTypeExact, m.callback)
+}
+
+func (m *MenuCommand) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
+}
+
+func (m *MenuCommand) GetName() string {
+	return "/menu"
 }
