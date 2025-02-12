@@ -10,7 +10,7 @@ import (
 )
 
 type proceedResult func(result Result)
-type logCommand func(userId int64, status string)
+type setUserInput func(userInput bool, chatId int64)
 
 type Echo struct {
 	question          []CollectItem
@@ -18,7 +18,7 @@ type Echo struct {
 	prefix            string
 	callbackHandlerID string
 	proceedResult     proceedResult
-	logCommand        logCommand
+	setUserInput      setUserInput
 	text              TextMeta
 }
 
@@ -27,12 +27,12 @@ type TextMeta struct {
 	StartText   string
 }
 
-func NewEcho(b *bot.Bot, questions []CollectItem, pr proceedResult, lc logCommand, textP TextMeta, opts []Option) *Echo {
+func NewEcho(b *bot.Bot, questions []CollectItem, pr proceedResult, ui setUserInput, textP TextMeta, opts []Option) *Echo {
 	e := &Echo{
 		question:      questions,
 		prefix:        bot.RandomString(16),
 		proceedResult: pr,
-		logCommand:    lc,
+		setUserInput:  ui,
 		text:          textP,
 	}
 	for _, opt := range opts {
@@ -57,7 +57,6 @@ func (e *Echo) Collect(ctx context.Context, b *bot.Bot, update *models.Update) {
 	}
 	e.addToStorage(sourceMessage.Chat.ID, &sourceMessage)
 	e.addToStorage(sourceMessage.Chat.ID, message)
-	e.logCommand(sourceMessage.Chat.ID, "start")
 }
 
 func (e *Echo) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
@@ -74,4 +73,9 @@ func (e *Echo) addToStorage(chatId int64, message *models.Message) {
 		)
 		e.messageStorage.Add(chatId, m)
 	}
+}
+
+func (e *Echo) ClearState(chatId int64) {
+	e.question = []CollectItem{}
+	delete(ActualStatus, chatId)
 }

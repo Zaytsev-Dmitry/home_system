@@ -5,38 +5,58 @@ import (
 	"fmt"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"telegramCLient/internal/dao"
+	"telegramCLient/internal/handler/loader"
 	"telegramCLient/util"
 )
 
-var commandsMap = map[string]BaseCommand{}
-var actualUserCommand = map[int64]CommandState{}
-
-type UserAction struct {
+type ActionItem struct {
+	LastUserAction        string
+	LastRequirementToUser string
+	LastUserSentMessageId int
+}
+type Action struct {
+	commands map[string]BaseCommand
+	dao      dao.TelegramBotDao
 }
 
-type CommandState struct {
-	status      string
-	commandName string
-}
-
-func NewUserAction() *UserAction {
-	return &UserAction{}
-}
-
-func (ua *UserAction) AddCommand(comm BaseCommand) {
-	commandsMap[comm.GetName()] = comm
-}
-
-func (ua *UserAction) LogCommand(userTgId int64, status string, commName string) {
-	actualUserCommand[userTgId] = CommandState{
-		status:      status,
-		commandName: commName,
+func NewAction(dao dao.TelegramBotDao) *Action {
+	return &Action{
+		dao:      dao,
+		commands: map[string]BaseCommand{},
 	}
-	fmt.Print("dfgg")
 }
 
-func (ua *UserAction) Proceed(ctx context.Context, bot *bot.Bot, update *models.Update) {
-	chatId, _ := util.GetChatAndMsgId(update)
-	actualCommand := actualUserCommand[chatId]
-	commandsMap[actualCommand.commandName].ProceedUserAnswer(ctx, bot, update)
+func (a *Action) AddCommand(c BaseCommand) {
+	a.commands[c.GetName()] = c
+}
+
+func (a *Action) Log(tgId int64, cName string, userInput bool, isRunning bool) {
+	a.dao.ActionRepo.SaveOrUpdate(tgId, userInput, 0, cName, isRunning)
+}
+
+func (a *Action) getCommandHandlerByName(name string) BaseCommand {
+	return a.commands[name]
+}
+
+func (a *Action) Proceed(ctx context.Context, b *bot.Bot, update *models.Update) {
+	userId, _ := util.GetChatAndMsgId(update)
+	actionEntity := a.dao.ActionRepo.GetByTgId(userId)
+	lastRunCommandHandler := a.getCommandHandlerByName(actionEntity.CommandName)
+	if !actionEntity.NeedUserInput {
+		text := fmt.Sprintf(
+			loader.UnnecessaryActionText,
+			actionEntity.CommandName,
+		)
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID:    userId,
+			Text:      text,
+			ParseMode: models.ParseModeHTML,
+		})
+		a.Log(userId, lastRunCommandHandler.GetName(), false, false)
+		lastRunCommandHandler.ClearState(userId)
+		//TODO заюзать message storage для update
+	} else {
+		lastRunCommandHandler.ProceedUserAnswer(ctx, b, update)
+	}
 }

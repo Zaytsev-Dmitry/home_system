@@ -45,13 +45,13 @@ func main() {
 		panic(err)
 	}
 
-	ua := command.NewUserAction()
+	ua := command.NewAction(*dao)
 	createAndRegisterCommands(ua, appConfig, bot, ctx, *dao)
 	bot.Start(ctx)
 	defer dao.Close()
 }
 
-func createAndRegisterCommands(ua *command.UserAction, conf *config.AppConfig, b *bot.Bot, ctx context.Context, dao dao.TelegramBotDao) {
+func createAndRegisterCommands(a *command.Action, conf *config.AppConfig, b *bot.Bot, ctx context.Context, dao dao.TelegramBotDao) {
 	storage := *storage.NewStorage()
 	authServerClient := external.NewAuthServerClient(conf.Server.AuthServerUrl)
 	noteBackendClient := external.NewNoteBackendClient(conf.Server.NoteBackendUrl)
@@ -61,31 +61,31 @@ func createAndRegisterCommands(ua *command.UserAction, conf *config.AppConfig, b
 		log.Println(fmt.Sprintf("Create command : %s. With order: %x", value, i+1))
 		switch value {
 		case TEST_COMMAND:
-			newCommand = test.NewTestCommand(*ua, storage, b, ctx)
+			newCommand = test.NewTestCommand(*a, storage, b, ctx)
 
 		case MENU_COMMAND:
-			newCommand = menu.NewMenuCommand(*ua, storage, b, ctx)
+			newCommand = menu.NewMenuCommand(*a, storage, b, ctx)
 
 		case TUTORIAL_COMMAND:
-			newCommand = tutorial.NewTutorialCommand(*ua, storage, b, ctx)
+			newCommand = tutorial.NewTutorialCommand(*a, storage, b, ctx)
 
 		case PROFILE_COMMAND:
-			newCommand = profile.NewProfileCommand(*ua, storage, b, ctx, authServerClient)
+			newCommand = profile.NewProfileCommand(*a, storage, b, ctx, authServerClient)
 
 		case NOTES_COMMAND:
-			newCommand = notes.NewNotesCommand(*ua, storage, b, ctx, dao, noteBackendClient)
+			newCommand = notes.NewNotesCommand(*a, storage, b, ctx, dao, noteBackendClient)
 
 		case START_COMMAND:
-			newCommand = start.NewStartCommand(*ua, storage, b, ctx, dao, authServerClient)
+			newCommand = start.NewStartCommand(*a, storage, b, ctx, dao, authServerClient)
 		default:
 			fmt.Println("Неизвестная команда")
 		}
 		newCommand.RegisterHandler()
-		ua.AddCommand(newCommand)
+		a.AddCommand(newCommand)
 	}
 
 	b.RegisterHandler(bot.HandlerTypeMessageText, "", bot.MatchTypeContains, func(ctx context.Context, b *bot.Bot, update *models.Update) {
-		ua.Proceed(ctx, b, update)
+		a.Proceed(ctx, b, update)
 	})
 }
 

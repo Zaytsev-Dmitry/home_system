@@ -10,6 +10,7 @@ import (
 
 func (comm *MenuCommand) callback(ctx context.Context, b *bot.Bot, update *models.Update) {
 	chatId, msgId := util.GetChatAndMsgId(update)
+	comm.action.Log(chatId, comm.GetName(), false, true)
 	//клик по кнопке
 	if update.CallbackQuery != nil {
 		b.EditMessageText(
@@ -22,7 +23,7 @@ func (comm *MenuCommand) callback(ctx context.Context, b *bot.Bot, update *model
 			})
 	} else {
 		//была вызвана команда
-		b.SendMessage(ctx, &bot.SendMessageParams{
+		message, _ := b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:      chatId,
 			Text:        fmt.Sprintf("Выбери то что тебе интересно"),
 			ReplyMarkup: comm.buildMenuKeyboard(),
@@ -31,5 +32,6 @@ func (comm *MenuCommand) callback(ctx context.Context, b *bot.Bot, update *model
 			ChatID:    chatId,
 			MessageID: msgId,
 		})
+		comm.action.Log(message.Chat.ID, comm.GetName(), false, true)
 	}
 }

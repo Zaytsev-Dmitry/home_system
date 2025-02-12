@@ -15,10 +15,10 @@ type ProfileCommand struct {
 	ctx               context.Context
 	bot               *bot.Bot
 	callbackHandlerID string
-	action            command.UserAction
+	action            command.Action
 }
 
-func NewProfileCommand(action command.UserAction, st storage.Storage, bot *bot.Bot, ctx context.Context, authServerClient *external.AuthServerClient) *ProfileCommand {
+func NewProfileCommand(action command.Action, st storage.Storage, bot *bot.Bot, ctx context.Context, authServerClient *external.AuthServerClient) *ProfileCommand {
 	return &ProfileCommand{
 		AuthServerClient: authServerClient,
 		messageStorage:   st,
@@ -32,13 +32,12 @@ func (p *ProfileCommand) RegisterHandler() {
 	p.callbackHandlerID = p.bot.RegisterHandler(bot.HandlerTypeMessageText, p.GetName(), bot.MatchTypeExact, p.callback)
 }
 
-func (p *ProfileCommand) LogCommandAction(userId int64, status string) {
-	p.action.LogCommand(userId, status, p.GetName())
-}
-
 func (p *ProfileCommand) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
 }
 
 func (p *ProfileCommand) GetName() string {
 	return "/profile"
+}
+
+func (p *ProfileCommand) ClearState(chatId int64) {
 }

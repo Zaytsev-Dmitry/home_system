@@ -11,6 +11,7 @@ import (
 
 func (p *ProfileCommand) callback(ctx context.Context, b *bot.Bot, update *models.Update) {
 	chatId, _ := util.GetChatAndMsgId(update)
+	p.action.Log(chatId, p.GetName(), false, true)
 	profile := p.AuthServerClient.GetProfileByTelegramId(int(chatId))
 
 	var username string

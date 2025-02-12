@@ -44,10 +44,10 @@ type TutorialCommand struct {
 	ctx               context.Context
 	bot               *bot.Bot
 	callbackHandlerID string
-	action            command.UserAction
+	action            command.Action
 }
 
-func NewTutorialCommand(action command.UserAction, st storage.Storage, bot *bot.Bot, ctx context.Context) *TutorialCommand {
+func NewTutorialCommand(action command.Action, st storage.Storage, bot *bot.Bot, ctx context.Context) *TutorialCommand {
 	return &TutorialCommand{
 		component:      *dialog2.NewDialogInline(),
 		messageStorage: st,
@@ -64,10 +64,9 @@ func (t *TutorialCommand) RegisterHandler() {
 func (t *TutorialCommand) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
 }
 
-func (t *TutorialCommand) LogCommandAction(userId int64, status string) {
-	t.action.LogCommand(userId, status, t.GetName())
-}
-
 func (t *TutorialCommand) GetName() string {
 	return "/tutorial"
+}
+
+func (t *TutorialCommand) ClearState(chatId int64) {
 }

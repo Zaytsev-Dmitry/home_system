@@ -16,10 +16,10 @@ type TestCommand struct {
 	ctx               context.Context
 	bot               *bot.Bot
 	callbackHandlerID string
-	action            command.UserAction
+	action            command.Action
 }
 
-func NewTestCommand(action command.UserAction, st storage.Storage, bot *bot.Bot, ctx context.Context) *TestCommand {
+func NewTestCommand(action command.Action, st storage.Storage, bot *bot.Bot, ctx context.Context) *TestCommand {
 	c := &TestCommand{
 		messageStorage: st,
 		bot:            bot,
@@ -31,7 +31,7 @@ func NewTestCommand(action command.UserAction, st storage.Storage, bot *bot.Bot,
 		StartText:   "Тестовый start текст",
 	}
 
-	c.component = echo.NewEcho(bot, c.getQuestions(), c.proceedResult, c.LogCommandAction, textMeta, []echo.Option{})
+	c.component = echo.NewEcho(bot, c.getQuestions(), c.proceedResult, c.setUserInput, textMeta, []echo.Option{})
 	return c
 }
 
@@ -43,12 +43,12 @@ func (T *TestCommand) proceedResult(result echo.Result) {
 	fmt.Print(result)
 }
 
-func (c *TestCommand) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
-
+func (t *TestCommand) setUserInput(userInput bool, chatId int64) {
+	t.action.Log(chatId, t.GetName(), userInput, true)
 }
 
-func (t *TestCommand) LogCommandAction(userId int64, status string) {
-	t.action.LogCommand(userId, status, t.GetName())
+func (c *TestCommand) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
+
 }
 
 func (t *TestCommand) GetName() string {
@@ -68,4 +68,6 @@ func (c *TestCommand) getQuestions() []echo.CollectItem {
 			Content:   "Введи свой Email",
 		},
 	}
+}
+func (t *TestCommand) ClearState(chatId int64) {
 }

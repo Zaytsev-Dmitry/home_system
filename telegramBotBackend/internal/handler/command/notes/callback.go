@@ -12,13 +12,16 @@ import (
 )
 
 func (n *NoteCommand) addNoteCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
-	//TODO вызывать logcommon action
+	message := util.GetChatMessage(update)
+	n.action.Log(message.Chat.ID, n.GetName(), false, true)
 	n.component.Collect(ctx, b, update)
 }
 
 // TODO если ошибки то обработать
 func (n *NoteCommand) showAllNotesCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
-	//TODO вызывать logcommon action
+	message := util.GetChatMessage(update)
+	n.action.Log(message.Chat.ID, n.GetName(), false, true)
+
 	data := n.noteBackClient.GetAllNotesByAccount(update.CallbackQuery.From.ID)
 	var stringData []string
 	for _, value := range *data.Objects {
@@ -42,6 +45,6 @@ func (n *NoteCommand) showNotesKeyboardCallback(ctx context.Context, b *bot.Bot,
 			Text:        "Выбери действие",
 			ReplyMarkup: n.buildNotesKeyboard(),
 		})
+	n.action.Log(message.Chat.ID, n.GetName(), false, true)
 	n.messageStorage.Add(chatId, *storage.NewMessage(message.ID, message.Text, 0, storage.BOT))
-	n.LogCommandAction(chatId, "start")
 }

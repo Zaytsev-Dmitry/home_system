@@ -21,10 +21,10 @@ type StartCommand struct {
 	ctx               context.Context
 	bot               *bot.Bot
 	callbackHandlerID string
-	action            command.UserAction
+	action            command.Action
 }
 
-func NewStartCommand(action command.UserAction, st storage.Storage, bot *bot.Bot, ctx context.Context, d dao.TelegramBotDao, serverClient *external.AuthServerClient) *StartCommand {
+func NewStartCommand(action command.Action, st storage.Storage, bot *bot.Bot, ctx context.Context, d dao.TelegramBotDao, serverClient *external.AuthServerClient) *StartCommand {
 	s := &StartCommand{
 		dao:              d,
 		authServerClient: serverClient,
@@ -40,7 +40,7 @@ func NewStartCommand(action command.UserAction, st storage.Storage, bot *bot.Bot
 	options := []echo.Option{
 		echo.WithMessageStorage(st),
 	}
-	s.component = echo.NewEcho(bot, s.getQuestions(), s.proceedResult, s.LogCommandAction, textMeta, options)
+	s.component = echo.NewEcho(bot, s.getQuestions(), s.proceedResult, s.setUserInput, textMeta, options)
 	return s
 }
 
@@ -50,6 +50,10 @@ func (s *StartCommand) RegisterHandler() {
 
 func (s *StartCommand) proceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
 	s.component.ProceedUserAnswer(ctx, b, update)
+}
+
+func (s *StartCommand) setUserInput(userInput bool, chatId int64) {
+	s.action.Log(chatId, s.GetName(), userInput, true)
 }
 
 func (s *StartCommand) proceedResult(result echo.Result) {
@@ -94,10 +98,6 @@ func (s *StartCommand) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update
 	s.component.ProceedUserAnswer(ctx, b, update)
 }
 
-func (s *StartCommand) LogCommandAction(userId int64, status string) {
-	s.action.LogCommand(userId, status, s.GetName())
-}
-
 func (s *StartCommand) GetName() string {
 	return "/start"
 }
@@ -115,4 +115,16 @@ func (s *StartCommand) getQuestions() []echo.CollectItem {
 			Content:   "Введи свой Email",
 		},
 	}
+}
+func (s *StartCommand) ClearState(chatId int64) {
+	s.component.ClearState(chatId)
+	allMsg := s.messageStorage.GetAll(chatId)
+	var idsToDel []int
+	for _, msg := range allMsg {
+		idsToDel = append(idsToDel, msg.Id)
+	}
+	s.bot.DeleteMessages(s.ctx, &bot.DeleteMessagesParams{
+		ChatID:     chatId,
+		MessageIDs: idsToDel,
+	})
 }

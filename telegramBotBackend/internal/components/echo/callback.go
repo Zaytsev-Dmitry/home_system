@@ -16,7 +16,7 @@ type Status struct {
 
 type State uint
 
-var actualStatus = map[int64]Status{}
+var ActualStatus = map[int64]Status{}
 
 const (
 	DEFAULT State = iota
@@ -27,7 +27,7 @@ const (
 func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) {
 	message := util.GetChatMessage(update)
 	e.addToStorage(message.Chat.ID, &message)
-	status := actualStatus[message.Chat.ID]
+	status := ActualStatus[message.Chat.ID]
 	var text string
 	var keyboard models.ReplyMarkup
 	var isComplete = false
@@ -35,6 +35,7 @@ func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) 
 	case DEFAULT:
 		text = "Первый вопрос: " + e.question[status.questionIterator].Content
 		status = Status{actualState: ASK_FIELDS}
+		e.setUserInput(true, message.Chat.ID)
 	case ASK_FIELDS:
 		{
 			e.question[status.questionIterator].Answer = message.Text
@@ -51,6 +52,7 @@ func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) 
 		}
 	case CONFIRM:
 		{
+			e.setUserInput(false, message.Chat.ID)
 			cmd := strings.TrimPrefix(update.CallbackQuery.Data, e.prefix)
 			if cmd == CONFIRM_YES {
 				isComplete = true
@@ -60,7 +62,7 @@ func (e *Echo) callback(ctx context.Context, b *bot.Bot, update *models.Update) 
 			}
 		}
 	}
-	actualStatus[message.Chat.ID] = status
+	ActualStatus[message.Chat.ID] = status
 	if !isComplete {
 		sendMessage, _ := b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:      message.Chat.ID,
@@ -98,6 +100,5 @@ func (e *Echo) sendResult(isComplete bool, message models.Message) {
 			Question:      e.question,
 			MessagesIds:   ids,
 		})
-		e.logCommand(message.Chat.ID, "end")
 	}
 }

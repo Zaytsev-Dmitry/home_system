@@ -21,10 +21,10 @@ type NoteCommand struct {
 	ctx               context.Context
 	bot               *bot.Bot
 	callbackHandlerID []string
-	action            command.UserAction
+	action            command.Action
 }
 
-func NewNotesCommand(action command.UserAction, st storage.Storage, bot *bot.Bot, ctx context.Context, d dao.TelegramBotDao, client *external.NoteBackendClient) *NoteCommand {
+func NewNotesCommand(action command.Action, st storage.Storage, bot *bot.Bot, ctx context.Context, d dao.TelegramBotDao, client *external.NoteBackendClient) *NoteCommand {
 	n := &NoteCommand{
 		noteBackClient: client,
 		dao:            d,
@@ -40,7 +40,7 @@ func NewNotesCommand(action command.UserAction, st storage.Storage, bot *bot.Bot
 	options := []echo.Option{
 		echo.WithMessageStorage(st),
 	}
-	n.component = echo.NewEcho(bot, n.getQuestions(), n.proceedResult, n.LogCommandAction, textMeta, options)
+	n.component = echo.NewEcho(bot, n.getQuestions(), n.proceedResult, n.setUserInput, textMeta, options)
 	return n
 }
 
@@ -50,12 +50,12 @@ func (n *NoteCommand) RegisterHandler() {
 	n.callbackHandlerID = append(n.callbackHandlerID, n.bot.RegisterHandler(bot.HandlerTypeCallbackQueryData, "show_all_notes", bot.MatchTypeExact, n.showAllNotesCallback))
 }
 
-func (p *NoteCommand) LogCommandAction(userId int64, status string) {
-	p.action.LogCommand(userId, status, p.GetName())
-}
-
 func (n *NoteCommand) ProceedUserAnswer(ctx context.Context, b *bot.Bot, update *models.Update) {
 	n.component.ProceedUserAnswer(ctx, b, update)
+}
+
+func (n *NoteCommand) setUserInput(userInput bool, chatId int64) {
+	n.action.Log(chatId, n.GetName(), userInput, true)
 }
 
 func (s *NoteCommand) proceedResult(result echo.Result) {
@@ -114,4 +114,16 @@ func (n *NoteCommand) getQuestions() []echo.CollectItem {
 			Content:   "какая ссылка",
 		},
 	}
+}
+func (n *NoteCommand) ClearState(chatId int64) {
+	n.component.ClearState(chatId)
+	allMsg := n.messageStorage.GetAll(chatId)
+	var idsToDel []int
+	for _, msg := range allMsg {
+		idsToDel = append(idsToDel, msg.Id)
+	}
+	n.bot.DeleteMessages(n.ctx, &bot.DeleteMessagesParams{
+		ChatID:     chatId,
+		MessageIDs: idsToDel,
+	})
 }
