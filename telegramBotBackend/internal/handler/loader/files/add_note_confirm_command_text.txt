@@ -1,7 +1,7 @@
 <b>Все верно?</b>
 
-<b>Название:</b><blockquote>name</blockquote>
+<b>name_0</b><blockquote>value_0</blockquote>
 
-<b>Содержимое:</b><blockquote>content</blockquote>
+<b>name_1</b><blockquote>value_1</blockquote>
 
-<b>Ссылка:</b><blockquote>link</blockquote>
+<b>name_2</b><blockquote>value_2</blockquote>
