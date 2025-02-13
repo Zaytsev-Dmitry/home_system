@@ -1,5 +1,20 @@
 version: '3'
 services:
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:4.0.6-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672 #Remove if not using management
+    volumes:
+      - ./data/:/var/lib/rabbitmq/
+      - ./log/:/var/log/rabbitmq
+    restart: unless-stopped
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
   auth-backend:
     build:
       context: authBackend
