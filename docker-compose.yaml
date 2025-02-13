@@ -1,5 +1,21 @@
 version: '3'
 services:
+  vault:
+    image: vault:1.13.3
+    volumes:
+      - ./data/vault:/data/vault
+    ports:
+      - "127.0.0.1:8200:8200"
+    environment:
+      - VAULT_ADDR=http://localhost:8200
+      - VAULT_API_ADDR=http://localhost:8200
+      - VAULT_ADDRESS=http://localhost:8200
+    cap_add:
+      - IPC_LOCK
+    command: vault server -config=data/vault/vault.json
+    networks:
+      - skynet
+
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:4.0.6-management-alpine
