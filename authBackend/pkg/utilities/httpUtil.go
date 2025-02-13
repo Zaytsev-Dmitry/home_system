@@ -101,6 +101,9 @@ func SetResponseWithStatus(v any, context *gin.Context, status int) {
 
 func SetResponseError(context *gin.Context, status int) {
 	var responseError = getErrorDto("Oops...что то пошло не так", status, context)
+	if status == http.StatusNotFound {
+		responseError = getErrorDto("Ничего не нашел", status, context)
+	}
 	context.Writer.Header().Set("Content-Type", "application/json")
 	context.Status(status)
 	json.NewEncoder(context.Writer).Encode(responseError)

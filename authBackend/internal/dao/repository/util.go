@@ -9,6 +9,7 @@ import (
 
 var (
 	SelectError = errors.New("SqlxAccountPort.Select error.")
+	NoRows      = errors.New("SqlxAccountPort.Select no rows.")
 	InsertError = errors.New("SqlxAccountPort.Insert error.")
 	CommitError = errors.New("SqlxAccountPort.Tx commit error.")
 )

@@ -79,6 +79,9 @@ func (port *SqlxAccountPort) GetByTgId(tgId int64) (authServerDomain.Account, er
 	var errResp error
 	err := port.Db.Get(&resp, SELECT_BY_TG_ID, tgId)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return authServerDomain.Account{}, repository.NoRows
+		}
 		errResp = errors.Join(repository.SelectError, errors.New("Wrap error: "+err.Error()))
 	}
 	return resp, errResp
