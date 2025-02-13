@@ -6,15 +6,15 @@ services:
     ports:
       - 5672:5672
       - 15672:15672 #Remove if not using management
-    volumes:
-      - ./data/:/var/lib/rabbitmq/
-      - ./log/:/var/log/rabbitmq
     restart: unless-stopped
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 30s
       timeout: 30s
       retries: 3
+    networks:
+      - skynet
+
   auth-backend:
     build:
       context: authBackend
@@ -31,7 +31,7 @@ services:
     networks:
       - skynet
 
-  note-backend-app:
+  note-backend:
     build:
       context: noteBackend
       dockerfile: Dockerfile
@@ -81,6 +81,7 @@ services:
       retries: 10
     networks:
       - skynet
+
   keycloak:
     image: quay.io/keycloak/keycloak:24.0
     container_name: keycloak
