@@ -1,10 +1,10 @@
 package noteControllers
 
 import (
-	noteSpec "github.com/Zaytsev-Dmitry/home_system_open_api/noteServerBackend"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	notePresenter "noteBackendApp/api/presenter"
+	generatedApi "noteBackendApp/api/spec"
 	noteInterface "noteBackendApp/internal/dao/interface"
 	noteUseCase "noteBackendApp/internal/usecases"
 	noteUtilities "noteBackendApp/pkg/utilities"
@@ -18,7 +18,7 @@ type NoteController struct {
 }
 
 func (controller *NoteController) SaveNote(c *gin.Context) {
-	var requestEntity noteSpec.CreateNoteRequest
+	var requestEntity generatedApi.CreateNoteRequest
 	noteUtilities.CatchMarshallErr(c.BindJSON(&requestEntity), c)
 	entity := controller.SaveUseCase.Save(controller.presenter.ToEntity(&requestEntity))
 	noteUtilities.SetResponse(

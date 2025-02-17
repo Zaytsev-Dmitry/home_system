@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	noteSpec "github.com/Zaytsev-Dmitry/home_system_open_api/noteServerBackend"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -11,6 +10,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	noteHandler "noteBackendApp/api/handlers"
+	generatedApi "noteBackendApp/api/spec"
 	noteConfig "noteBackendApp/configs"
 	noteDaoPorts "noteBackendApp/internal/dao/impl"
 	noteInterface "noteBackendApp/internal/dao/interface"
@@ -49,7 +49,7 @@ func main() {
 	fmt.Printf("%s!\n", startMessage)
 	router, apiInterface := initAPI(createDAO(config))
 	router.Use(commonMiddleware)
-	noteSpec.RegisterHandlers(router, apiInterface)
+	generatedApi.RegisterHandlers(router, apiInterface)
 	log.Println(fmt.Sprintf("Starting server on : %s", config.Server.Port))
 	if err := router.Run(":" + config.Server.Port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
@@ -60,7 +60,7 @@ func commonMiddleware(context *gin.Context) {
 	context.Header("Content-Type", "application/json")
 }
 
-func initAPI(dao noteInterface.NoteDao) (router *gin.Engine, serverInterface noteSpec.ServerInterface) {
+func initAPI(dao noteInterface.NoteDao) (router *gin.Engine, serverInterface generatedApi.ServerInterface) {
 	return gin.Default(), noteHandler.NewNoteBackendApi(dao)
 }
 

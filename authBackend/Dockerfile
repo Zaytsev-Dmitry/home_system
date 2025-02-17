@@ -3,7 +3,6 @@ WORKDIR /app
 COPY /cmd/main.go .
 COPY go.mod go.sum ./
 RUN go mod download
-RUN go get -u all
 COPY . .
 
 RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest

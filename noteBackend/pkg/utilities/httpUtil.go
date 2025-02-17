@@ -2,15 +2,15 @@ package noteUtilities
 
 import (
 	"encoding/json"
-	noteSpec "github.com/Zaytsev-Dmitry/home_system_open_api/noteServerBackend"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	generatedApi "noteBackendApp/api/spec"
 	"time"
 )
 
-func getErrorDto(err string, status int, context *gin.Context) noteSpec.ErrorResponse {
+func getErrorDto(err string, status int, context *gin.Context) generatedApi.ErrorResponse {
 	nowString := time.Now().String()
-	return noteSpec.ErrorResponse{
+	return generatedApi.ErrorResponse{
 		Timestamp: &nowString,
 		Status:    &status,
 		Error:     &err,

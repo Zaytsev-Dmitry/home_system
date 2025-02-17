@@ -2,15 +2,15 @@ package notePresenter
 
 import (
 	"fmt"
-	noteSpec "github.com/Zaytsev-Dmitry/home_system_open_api/noteServerBackend"
+	generatedApi "noteBackendApp/api/spec"
 	noteDomain "noteBackendApp/internal/domain"
 )
 
 type Presenter struct {
 }
 
-func (presenter *Presenter) ToNoteResponse(entity noteDomain.Note) noteSpec.NoteResponse {
-	return noteSpec.NoteResponse{
+func (presenter *Presenter) ToNoteResponse(entity noteDomain.Note) generatedApi.NoteResponse {
+	return generatedApi.NoteResponse{
 		Name:        &entity.Name,
 		Link:        &entity.Link,
 		Description: &entity.Description,
@@ -19,7 +19,7 @@ func (presenter *Presenter) ToNoteResponse(entity noteDomain.Note) noteSpec.Note
 	}
 }
 
-func (presenter *Presenter) ToEntity(requestEntity *noteSpec.CreateNoteRequest) noteDomain.Note {
+func (presenter *Presenter) ToEntity(requestEntity *generatedApi.CreateNoteRequest) noteDomain.Note {
 	return noteDomain.Note{
 		Name:        *requestEntity.Name,
 		Description: *requestEntity.Description,
@@ -28,11 +28,11 @@ func (presenter *Presenter) ToEntity(requestEntity *noteSpec.CreateNoteRequest) 
 	}
 }
 
-func (presenter *Presenter) ToListNoteResponse(entities []noteDomain.Note) noteSpec.NoteResponseList {
-	var result = make([]noteSpec.NoteResponse, len(entities))
+func (presenter *Presenter) ToListNoteResponse(entities []noteDomain.Note) generatedApi.NoteResponseList {
+	var result = make([]generatedApi.NoteResponse, len(entities))
 	for i, value := range entities {
 		id := fmt.Sprint(value.ID)
-		var response = noteSpec.NoteResponse{
+		var response = generatedApi.NoteResponse{
 			AccountId:   &value.AccountId,
 			TgId:        &value.TelegramId,
 			Link:        &value.Link,
@@ -43,7 +43,7 @@ func (presenter *Presenter) ToListNoteResponse(entities []noteDomain.Note) noteS
 		result[i] = response
 	}
 
-	return noteSpec.NoteResponseList{
+	return generatedApi.NoteResponseList{
 		Objects: &result,
 	}
 }
