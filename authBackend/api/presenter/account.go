@@ -1,15 +1,15 @@
 package presenter
 
 import (
+	generatedApi "authServer/api/spec"
 	domain "authServer/internal/domain"
-	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 )
 
 type AccountPresenter struct {
 }
 
-func (presenter *AccountPresenter) ToAccountResponse(entity domain.Account) authSpec.AccountResponse {
-	return authSpec.AccountResponse{
+func (presenter *AccountPresenter) ToAccountResponse(entity domain.Account) generatedApi.AccountResponse {
+	return generatedApi.AccountResponse{
 		Email:            &entity.Email,
 		FirstName:        &entity.FirstName,
 		Id:               &entity.ID,
@@ -20,7 +20,7 @@ func (presenter *AccountPresenter) ToAccountResponse(entity domain.Account) auth
 	}
 }
 
-func (presenter *AccountPresenter) ToEntity(requestEntity *authSpec.CreateAccountRequest) domain.Account {
+func (presenter *AccountPresenter) ToEntity(requestEntity *generatedApi.CreateAccountRequest) domain.Account {
 	return domain.Account{
 		FirstName: *requestEntity.FirstName,
 		LastName:  *requestEntity.LastName,

@@ -1,17 +1,17 @@
 package presenter
 
 import (
+	generatedApi "authServer/api/spec"
 	domain "authServer/internal/domain"
-	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 )
 
 type ProfilePresenter struct {
 }
 
-func (presenter *ProfilePresenter) ToProfileResponse(entity domain.Profile) authSpec.ProfileResponse {
+func (presenter *ProfilePresenter) ToProfileResponse(entity domain.Profile) generatedApi.ProfileResponse {
 	accId64 := int64(entity.AccountId)
 	id64 := int64(entity.ID)
-	return authSpec.ProfileResponse{
+	return generatedApi.ProfileResponse{
 		AccountId: &accId64,
 		Id:        &id64,
 		Role:      &entity.Role,

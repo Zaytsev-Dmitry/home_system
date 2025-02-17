@@ -1,9 +1,9 @@
 package keycloak
 
 import (
+	generatedApi "authServer/api/spec"
 	"authServer/pkg/utilities"
 	"errors"
-	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 )
 
 type KeycloakClient struct {
@@ -16,7 +16,7 @@ type KeycloakClient struct {
 	ServerGrantType string
 }
 
-func (client KeycloakClient) RegisterAccount(request authSpec.CreateAccountRequest) (error, KeycloakEntity) {
+func (client KeycloakClient) RegisterAccount(request generatedApi.CreateAccountRequest) (error, KeycloakEntity) {
 	var result KeycloakEntity
 	serviceAccountToken, err := client.getToken()
 	if err != nil {

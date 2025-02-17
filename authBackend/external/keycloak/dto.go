@@ -1,8 +1,8 @@
 package keycloak
 
 import (
+	generatedApi "authServer/api/spec"
 	"authServer/pkg/utilities"
-	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"net/http"
 	"net/url"
 )
@@ -46,7 +46,7 @@ type KeycloakResponseError struct {
 	ErrorMessage     string `json:"errorMessage"`
 }
 
-func newKeycloakUserCreateRequest(request authSpec.CreateAccountRequest) *KeycloakUserCreateRequest {
+func newKeycloakUserCreateRequest(request generatedApi.CreateAccountRequest) *KeycloakUserCreateRequest {
 	credentials := make([]Credentials, 1)
 	//credentials[0] = Credentials{
 	//	Type: "password", Value: *request.Password, Temporary: false,

@@ -2,12 +2,12 @@ package controller
 
 import (
 	"authServer/api/presenter"
+	generatedApi "authServer/api/spec"
 	"authServer/external/keycloak"
 	daoImpl "authServer/internal/dao"
 	"authServer/internal/domain"
 	useCases "authServer/internal/usecases"
 	"authServer/pkg/utilities"
-	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,7 +18,7 @@ type AccountController struct {
 }
 
 func (controller *AccountController) RegisterAccount(context *gin.Context) {
-	var requestEntity authSpec.CreateAccountRequest
+	var requestEntity generatedApi.CreateAccountRequest
 	utilities.CatchMarshallErr(context.BindJSON(&requestEntity), context)
 	entity, err, status := controller.registerAcc.Register(requestEntity)
 	controller.processAccountResult(context, err, status, entity)

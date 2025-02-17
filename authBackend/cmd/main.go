@@ -2,11 +2,11 @@ package main
 
 import (
 	"authServer/api/handlers"
+	generatedApi "authServer/api/spec"
 	"authServer/configs"
 	"authServer/internal/dao"
 	"authServer/pkg/utilities"
 	"fmt"
-	"github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"strconv"
@@ -28,7 +28,7 @@ func main() {
 	router, apiInterface := gin.Default(), handlers.NewAuthServerApi(appConfig, *dao)
 
 	//регаю хэндлеры
-	authSpec.RegisterHandlers(router, apiInterface)
+	generatedApi.RegisterHandlers(router, apiInterface)
 
 	logger.Info(fmt.Sprintf("Start application: %s on port %x", appConfig.Server.Name, appConfig.Server.Port))
 

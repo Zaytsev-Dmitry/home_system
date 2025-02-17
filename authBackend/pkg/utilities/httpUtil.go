@@ -1,9 +1,9 @@
 package utilities
 
 import (
+	generatedApi "authServer/api/spec"
 	"bytes"
 	"encoding/json"
-	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
@@ -71,9 +71,9 @@ func UrlencodedRequest(httpMethod string, urlStr string, data url.Values) (*http
 	return resp, err
 }
 
-func getErrorDto(err string, status int, context *gin.Context) authSpec.ErrorResponse {
+func getErrorDto(err string, status int, context *gin.Context) generatedApi.ErrorResponse {
 	nowString := time.Now().String()
-	return authSpec.ErrorResponse{
+	return generatedApi.ErrorResponse{
 		Timestamp: &nowString,
 		Status:    &status,
 		Error:     &err,
