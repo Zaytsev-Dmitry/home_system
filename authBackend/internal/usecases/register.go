@@ -7,7 +7,6 @@ import (
 	domain "authServer/internal/domain"
 	"authServer/pkg/utilities"
 	"errors"
-	"net/http"
 )
 
 type RegisterAccount struct {
@@ -15,20 +14,19 @@ type RegisterAccount struct {
 	Repo     intefraces.AccountRepository
 }
 
-func (usecase *RegisterAccount) Register(request generatedApi.CreateAccountRequest) (domain.Account, error, int) {
-	var status = http.StatusOK
+func (usecase *RegisterAccount) Register(request generatedApi.CreateAccountRequest) (domain.Account, error) {
 	var result domain.Account
 	result, respErr := usecase.runBusinessLayout(request)
-	return result, respErr, IfExistErrLogAndReturn500Http(respErr, status)
+	return result, respErr
 }
 
 func (usecase *RegisterAccount) runBusinessLayout(request generatedApi.CreateAccountRequest) (domain.Account, error) {
 	var result domain.Account
-	respErr, keycloakEntity := usecase.getKeycloakUser(request)
-	if respErr == nil {
-		result, respErr = usecase.Repo.CreateAccountAndProfile(keycloakEntity, *request.Username, *request.TelegramId)
+	err, keycloakEntity := usecase.getKeycloakUser(request)
+	if err == nil {
+		result, err = usecase.Repo.CreateAccountAndProfile(keycloakEntity, *request.Username, *request.TelegramId)
 	}
-	return result, respErr
+	return result, err
 }
 
 func (usecase *RegisterAccount) getKeycloakUser(request generatedApi.CreateAccountRequest) (error, keycloak.KeycloakEntity) {

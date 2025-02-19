@@ -83,8 +83,8 @@ func getErrorDto(err string, status int, context *gin.Context) generatedApi.Erro
 
 func CatchMarshallErr(err error, context *gin.Context) {
 	if err != nil {
-		var responseError = getErrorDto(err.Error(), http.StatusBadRequest, context)
-		context.Status(http.StatusBadRequest)
+		var responseError = getErrorDto(err.Error(), http.StatusInternalServerError, context)
+		context.Status(http.StatusInternalServerError)
 		json.NewEncoder(context.Writer).Encode(responseError)
 	}
 }
