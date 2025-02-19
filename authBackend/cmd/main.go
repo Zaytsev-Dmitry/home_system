@@ -14,23 +14,14 @@ import (
 
 func main() {
 	//гружу конфиг
-	appConfig := configs.LoadConfig("MODE")
+	appConfig := getConfig()
 
-	if appConfig == nil {
-		panic("appConfig is nil")
-	}
 	//делаю логер
-	logger := utilities.GetLogger()
-	if logger == nil {
-		panic("logger is nil")
-	}
+	logger := getLogger()
 	defer logger.Sync()
 
 	//создаю DAO
-	dao := dao.CreateDao(*appConfig)
-	if dao == nil {
-		panic("dao is nil")
-	}
+	dao := getDao(appConfig)
 	defer dao.Close()
 
 	//инициализирую апи
@@ -45,6 +36,31 @@ func main() {
 	)
 	//старт сервера
 	if err := router.Run(":" + strconv.Itoa(appConfig.Server.Port)); err != nil {
-		logger.Error("Failed to start server: " + err.Error())
+		panic("Failed to start server: " + err.Error())
 	}
+}
+
+func getDao(appConfig *configs.AppConfig) *dao.AuthDao {
+	dao := dao.CreateDao(*appConfig)
+	if dao == nil {
+		panic("dao is nil")
+	}
+	return dao
+}
+
+func getLogger() *zap.Logger {
+	logger := utilities.GetLogger()
+	if logger == nil {
+		panic("logger is nil")
+	}
+	return logger
+}
+
+func getConfig() *configs.AppConfig {
+	appConfig := configs.LoadConfig("MODE")
+
+	if appConfig == nil {
+		panic("appConfig is nil")
+	}
+	return appConfig
 }
