@@ -2,6 +2,7 @@ package keycloak
 
 import (
 	generatedApi "authServer/api/spec"
+	authConfig "authServer/configs"
 	"authServer/pkg/utilities"
 	"errors"
 )
@@ -14,6 +15,18 @@ type KeycloakClient struct {
 	ClientId        string
 	ClientSecret    string
 	ServerGrantType string
+}
+
+func New(config *authConfig.AppConfig) *KeycloakClient {
+	return &KeycloakClient{
+		KeycloakUrl:     config.Keycloak.KeycloakUrl,
+		TokenUrl:        config.Keycloak.TokenUrl,
+		KeycloakHost:    config.Keycloak.KeycloakHost,
+		KeycloakRealm:   config.Keycloak.KeycloakRealm,
+		ClientId:        config.Keycloak.ClientId,
+		ClientSecret:    config.Keycloak.ClientSecret,
+		ServerGrantType: config.Keycloak.ServerGrantType,
+	}
 }
 
 func (client KeycloakClient) RegisterAccount(request generatedApi.CreateAccountRequest) (error, KeycloakEntity) {

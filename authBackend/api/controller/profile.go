@@ -14,7 +14,7 @@ type ProfileController struct {
 	Presenter      *presenter.ProfilePresenter
 }
 
-func CreateProfileController(dao daoImpl.AuthDao) *ProfileController {
+func CreateProfileController(dao *daoImpl.AuthDao) *ProfileController {
 	return &ProfileController{
 		profileUseCase: &useCases.ProfileUseCase{Repo: dao.ProfileRepo},
 		getAccByTgId:   &useCases.GetAccByTelegramId{Repo: dao.AccountRepo},

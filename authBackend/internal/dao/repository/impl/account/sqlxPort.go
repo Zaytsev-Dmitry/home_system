@@ -4,7 +4,6 @@ import (
 	"authServer/external/keycloak"
 	"authServer/internal/dao/repository"
 	"authServer/internal/dao/repository/impl/profile"
-	"authServer/internal/dao/repository/intefraces"
 	authServerDomain "authServer/internal/domain"
 	"authServer/pkg/utilities"
 	"database/sql"
@@ -20,8 +19,7 @@ const (
 )
 
 type SqlxAccountPort struct {
-	Db          *sqlx.DB
-	ProfileRepo intefraces.ProfileRepository
+	Db *sqlx.DB
 }
 
 func (port *SqlxAccountPort) CreateAccountAndProfile(entity keycloak.KeycloakEntity, username string, tgId int64) (authServerDomain.Account, error) {
@@ -91,6 +89,6 @@ func (port *SqlxAccountPort) CloseConnection() {
 	port.Db.Close()
 }
 
-func CreateSqlxAccountPort(db *sqlx.DB, prof *intefraces.ProfileRepository) *SqlxAccountPort {
-	return &SqlxAccountPort{Db: db, ProfileRepo: *prof}
+func New(db *sqlx.DB) *SqlxAccountPort {
+	return &SqlxAccountPort{Db: db}
 }

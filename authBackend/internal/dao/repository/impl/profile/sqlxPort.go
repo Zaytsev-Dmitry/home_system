@@ -16,7 +16,7 @@ type SqlxProfilePort struct {
 	Db *sqlx.DB
 }
 
-func CreateSqlxProfilePort(db *sqlx.DB) *SqlxProfilePort {
+func New(db *sqlx.DB) *SqlxProfilePort {
 	return &SqlxProfilePort{Db: db}
 }
 
@@ -25,7 +25,7 @@ func (p *SqlxProfilePort) CreateProfile(account authServerDomain.Account) error 
 	var resultErr error
 
 	tx := p.Db.MustBegin()
-	if p.GetProfileByAccountId(int64(account.ID)).ID == 0 {
+	if p.GetProfileByAccountId(account.ID).ID == 0 {
 		insertErr := tx.QueryRowx(INSERT_PROFILE, account.ID, "USER", true, account.Username).StructScan(&result)
 		resultErr = repository.ProceedErrorWithRollback(insertErr, tx)
 	}

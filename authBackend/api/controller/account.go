@@ -42,10 +42,10 @@ func (controller *AccountController) processAccountResult(context *gin.Context, 
 	}
 }
 
-func CreateAccountController(keycloakClient keycloak.KeycloakClient, dao daoImpl.AuthDao) *AccountController {
+func CreateAccountController(keycloakClient *keycloak.KeycloakClient, dao *daoImpl.AuthDao) *AccountController {
 	return &AccountController{
 		registerAcc: &useCases.RegisterAccount{
-			Keycloak: &keycloakClient,
+			Keycloak: keycloakClient,
 			Repo:     dao.AccountRepo,
 		},
 		getAccByTgId: &useCases.GetAccByTelegramId{

@@ -25,7 +25,7 @@ func main() {
 	defer dao.Close()
 
 	//инициализирую апи
-	router, apiInterface := gin.Default(), handlers.NewAuthServerApi(appConfig, *dao)
+	router, apiInterface := gin.Default(), handlers.NewAuthServerApi(appConfig, dao)
 
 	//регаю хэндлеры
 	generatedApi.RegisterHandlers(router, apiInterface)
@@ -41,7 +41,7 @@ func main() {
 }
 
 func getDao(appConfig *configs.AppConfig) *dao.AuthDao {
-	dao := dao.CreateDao(*appConfig)
+	dao := dao.New(appConfig)
 	if dao == nil {
 		panic("dao is nil")
 	}

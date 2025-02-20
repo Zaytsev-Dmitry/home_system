@@ -25,16 +25,8 @@ func (api *AuthServerApi) RegisterAccount(context *gin.Context) {
 	api.accController.RegisterAccount(context)
 }
 
-func NewAuthServerApi(config *authConfig.AppConfig, dao daoImpl.AuthDao) *AuthServerApi {
-	keycloak := keycloak.KeycloakClient{
-		KeycloakUrl:     config.Keycloak.KeycloakUrl,
-		TokenUrl:        config.Keycloak.TokenUrl,
-		KeycloakHost:    config.Keycloak.KeycloakHost,
-		KeycloakRealm:   config.Keycloak.KeycloakRealm,
-		ClientId:        config.Keycloak.ClientId,
-		ClientSecret:    config.Keycloak.ClientSecret,
-		ServerGrantType: config.Keycloak.ServerGrantType,
-	}
+func NewAuthServerApi(config *authConfig.AppConfig, dao *daoImpl.AuthDao) *AuthServerApi {
+	keycloak := keycloak.New(config)
 	return &AuthServerApi{
 		accController:     accountController.CreateAccountController(keycloak, dao),
 		profileController: accountController.CreateProfileController(dao),

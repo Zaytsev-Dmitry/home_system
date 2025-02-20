@@ -28,28 +28,6 @@ func ProceedErrorWithRollback(err error, tx *sqlx.Tx) error {
 	return err
 }
 
-func CommitOrRollbackTx(err []error, tx *sqlx.Tx) error {
-	var res error
-	if len(err) > 0 {
-		for i, value := range err {
-			if value != nil {
-				if res == nil {
-					res = err[i]
-				} else {
-					res = errors.Join(res, errors.New("Wrap error: "+value.Error()))
-				}
-			}
-		}
-		rollbackErr := tx.Rollback()
-		if rollbackErr != nil {
-			res = errors.Join(res, errors.New("Wrap error: "+rollbackErr.Error()))
-		}
-	} else {
-		tx.Commit()
-	}
-	return res
-}
-
 func CommitAndProceedErrors(tx *sqlx.Tx, resultErr error) error {
 	if resultErr == nil {
 		commitErr := tx.Commit()
