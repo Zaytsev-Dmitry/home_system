@@ -1,0 +1,20 @@
+keycloak:
+  keycloakUrl: "http://localhost:7080/realms/home-system/protocol/openid-connect"
+  keycloakHost: "http://localhost:7080"
+  keycloakRealm: "home-system"
+  tokenUrl: "/token"
+  clientId: "d3f1202c-d7d6-4694-9a6c-6e1575321baf"
+  clientSecret: "W2aXh7r5NrGPPROdgS1x1Ic5cMXqCZHx"
+  serverGrantType: "client_credentials"
+
+database:
+  host: "localhost"
+  user: "auth_user"
+  password: "8c6b18ac-84ff-4436-8916-6e11aaa41e92"
+  dataBaseName: "auth"
+  dialect: "postgres"
+  impl: "sqlx"
+
+server:
+  name: "auth backend server"
+  port: 8081

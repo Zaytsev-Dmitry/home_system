@@ -1,0 +1,13 @@
+server:
+  botToken: "7283192097:AAEXgZuC77bjQK-fq1s9CNWvfa5byo7cpRk"
+  commandsToInit: [TEST,MENU,TUTORIAL,PROFILE,NOTES,START]
+  authServerUrl: "http://localhost:8081"
+  noteBackendUrl: "http://localhost:8080"
+
+database:
+  host: "localhost"
+  user: "telegram_bot_user"
+  password: "9876c88e-94a6-45c0-8e88-161d7519bf12"
+  dataBaseName: "telegram_bot"
+  dialect: "postgres"
+  impl: "sqlx"

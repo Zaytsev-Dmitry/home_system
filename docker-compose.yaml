@@ -1,22 +1,72 @@
 version: '3'
 services:
-  auth-server:
+  vault:
+    image: vault:1.13.3
+    volumes:
+      - ./data/vault:/data/vault
+    ports:
+      - "127.0.0.1:8200:8200"
+    environment:
+      - VAULT_ADDR=http://localhost:8200
+      - VAULT_API_ADDR=http://localhost:8200
+      - VAULT_ADDRESS=http://localhost:8200
+    cap_add:
+      - IPC_LOCK
+    command: vault server -config=data/vault/vault.json
+    networks:
+      - skynet
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:4.0.6-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672 #Remove if not using management
+    restart: unless-stopped
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    networks:
+      - skynet
+
+  auth-backend:
     build:
-      context: ./authServer
+      context: authBackend
       dockerfile: Dockerfile
+    container_name: authBackend
     ports:
       - "8081:8081"
     environment:
-      MODE: dev
+      MODE: docker
     restart: unless-stopped
     depends_on:
       - keycloak
-      - note-backend-app
+      - postgres_server
     networks:
       - skynet
-  note-backend-app:
+
+  note-backend:
     build:
-      context: ./noteBackendApp
+      context: noteBackend
+      dockerfile: Dockerfile
+    container_name: noteBackend
+    ports:
+      - "8080:8080"
+    environment:
+      MODE: docker
+    restart: unless-stopped
+    networks:
+      - skynet
+    depends_on:
+      - postgres_server
+      - keycloak
+      - auth-backend
+
+  telegram-bot-backend:
+    build:
+      context: telegramBotBackend
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
@@ -25,15 +75,21 @@ services:
     restart: unless-stopped
     networks:
       - skynet
+    depends_on:
+      - postgres_server
+      - keycloak
+
   postgres_server:
+    container_name: postgresServer
     restart: always
     image: postgres:14
     environment:
       PGUSER: postgres
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: auth
     ports:
-      - '5432:5432'
+      - "5432:5432"
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 1s
@@ -41,8 +97,10 @@ services:
       retries: 10
     networks:
       - skynet
+
   keycloak:
     image: quay.io/keycloak/keycloak:24.0
+    container_name: keycloak
     environment:
       KEYCLOAK_IMPORT: /opt/keycloak/data/import/create-realm.json
       KC_HOSTNAME: localhost
@@ -52,6 +110,10 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HEALTH_ENABLED: "true"
       KC_LOG_LEVEL: info
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgresServer:5432/keycloak
+      KC_DB_USERNAME: keycloak_user
+      KC_DB_PASSWORD: "32f21777-78c6-49bb-a5fe-b3ebeb325593"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:7080/health/ready" ]
       interval: 15s
@@ -65,6 +127,12 @@ services:
       - ./data/keycloak/create-realm.json:/opt/keycloak/data/import/create-realm.json
     networks:
       - skynet
+    depends_on:
+      - postgres_server
 
 networks:
   skynet:
+
+
+
+

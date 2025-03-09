@@ -1,0 +1,6 @@
+<b>Проверь данные?</b>
+
+<b>name_0</b><blockquote>value_0</blockquote>
+
+<b>name_1</b><blockquote>value_1</blockquote>
+

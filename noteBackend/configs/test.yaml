@@ -1,0 +1,11 @@
+server:
+  port: 8080
+
+database:
+  url: "jdbc:postgresql://localhost:5432"
+  host: "localhost"
+  user: "postgres"
+  password: "root"
+  dataBaseName: "notes"
+  dialect: "postgres"
+  impl: "sqlx"
