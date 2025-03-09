@@ -25,6 +25,7 @@ jobs:
         cd authBackend/api/spec
         go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
         oapi-codegen -package=generatedApi -generate "types,spec,gin" auth-server-api.yml > auth-server-api.gen.go
+        cd / && ls
 
     - name: Build
       run: |
