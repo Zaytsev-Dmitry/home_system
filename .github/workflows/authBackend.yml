@@ -1,7 +1,7 @@
 # This workflow will build a golang project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
-name: Go
+name: Build authBackend APP
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
         cd authBackend/api/spec
         go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
         oapi-codegen -package=generatedApi -generate "types,spec,gin" auth-server-api.yml > auth-server-api.gen.go
-        cd / && ls
+        echo 'authBackend api is Done'
 
     - name: Build
       run: |
@@ -35,5 +35,7 @@ jobs:
         cd ..
         go build -v ./...
 
-#    - name: Test
-#      run: go test -v ./...
+    - name: Test
+      run: |
+        cd authBackend/cmd
+        go test -v ./...
