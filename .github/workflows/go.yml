@@ -23,7 +23,7 @@ jobs:
 
     - name: Build
       run: |
-        cd authBackend/cmd
+        cd authBackend
         go build -v ./...
 
 #    - name: Test
