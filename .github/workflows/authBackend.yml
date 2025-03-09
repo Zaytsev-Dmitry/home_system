@@ -11,9 +11,13 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      testType:
+        description: 'Type of tests to run'
+        required: true
+        default: 'integration'
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
