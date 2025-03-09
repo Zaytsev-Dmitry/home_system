@@ -24,6 +24,8 @@ jobs:
     - name: Build
       run: |
         cd authBackend
+        go get .
+        go mod verify
         go build -v ./...
 
 #    - name: Test
