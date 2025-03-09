@@ -20,6 +20,11 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.23.0'
+    - name: Generate API
+      run: |
+        cd authBackend/api/spec
+        go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
+        oapi-codegen -package=generatedApi -generate "types,spec,gin" auth-server-api.yml > auth-server-api.gen.go
 
     - name: Build
       run: |
