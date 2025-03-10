@@ -39,13 +39,19 @@ jobs:
           cd authBackend/cmd
           go test -v ./...
 
+  docker:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set Docker Repo url
+      - name: Set Up Docker Repo url
         run: |
           if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
             echo "REPO_URL=${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }}" >> $GITHUB_ENV
