@@ -2,28 +2,24 @@ name: Build Dev Apps
 
 on:
   push:
-    branches: ["dev"]
-  pull_request:
-    branches: ["dev"]
+    branches: ["prod","dev"]
+    paths:
+      - 'authBackend/**'
+
+env:
+  REPO_URL: ${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.23.0'
-      - name: Generate API
-        run: |
-          cd authBackend/api/spec
-          go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
-          oapi-codegen -package=generatedApi -generate "types,spec,gin" auth-server-api.yml > auth-server-api.gen.go
-          echo 'authBackend api is generated'
-
       - name: Build
+        needs: Set up Go
         run: |
           cd authBackend/cmd
           go get .
@@ -32,18 +28,28 @@ jobs:
           go build -v ./...
 
       - name: Test
+        needs: Build
         run: |
           cd authBackend/cmd
           go test -v ./...
 
       - name: Login to DockerHub
+        needs: [Set up Go,Build,Test]
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Docker Build and Push to DockerHub
+      - name: Set Docker Repo url
+        needs: Login to DockerHub
+        if: github.ref == 'refs/heads/dev'
         run: |
+          ${{ env.REPO_URL }} = ${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }}
+
+      - name: Docker Build and Push to DockerHub
+        needs: Set Docker Repo url
+        run: |
+          echo "Docker repo url == ${{ env.REPO_URL }}"
           cd authBackend
-          docker build -t zaytsevdv/home-system-dev:latest .
-          docker push zaytsevdv/home-system-dev:latest
+          docker build -t ${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }}:latest .
+          docker push ${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }}:latest
