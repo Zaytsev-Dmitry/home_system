@@ -7,23 +7,43 @@ on:
   #      - 'authBackend/**'
 
 env:
-  DOCKER_REPO_URL: 'GlobalValue'
+  DOCKER_REPO_URL: none
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      #      - uses: actions/checkout@v4
-      - name: SET DOCKER_REPO_URL
+      - name: Set ENV
+#      - if: ${{ github.ref }} == 'refs/heads/dev'
+#        run: |
+#          echo "myVar=${{ env.MY_VAR }}" >> $GITHUB_ENV
+      - name: ST DOCKER_REPO_URL
         run: |
-          if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
-             $DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }} >> $GITHUB_ENV
-           elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
-             $DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }} >> $GITHUB_ENV
-           fi
-
+            if [[ ${{ github.ref }} == 'master']]; then
+                echo "DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}" >> "$GITHUB_ENV"
+            else
+                echo "DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }}" >> "$GITHUB_ENV"
+            fi
       - name: PRINT DOCKER_REPO_URL
-        run: echo $DOCKER_REPO_URL
+        run: |
+          echo "myVar=${{ env.DOCKER_REPO_URL }}" >> $GITHUB_ENV
+#
+#jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#    steps:
+#      #      - uses: actions/checkout@v4
+#      - name: SET DOCKER_REPO_URL
+#        run: |
+#          if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
+#             $DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }} >> $GITHUB_ENV
+#           elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
+#             $DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }} >> $GITHUB_ENV
+#           fi
+#
+#      - name: PRINT DOCKER_REPO_URL
+#        run: echo $DOCKER_REPO_URL
 #      - name: Set up Go
 #        uses: actions/setup-go@v4
 #        with:
