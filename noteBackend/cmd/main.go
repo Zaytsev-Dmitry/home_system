@@ -40,6 +40,7 @@ func LoadConfig(env string) *noteConfig.AppConfig {
 	if err != nil {
 
 	}
+
 	return &cfg
 }
 
