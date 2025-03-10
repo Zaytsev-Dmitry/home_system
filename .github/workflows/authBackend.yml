@@ -48,14 +48,14 @@ jobs:
       - name: Set Docker Repo url
         run: |
           if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
-            echo "REPO_URL=${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }}" >> $GITHUB_ENV
+            REPO_URL=${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }} >> $GITHUB_ENV
           elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
-            echo "REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}" >> $GITHUB_ENV
+            REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }} >> $GITHUB_ENV
           fi
 
       - name: Docker Build and Push to DockerHub
         run: |
-          echo "Docker repo url == $REPO_URL"
+          echo "Docker repo url=${REPO_URL}" >> $GITHUB_ENV
           cd authBackend
           docker build -t $REPO_URL:latest .
           docker push $REPO_URL:latest
