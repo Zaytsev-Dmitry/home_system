@@ -7,23 +7,24 @@ on:
   #      - 'authBackend/**'
 
   #env:
-  REPO_URL: ''
+  REPO_URL: 'EXAMPLE REPO'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: SET REPO URL
-        run: |
-          if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
-          ::set-env name=REPO_URL::${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }}
-          elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
-          ::set-env name=REPO_URL::${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}
-          fi
+#      - name: SET REPO URL
+#        run: |
+#          if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
+#          ::set-env name=REPO_URL::${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }}
+#          elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
+#          ::set-env name=REPO_URL::${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}
+#          fi
 
       - name: PRINT REPO URL
-        run: echo "REPO_URL = $REPO_URL"
+        run: | 
+          echo This is the database URL: $REPO_URL
 #      - name: Set up Go
 #        uses: actions/setup-go@v4
 #        with:
