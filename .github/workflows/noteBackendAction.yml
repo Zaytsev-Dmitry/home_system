@@ -51,7 +51,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set Up Docker Repo url
+      - name: Set Up Env
         run: |
           if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
             echo "REPO_URL=${{ secrets.NOTE_BACKEND_DEV_DOCKERHUB_REPO }}" >> $GITHUB_ENV
