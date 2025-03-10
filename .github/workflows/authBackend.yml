@@ -42,8 +42,9 @@ jobs:
 
       - name: Test
         run: |
+          cd authBackend
           go mod tidy
-          cd authBackend/cmd
+          cd cmd
           go test -v ./...          
 
   docker:
