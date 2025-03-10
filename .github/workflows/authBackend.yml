@@ -37,6 +37,7 @@ jobs:
       - name: Test
         run: |
           cd authBackend/cmd
+          go mod tidy
           go test -v ./...
 
   test:
@@ -50,7 +51,7 @@ jobs:
           cd authBackend/cmd
           go test -v ./...          
 
-  docker-login:
+  docker:
     runs-on: ubuntu-latest
     needs: test
     steps:
@@ -62,12 +63,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  docker-set-up-repo-url:
-    runs-on: ubuntu-latest
-    needs: docker-login
-    steps:
-      - uses: actions/checkout@v4
-
       - name: Set Up Docker Repo url
         run: |
           if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
@@ -75,12 +70,6 @@ jobs:
           elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
             echo "REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}" >> $GITHUB_ENV
           fi
-
-  docker-build-and-push:
-    runs-on: ubuntu-latest
-    needs: docker-set-up-repo-url
-    steps:
-      - uses: actions/checkout@v4
 
       - name: Docker Build and Push to DockerHub
         run: |
