@@ -1,0 +1,66 @@
+name: Build and Push To Docker Hub Note backend App
+
+on:
+  push:
+    branches: ["master","dev"]
+    paths:
+      - 'noteBackend/**'
+
+env:
+  REPO_URL: '${{ secrets.NOTE_BACKEND_PROD_DOCKERHUB_REPO }}'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23.0'
+
+      - name: Generate API
+        run: |
+          cd noteBackend/api/spec
+          go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
+          oapi-codegen -package=generatedApi -generate "types,spec,gin" note-api.yml > note-api.gen.go
+          echo 'noteBackend api is Done'    
+
+      - name: Build
+        run: |
+          cd noteBackend/cmd
+          go get .
+          go mod verify
+          cd ..
+          go build -v ./...
+
+      - name: Test
+        run: |
+          cd noteBackend/cmd
+          go test -v ./...
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set Up Docker Repo url
+        run: |
+          if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
+            echo "REPO_URL=${{ secrets.NOTE_BACKEND_DEV_DOCKERHUB_REPO }}" >> $GITHUB_ENV
+          elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
+            echo "REPO_URL=${{ secrets.NOTE_BACKEND_PROD_DOCKERHUB_REPO }}" >> $GITHUB_ENV
+          fi
+
+      - name: Docker Build and Push to DockerHub
+        run: |
+          cd noteBackend
+          docker build -t $REPO_URL:latest .
+          docker push $REPO_URL:latest
