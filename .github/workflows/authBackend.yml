@@ -3,8 +3,8 @@ name: Build and Push To Docker Hub Auth backend App
 on:
   push:
     branches: ["master","dev"]
-#    paths:
-#      - 'authBackend/**'
+    paths:
+      - 'authBackend/**'
 
 env:
   REPO_URL: '${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}'
