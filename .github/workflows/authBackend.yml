@@ -11,19 +11,17 @@ env:
 
 
 jobs:
-  deploy:
+  set_env:
     runs-on: ubuntu-latest
     steps:
-      - name: Configuration for MASTER branch
-        if: ${{ github.ref == 'refs/heads/master' }}
+      - name: Set the value
+        id: step_one
         run: |
-          echo "DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}" >> $GITHUB_ENV
-          echo "dfgdfgdf $DOCKER_REPO_URL"
-
-      - name: Configuration for DEV branch
-        if: ${{ github.ref == 'refs/heads/dev' }}
+          echo "action_state=yellow" >> "$GITHUB_ENV"
+      - name: Use the value
+        id: step_two
         run: |
-          echo "DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }}" >> $GITHUB_ENV
+          printf '%s\n' "$action_state" # This will output 'yellow'
 
 
 #jobs:
