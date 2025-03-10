@@ -14,14 +14,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-
-      - name: SET DOCKER_REPO_URL
+      - name: Configuration for MASTER branch
+        if: ${{ github.ref == 'refs/heads/master' }}
         run: |
-          if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
-          $DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }} >> $GITHUB_ENV
-          elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
-          $DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }} >> $GITHUB_ENV
-          fi
+          echo "DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}" >> $GITHUB_ENV
+
+      - name: Configuration for DEV branch
+        if: ${{ github.ref == 'refs/heads/dev' }}
+        run: |
+          echo "DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }}" >> $GITHUB_ENV
 
 
 #jobs:
