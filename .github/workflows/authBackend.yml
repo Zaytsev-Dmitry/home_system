@@ -21,7 +21,8 @@ jobs:
       - name: Use the value
         id: step_two
         run: |
-          printf '%s' '$DOCKER_REPO_URL' > some.conf
+          echo "$DOCKER_REPO_URL" >> config.ini
+          cat config.ini
 
 
 #jobs:
