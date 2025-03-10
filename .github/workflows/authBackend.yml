@@ -10,7 +10,7 @@ env:
   REPO_URL: '${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}'
 
 jobs:
-  build:
+  generate-api-build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,8 +39,12 @@ jobs:
           cd authBackend/cmd
           go test -v ./...
 
+  docker-build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: docker/login-action@v2
+
       - name: Login to DockerHub
-        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -53,7 +57,7 @@ jobs:
             echo "REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}" >> $GITHUB_ENV
           fi
 
-      - name: Docker Build and Push to DockerHub
+      - name: Build and Push to DockerHub
         run: |
           cd authBackend
           docker build -t $REPO_URL:latest .
