@@ -2,12 +2,12 @@ name: Build Dev Apps
 
 on:
   push:
-    branches: ["master","dev"]
+    branches: [ "master","dev" ]
 #    paths:
 #      - 'authBackend/**'
 
-env:
-  REPO_URL: '${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}'
+#env:
+#  REPO_URL: '${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}'
 
 jobs:
   build:
@@ -55,7 +55,9 @@ jobs:
 
       - name: Docker Build and Push to DockerHub
         run: |
-          echo "Docker repo url=${REPO_URL}" >> $GITHUB_ENV
+          echo "$REPO_URL"
+          echo "${{ env.REPO_URL }}"
+          
           cd authBackend
           docker build -t $REPO_URL:latest .
           docker push $REPO_URL:latest
