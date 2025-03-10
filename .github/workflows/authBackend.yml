@@ -17,7 +17,7 @@ jobs:
       - name: Set the value
         id: step_one
         run: |
-          echo "DOCKER_REPO_URL=yellow" >> "$GITHUB_ENV"
+          echo "DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}" >> "$GITHUB_ENV"
       - name: Use the value
         id: step_two
         run: |
