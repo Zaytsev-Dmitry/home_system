@@ -6,8 +6,8 @@ on:
   #    paths:
   #      - 'authBackend/**'
 
-  env:
-    GLOBAL_VAR: 'GlobalValue'
+env:
+  GLOBAL_VAR: 'GlobalValue'
 
 jobs:
   build:
