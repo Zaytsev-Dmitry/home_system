@@ -39,9 +39,20 @@ jobs:
           cd authBackend/cmd
           go test -v ./...
 
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test
+        run: |
+          cd authBackend/cmd
+          go test -v ./...          
+
   docker-login:
     runs-on: ubuntu-latest
-    needs: build
+    needs: test
     steps:
       - uses: actions/checkout@v4
 
@@ -64,12 +75,6 @@ jobs:
           elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
             echo "REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}" >> $GITHUB_ENV
           fi
-
-      - name: Docker Build and Push to DockerHub
-        run: |
-          cd authBackend
-          docker build -t $REPO_URL:latest .
-          docker push $REPO_URL:latest   
 
   docker-build-and-push:
     runs-on: ubuntu-latest
