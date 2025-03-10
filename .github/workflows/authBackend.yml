@@ -17,9 +17,9 @@ jobs:
       - name: SET DOCKER_REPO_URL
         run: |
           if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
-             DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }} >> $GITHUB_ENV
+             $DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }} >> $GITHUB_ENV
            elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
-             DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }} >> $GITHUB_ENV
+             $DOCKER_REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }} >> $GITHUB_ENV
            fi
 
       - name: PRINT DOCKER_REPO_URL
