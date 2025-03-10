@@ -1,4 +1,4 @@
-name: Build and Push To Docker Hub Note backend App
+name: Note backend App
 
 on:
   push:
