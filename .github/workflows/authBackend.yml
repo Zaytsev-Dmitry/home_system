@@ -21,7 +21,7 @@ jobs:
       - name: Use the value
         id: step_two
         run: |
-          printf '%s\n' "$action_state" # This will output 'yellow'
+          echo "$action_state"
 
 
 #jobs:
