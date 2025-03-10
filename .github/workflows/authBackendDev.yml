@@ -1,0 +1,37 @@
+name: Build Dev Apps
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23.0'
+      - name: Generate API
+        run: |
+          cd authBackend/api/spec
+          go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
+          oapi-codegen -package=generatedApi -generate "types,spec,gin" auth-server-api.yml > auth-server-api.gen.go
+          echo 'authBackend api is generated'
+
+      - name: Build
+        run: |
+          cd authBackend/cmd
+          go get .
+          go mod verify
+          cd ..
+          go build -v ./...
+
+      - name: Test
+        run: |
+          cd authBackend/cmd
+          go test -v ./...
