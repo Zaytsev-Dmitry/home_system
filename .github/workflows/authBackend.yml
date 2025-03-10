@@ -34,12 +34,6 @@ jobs:
           cd ..
           go build -v ./...
 
-      - name: Test
-        run: |
-          cd authBackend/cmd
-          go mod tidy
-          go test -v ./...
-
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -48,6 +42,7 @@ jobs:
 
       - name: Test
         run: |
+          go mod tidy
           cd authBackend/cmd
           go test -v ./...          
 
