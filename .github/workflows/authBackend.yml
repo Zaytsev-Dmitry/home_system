@@ -3,8 +3,6 @@ name: Build Dev Apps
 on:
   push:
     branches: ["prod","dev"]
-    paths:
-      - 'authBackend/**'
 
 env:
   REPO_URL: ${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}
