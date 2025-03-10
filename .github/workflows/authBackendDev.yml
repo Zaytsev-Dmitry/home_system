@@ -44,6 +44,6 @@ jobs:
 
       - name: Docker Build and Push to DockerHub
         run: |
-          cd authBackend/cmd
+          cd authBackend
           docker build -t zaytsevdv/home-system-dev:latest .
           docker push zaytsevdv/home-system-dev:latest
