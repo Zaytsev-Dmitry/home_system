@@ -34,6 +34,7 @@ func main() {
 		zap.String("name", appConfig.Server.Name),
 		zap.Int("port", appConfig.Server.Port),
 	)
+
 	//старт сервера
 	if err := router.Run(":" + strconv.Itoa(appConfig.Server.Port)); err != nil {
 		panic("Failed to start server: " + err.Error())
