@@ -1,4 +1,4 @@
-name: Build Dev Apps
+name: Build and Push To Docker Hub Auth backend App
 
 on:
   push:
