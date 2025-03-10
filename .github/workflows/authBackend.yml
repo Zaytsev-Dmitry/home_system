@@ -7,23 +7,23 @@ on:
   #      - 'authBackend/**'
 
 env:
-  GLOBAL_VAR: 'GlobalValue'
+  DOCKER_REPO_URL: 'GlobalValue'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-#      - uses: actions/checkout@v4
-#      - name: SET REPO URL
-#        run: |
-#          if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
-#          ::set-env name=REPO_URL::${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }}
-#          elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
-#          ::set-env name=REPO_URL::${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}
-#          fi
+      #      - uses: actions/checkout@v4
+      - name: SET DOCKER_REPO_URL
+        run: |
+          if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
+          ::set-env name=DOCKER_REPO_URL::${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }}
+          elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
+          ::set-env name=DOCKER_REPO_URL::${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}
+          fi
 
-      - name: PRINT GLOBAL_VAR
-        run: echo $GLOBAL_VAR
+      - name: PRINT DOCKER_REPO_URL
+        run: echo $DOCKER_REPO_URL
 #      - name: Set up Go
 #        uses: actions/setup-go@v4
 #        with:
