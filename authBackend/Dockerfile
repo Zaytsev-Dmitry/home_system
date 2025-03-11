@@ -17,4 +17,11 @@ ENV GIN_MODE=release
 FROM scratch
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder main /bin/main
+
+ARG KEYCLOAK_URL_ARG
+ARG KEYCLOAK_HOST_ARG
+
+ENV KEYCLOAK_URL=$KEYCLOAK_URL_ARG
+ENV KEYCLOAK_HOST=$KEYCLOAK_HOST_ARG
+
 ENTRYPOINT ["/bin/main"]

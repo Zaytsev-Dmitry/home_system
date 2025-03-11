@@ -69,8 +69,8 @@ jobs:
         run: |
           cd authBackend
           docker build \
-          --build-arg KEYCLOAK_URL="$KEYCLOAK_URL" \
-          --build-arg KEYCLOAK_HOST="$KEYCLOAK_HOST" \
+          --build-arg KEYCLOAK_URL_ARG="$KEYCLOAK_URL" \
+          --build-arg KEYCLOAK_HOST_ARG="$KEYCLOAK_HOST" \
           -t $REPO_URL:latest .
           
           docker push $REPO_URL:latest
