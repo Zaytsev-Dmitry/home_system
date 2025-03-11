@@ -8,6 +8,8 @@ on:
 
 env:
   REPO_URL: '${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}'
+  KEYCLOAK_URL: '${{ secrets.KEYCLOAK_PROD_URL }}'
+  KEYCLOAK_HOST: '${{ secrets.KEYCLOAK_HOST_PROD_URL }}'
 
 jobs:
   build-and-test:
@@ -55,8 +57,12 @@ jobs:
         run: |
           if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
             echo "REPO_URL=${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }}" >> $GITHUB_ENV
+            echo "KEYCLOAK_URL=${{ secrets.KEYCLOAK_DEV_URL }}" >> $GITHUB_ENV
+            echo "KEYCLOAK_HOST=${{ secrets.KEYCLOAK_HOST_DEV_URL }}" >> $GITHUB_ENV
           elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
             echo "REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}" >> $GITHUB_ENV
+            echo "KEYCLOAK_URL=${{ secrets.KEYCLOAK_PROD_URL }}" >> $GITHUB_ENV
+            echo "KEYCLOAK_HOST=${{ secrets.KEYCLOAK_HOST_PROD_URL }}" >> $GITHUB_ENV
           fi
 
       - name: Docker Build and Push to DockerHub

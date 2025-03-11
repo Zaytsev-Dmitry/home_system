@@ -6,6 +6,7 @@ import (
 	"authServer/configs"
 	"authServer/internal/dao"
 	"authServer/pkg/utilities"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
@@ -57,7 +58,10 @@ func getLogger() *zap.Logger {
 }
 
 func getConfig() *configs.AppConfig {
-	appConfig := configs.LoadConfig("MODE")
+	appConfig := configs.LoadConfig()
+
+	fmt.Println(fmt.Sprintf("Keycloak URL: %s", appConfig.Keycloak.KeycloakUrl))
+	fmt.Println(fmt.Sprintf("Keycloak HOST: %s", appConfig.Keycloak.KeycloakHost))
 
 	if appConfig == nil {
 		panic("appConfig is nil")
