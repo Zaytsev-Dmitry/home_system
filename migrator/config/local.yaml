@@ -1,0 +1,17 @@
+app:
+  dbUrl: "localhost:5432"
+databases:
+  - name: "auth"
+    user: "auth_user"
+    password: "8c6b18ac-84ff-4436-8916-6e11aaa41e92"
+    directoryName: "auth"
+
+  - name: "notes"
+    user: "notes_user"
+    password: "5fea3e86-29b6-4f85-a5ed-3117d7ff7c7f"
+    directoryName: "notes"
+
+  - name: "telegram_bot"
+    user: "telegram_bot_user"
+    password: "9876c88e-94a6-45c0-8e88-161d7519bf12"
+    directoryName: "telegram"
