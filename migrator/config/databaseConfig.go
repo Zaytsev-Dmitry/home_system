@@ -23,14 +23,15 @@ type Config struct {
 func LoadConfig() *Config {
 	configPath := os.Getenv("CONFIG_PATH")
 	profile := os.Getenv("APP_PROFILE")
-	if profile == "" {
-		profile = "local"
+
+	if configPath == "" && profile == "local" {
 		configPath = "config/" + "local.yaml"
 	}
 
 	if configPath == "" {
-		log.Fatal("CONFIG_PATH environment variable not set")
+		log.Fatalf("CONFIG_PATH environment variable not set")
 	}
+
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Fatalf("CONFIG_PATH does not exist: %s", configPath)
 	}
