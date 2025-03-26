@@ -31,6 +31,18 @@ services:
     networks:
       - skynet
 
+  migrator:
+    build:
+      context: migrator
+      dockerfile: Dockerfile
+    container_name: migrator
+    ports:
+      - "8083:8083"
+    depends_on:
+      - postgres_server
+    networks:
+      - skynet
+
   auth-backend:
     build:
       context: authBackend
@@ -99,7 +111,7 @@ services:
       - skynet
 
   keycloak:
-    image: quay.io/keycloak/keycloak:24.0
+    image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
     environment:
       KEYCLOAK_IMPORT: /opt/keycloak/data/import/create-realm.json
