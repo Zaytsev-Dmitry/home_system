@@ -36,6 +36,9 @@ services:
       context: migrator
       dockerfile: Dockerfile
     container_name: migrator
+    environment:
+      CONFIG_PATH: "/app/config/docker.yaml"
+      APP_PROFILE: "docker"
     ports:
       - "8083:8083"
     depends_on:

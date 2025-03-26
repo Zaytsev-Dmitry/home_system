@@ -59,5 +59,6 @@ func main() {
 		}
 		log.Printf("Миграция завершена. Текущая версия БД: %d (dirty: %v)", version, dirty)
 		log.Println("Миграции успешно применены для базы данных:", database.Name)
+		log.Println("\n")
 	}
 }
