@@ -5,7 +5,7 @@ import (
 	"net/http"
 	notePresenter "noteBackendApp/api/presenter"
 	generatedApi "noteBackendApp/api/spec"
-	noteInterface "noteBackendApp/internal/dao/interface"
+	noteInterface "noteBackendApp/internal/dao"
 	noteUseCase "noteBackendApp/internal/usecases"
 	noteUtilities "noteBackendApp/pkg/utilities"
 )
@@ -42,9 +42,9 @@ func (controller *NoteController) GetNotesByTgId(context *gin.Context, tgId int6
 
 func Create(dao noteInterface.NoteDao) *NoteController {
 	return &NoteController{
-		SaveUseCase:   &noteUseCase.SaveNoteUseCase{DAO: dao},
-		DeleteUseCase: &noteUseCase.DeleteNoteUseCase{DAO: dao},
-		GetUseCase:    &noteUseCase.GetNoteUseCase{DAO: dao},
+		SaveUseCase:   &noteUseCase.SaveNoteUseCase{Dao: dao},
+		DeleteUseCase: &noteUseCase.DeleteNoteUseCase{Dao: dao},
+		GetUseCase:    &noteUseCase.GetNoteUseCase{Dao: dao},
 		presenter:     &notePresenter.Presenter{},
 	}
 }

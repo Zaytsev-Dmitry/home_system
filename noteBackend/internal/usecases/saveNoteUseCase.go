@@ -1,19 +1,19 @@
 package usecases
 
 import (
-	noteInterface "noteBackendApp/internal/dao/interface"
-	noteDomain "noteBackendApp/internal/domain"
+	"noteBackendApp/internal/dao"
+	"noteBackendApp/internal/domain"
 )
 
 type SaveNoteUseCase struct {
-	DAO noteInterface.NoteDao
+	Dao dao.NoteDao
 }
 
-func (saveUse *SaveNoteUseCase) Save(toSave noteDomain.Note) noteDomain.Note {
-	found := saveUse.DAO.ExistByName(toSave.Name)
+func (saveUse *SaveNoteUseCase) Save(toSave domain.Note) domain.Note {
+	found := saveUse.Dao.ExistByName(toSave.Name)
 	if found {
-		return saveUse.DAO.GetByName(toSave.Name)
+		return saveUse.Dao.GetByName(toSave.Name)
 	} else {
-		return saveUse.DAO.Save(toSave)
+		return saveUse.Dao.Save(toSave)
 	}
 }

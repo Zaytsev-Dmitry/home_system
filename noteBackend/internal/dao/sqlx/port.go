@@ -1,9 +1,9 @@
-package noteDaoPorts
+package sqlx
 
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	noteDomain "noteBackendApp/internal/domain"
+	"noteBackendApp/internal/domain"
 )
 
 const (
@@ -16,8 +16,8 @@ type SqlxAuthPort struct {
 }
 
 // TODO отловить ошибки
-func (p *SqlxAuthPort) Save(entity noteDomain.Note) noteDomain.Note {
-	var result noteDomain.Note
+func (p *SqlxAuthPort) Save(entity domain.Note) domain.Note {
+	var result domain.Note
 	err := p.Db.QueryRowx(INSERT, entity.AccountId, entity.TelegramId, entity.Name, entity.Link, entity.Description).StructScan(&result)
 	if err != nil {
 		fmt.Println(err)
@@ -29,8 +29,8 @@ func (p *SqlxAuthPort) DeleteNotesByTgId(tgId int64) {
 
 }
 
-func (p *SqlxAuthPort) GetNotesByTgId(tgId int64) []noteDomain.Note {
-	var resp []noteDomain.Note
+func (p *SqlxAuthPort) GetNotesByTgId(tgId int64) []domain.Note {
+	var resp []domain.Note
 	err := p.Db.Select(&resp, SELECT_BY_TELEGRAM_ID, tgId)
 	if err != nil {
 		fmt.Println(err)
@@ -42,14 +42,10 @@ func (p *SqlxAuthPort) ExistByName(name string) bool {
 	return false
 }
 
-func (p *SqlxAuthPort) GetByName(name string) noteDomain.Note {
-	return noteDomain.Note{}
+func (p *SqlxAuthPort) GetByName(name string) domain.Note {
+	return domain.Note{}
 }
 
 func (port *SqlxAuthPort) CloseConnection() {
 	port.Db.Close()
-}
-
-func CreateSqlxAuthPort(db *sqlx.DB) *SqlxAuthPort {
-	return &SqlxAuthPort{Db: db}
 }

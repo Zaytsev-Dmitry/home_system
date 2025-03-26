@@ -1,4 +1,4 @@
-package noteDomain
+package domain
 
 type Note struct {
 	ID          uint   `db:"id"`
