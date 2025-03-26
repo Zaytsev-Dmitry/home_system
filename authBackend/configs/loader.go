@@ -1,16 +1,22 @@
 package configs
 
 import (
-	"context"
-	"github.com/sethvargo/go-envconfig"
-	"log"
+	"gopkg.in/yaml.v3"
+	"os"
 )
 
 func LoadConfig() *AppConfig {
 	var appConfig AppConfig
-	ctx := context.Background()
-	if err := envconfig.Process(ctx, &appConfig); err != nil {
-		log.Fatal(err)
+	configEnv := os.Getenv("APP_CONFIG")
+	if configEnv == "" {
+		//TODO логер warn
+		var defaultConfigName = "configs/" + "default" + ".yaml"
+		f, _ := os.Open(defaultConfigName)
+		yaml.NewDecoder(f).Decode(&appConfig)
+		defer f.Close()
+	} else {
+		yaml.Unmarshal([]byte(configEnv), &appConfig)
 	}
+
 	return &appConfig
 }

@@ -6,6 +6,7 @@ import (
 	"authServer/configs"
 	"authServer/internal/dao"
 	"authServer/pkg/utilities"
+	_ "embed"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -27,7 +28,8 @@ func main() {
 
 	//инициализирую апи
 	router, apiInterface := gin.Default(), handlers.NewAuthServerApi(appConfig, dao)
-
+	//устанавливаю роут под swagger ui
+	generatedApi.Load(router)
 	//регаю хэндлеры
 	generatedApi.RegisterHandlers(router, apiInterface)
 
@@ -59,10 +61,7 @@ func getLogger() *zap.Logger {
 
 func getConfig() *configs.AppConfig {
 	appConfig := configs.LoadConfig()
-
-	fmt.Println(fmt.Sprintf("Keycloak URL: %s", appConfig.Keycloak.KeycloakUrl))
-	fmt.Println(fmt.Sprintf("Keycloak HOST: %s", appConfig.Keycloak.KeycloakHost))
-
+	fmt.Printf("%+v\n", appConfig)
 	if appConfig == nil {
 		panic("appConfig is nil")
 	}
