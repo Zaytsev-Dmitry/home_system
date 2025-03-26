@@ -70,7 +70,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      MODE: docker
+      CONFIG_PATH: "/app/config/docker.yaml"
+      APP_PROFILE: "docker"
     restart: unless-stopped
     networks:
       - skynet
