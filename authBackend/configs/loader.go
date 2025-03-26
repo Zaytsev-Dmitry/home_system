@@ -10,7 +10,7 @@ func LoadConfig() *AppConfig {
 	configEnv := os.Getenv("APP_CONFIG")
 	if configEnv == "" {
 		//TODO логер warn
-		var defaultConfigName = "configs/" + "default" + ".yaml"
+		var defaultConfigName = "config/" + "default" + ".yaml"
 		f, _ := os.Open(defaultConfigName)
 		yaml.NewDecoder(f).Decode(&appConfig)
 		defer f.Close()
