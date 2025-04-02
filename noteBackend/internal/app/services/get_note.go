@@ -5,10 +5,10 @@ import (
 	"noteBackendApp/internal/domain"
 )
 
-type GetNoteUCase struct {
+type GetNoteUCaseImpl struct {
 	Dao dao.NoteDao
 }
 
-func (g *GetNoteUCase) GetNoteByTgId(id int64) []domain.Note {
+func (g *GetNoteUCaseImpl) GetNoteByTgId(id int64) []domain.Note {
 	return g.Dao.GetNotesByTgId(id)
 }

@@ -5,16 +5,17 @@ import (
 	"net/http"
 	openapi "noteBackendApp/api/http"
 	notePresenter "noteBackendApp/api/presenter"
+	"noteBackendApp/internal/app/services"
+	"noteBackendApp/internal/app/usecases"
 	noteInterface "noteBackendApp/internal/dao"
-	noteUseCase "noteBackendApp/internal/usecases"
 	noteUtilities "noteBackendApp/pkg/utilities"
 )
 
 type NoteController struct {
-	SaveUseCase   *noteUseCase.SaveNoteUseCase
-	DeleteUseCase *noteUseCase.DeleteNoteUseCase
-	GetUseCase    *noteUseCase.GetNoteUseCase
-	presenter     *notePresenter.Presenter
+	SaveUseCase   usecases.SaveNoteUCase
+	DeleteUseCase usecases.DeleteNoteUCase
+	GetUseCase    usecases.GetNoteUCase
+	presenter     notePresenter.Presenter
 }
 
 func (controller *NoteController) SaveNote(c *gin.Context) {
@@ -42,9 +43,9 @@ func (controller *NoteController) GetNotesByTgId(context *gin.Context, tgId int6
 
 func Create(dao noteInterface.NoteDao) *NoteController {
 	return &NoteController{
-		SaveUseCase:   &noteUseCase.SaveNoteUseCase{Dao: dao},
-		DeleteUseCase: &noteUseCase.DeleteNoteUseCase{Dao: dao},
-		GetUseCase:    &noteUseCase.GetNoteUseCase{Dao: dao},
-		presenter:     &notePresenter.Presenter{},
+		SaveUseCase:   &services.SaveNoteUCaseImpl{Dao: dao},
+		DeleteUseCase: &services.DeleteNoteUCaseImpl{Dao: dao},
+		GetUseCase:    &services.GetNoteUCaseImpl{Dao: dao},
+		presenter:     notePresenter.Presenter{},
 	}
 }
