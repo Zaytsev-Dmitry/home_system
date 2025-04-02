@@ -24,13 +24,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NoteResponse'
+                $ref: '#/components/schemas/SingleNoteBackendResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
         '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/500'
   #--------------------------------------------------------------------------------------------------------#
   /note/{tgId}:
     get:
@@ -51,19 +53,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NoteResponseList'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ListNoteBackendResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
         '404':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
     delete:
       tags:
         - Note
@@ -79,28 +77,71 @@ paths:
       responses:
         '204':
           description: No content
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
         '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/500'
 #--------------------------------------------------------------------------------------------------------#
 components:
+  responses:
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BackendErrorResponse'
+    '401':
+      description: UNAUTHORIZED
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BackendErrorResponse'
+    404:
+      description: NOT_FOUND
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BackendErrorResponse'
+    '500':
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BackendErrorResponse'
+#--------------------------------------------------------------------------------------------------------#
   schemas:
-    CreateNoteRequest:
+    BackendErrorResponse:
       type: object
       properties:
-        tgId:
+        meta:
+          $ref: '#/components/schemas/MetaData'
+        errorCode:
           type: integer
-          format: int64
-        name:
+        description:
+          type: string
+#--------------------------------------------------------------------------------------------------------#
+    MetaData:
+      type: object
+      properties:
+        timestamp:
+          type: string
+        path:
+          type: string
+#--------------------------------------------------------------------------------------------------------#
+    BasicBackendResponse:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/MetaData'
+        errorCode:
           type: string
         description:
           type: string
-        link:
-          type: string
-    #--------------------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------------------#
     NoteResponse:
       type: object
       properties:
@@ -117,25 +158,34 @@ components:
         tgId:
           type: integer
           format: int64
-    #--------------------------------------------------------------------------------------------------------#
-    NoteResponseList:
+#--------------------------------------------------------------------------------------------------------#
+    SingleNoteBackendResponse:
+      allOf:
+        - $ref: '#/components/schemas/BasicBackendResponse'
+        - type: object
+          properties:
+            payload:
+              $ref: '#/components/schemas/NoteResponse'
+    ListNoteBackendResponse:
+      allOf:
+        - $ref: '#/components/schemas/BasicBackendResponse'
+        - type: object
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: '#/components/schemas/NoteResponse'
+#--------------------------------------------------------------------------------------------------------#
+    CreateNoteRequest:
       type: object
       properties:
-        objects:
-          type: array
-          items:
-            $ref: '#/components/schemas/NoteResponse'
-    #--------------------------------------------------------------------------------------------------------#
-    ErrorResponse:
-      type: object
-      properties:
-        timestamp:
-          type: string
-        status:
+        tgId:
           type: integer
-        businessCode:
-          type: integer
-        error:
+          format: int64
+        name:
           type: string
-        path:
+        description:
           type: string
+        link:
+          type: string
+#--------------------------------------------------------------------------------------------------------#
