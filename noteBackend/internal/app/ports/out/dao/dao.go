@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-type Dao struct {
+type NoteDao struct {
 	NoteRepo note.NoteRepository
 }
 
@@ -28,7 +28,7 @@ func newDbConnection(config *config_loader.AppConfig) *sqlx.DB {
 	return db
 }
 
-func Create(config *config_loader.AppConfig) (*Dao, *sqlx.DB) {
+func Create(config *config_loader.AppConfig) (*NoteDao, *sqlx.DB) {
 	db := newDbConnection(config)
-	return &Dao{NoteRepo: note.NewNoteSqlx(db)}, db
+	return &NoteDao{NoteRepo: note.NewNoteSqlx(db)}, db
 }

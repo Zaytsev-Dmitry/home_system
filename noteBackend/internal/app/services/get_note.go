@@ -10,5 +10,5 @@ type GetNoteUCaseImpl struct {
 }
 
 func (g *GetNoteUCaseImpl) GetNoteByTgId(id int64) []domain.Note {
-	return g.Dao.GetNotesByTgId(id)
+	return g.Dao.NoteRepo.GetNotesByTgId(id)
 }

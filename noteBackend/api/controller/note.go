@@ -41,11 +41,11 @@ func (controller *NoteController) GetNotesByTgId(context *gin.Context, tgId int6
 	)
 }
 
-func Create(dao noteInterface.NoteDao) *NoteController {
+func Create(dao *noteInterface.NoteDao) *NoteController {
 	return &NoteController{
-		SaveUseCase:   &services.SaveNoteUCaseImpl{Dao: dao},
-		DeleteUseCase: &services.DeleteNoteUCaseImpl{Dao: dao},
-		GetUseCase:    &services.GetNoteUCaseImpl{Dao: dao},
-		presenter:     notePresenter.Presenter{},
+		SaveUseCase: &services.SaveNoteUCaseImpl{Dao: dao},
+		//DeleteUseCase: &services.DeleteNoteUCaseImpl{Dao: dao},
+		//GetUseCase:    &services.GetNoteUCaseImpl{Dao: dao},
+		//presenter:     notePresenter.Presenter{},
 	}
 }

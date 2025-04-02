@@ -6,14 +6,14 @@ import (
 )
 
 type SaveNoteUCaseImpl struct {
-	Dao dao.NoteDao
+	Dao *dao.NoteDao
 }
 
 func (s *SaveNoteUCaseImpl) Save(toSave domain.Note) domain.Note {
-	found := s.Dao.ExistByName(toSave.Name)
+	found := s.Dao.NoteRepo.ExistByName(toSave.Name)
 	if found {
-		return s.Dao.GetByName(toSave.Name)
+		return s.Dao.NoteRepo.GetByName(toSave.Name)
 	} else {
-		return s.Dao.Save(toSave)
+		return s.Dao.NoteRepo.Save(toSave)
 	}
 }

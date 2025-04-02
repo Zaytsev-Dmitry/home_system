@@ -7,7 +7,7 @@ import (
 	"log"
 	noteHandler "noteBackendApp/api/handlers"
 	openapi "noteBackendApp/api/http"
-	"noteBackendApp/internal/dao/sqlx"
+	"noteBackendApp/internal/app/ports/out/dao"
 	"noteBackendApp/pkg/config_loader"
 )
 
@@ -15,7 +15,11 @@ func main() {
 	config := config_loader.LoadConfig()
 	startMessage := "Note backend ver 1.0"
 	fmt.Printf("%s!\n", startMessage)
-	router, apiInterface := gin.Default(), noteHandler.NewNoteBackendApi(sqlx.CreateSqlxPort(config))
+
+	dao, db := dao.Create(config)
+	defer db.Close()
+
+	router, apiInterface := gin.Default(), noteHandler.NewNoteBackendApi(dao)
 
 	//устанавливаю роут под swagger ui
 	openapi.Load(router)

@@ -9,5 +9,5 @@ type DeleteNoteUCaseImpl struct {
 }
 
 func (d *DeleteNoteUCaseImpl) DeleteNoteByTgId(tgId int64) {
-	d.Dao.DeleteNotesByTgId(tgId)
+	d.Dao.NoteRepo.DeleteNotesByTgId(tgId)
 }
