@@ -1,4 +1,4 @@
-package configs
+package config_loader
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
@@ -9,14 +9,14 @@ import (
 type AppConfig struct {
 	Server struct {
 		Port string `yaml:"port"`
+		Name string `yaml:"name"`
 	} `yaml:"server"`
 	Database struct {
 		Host         string `yaml:"host"`
-		Username     string `yaml:"user"`
+		Username     string `yaml:"userName"`
 		Password     string `yaml:"password"`
 		DataBaseName string `yaml:"dataBaseName"`
 		Dialect      string `yaml:"dialect"`
-		Impl         string `yaml:"impl"`
 		Port         string `yaml:"port"`
 	} `yaml:"database"`
 }
@@ -33,13 +33,17 @@ func LoadConfig() *AppConfig {
 		log.Fatalf("CONFIG_PATH environment variable not set")
 	}
 
+	if profile == "" {
+		log.Fatalf("CONFIG_PATH environment variable not set")
+	}
+
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Fatalf("CONFIG_PATH does not exist: %s", configPath)
 	}
 
 	var config AppConfig
 	if err := cleanenv.ReadConfig(configPath, &config); err != nil {
-		log.Fatalf("cannot read configs: %s", err)
+		log.Fatalf("cannot read config: %s", err)
 	}
 	return &config
 }

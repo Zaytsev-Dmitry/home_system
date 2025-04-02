@@ -10,7 +10,7 @@ COPY . .
 RUN ls -la /app/configs/
 
 RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
-RUN oapi-codegen -package=generatedApi -generate "types,spec,gin" /app/api/spec/openapi/note-api.yml > api/spec/openapi/note-api.gen.go
+RUN oapi-codegen -package=http -generate "types,spec,gin" /app/api/http/note-api.yml > api/http/note-api.gen.go
 
 RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux go build -o /main main.go
@@ -20,6 +20,7 @@ ENV GIN_MODE=release
 FROM scratch
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder main /bin/main
+EXPOSE 8080
 
 # Объявляем аргументы
 ARG CONFIG_PATH_ARG
