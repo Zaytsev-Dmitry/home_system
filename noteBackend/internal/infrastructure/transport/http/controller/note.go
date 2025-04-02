@@ -2,50 +2,29 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
-	openapi "noteBackendApp/api/http"
+	"noteBackendApp/internal/app/ports/in/delegate"
 	noteInterface "noteBackendApp/internal/app/ports/out/dao"
-	"noteBackendApp/internal/app/services"
-	"noteBackendApp/internal/app/usecases"
 	notePresenter "noteBackendApp/internal/infrastructure/transport/http/presenter"
-	noteUtilities "noteBackendApp/pkg/utilities"
 )
 
 type NoteController struct {
-	SaveUseCase   usecases.SaveNoteUCase
-	DeleteUseCase usecases.DeleteNoteUCase
-	GetUseCase    usecases.GetNoteUCase
-	presenter     notePresenter.Presenter
+	delegate  *delegate.NoteDelegate
+	presenter notePresenter.Presenter
 }
 
 func (controller *NoteController) SaveNote(c *gin.Context) {
-	var requestEntity openapi.CreateNoteRequest
-	noteUtilities.CatchMarshallErr(c.BindJSON(&requestEntity), c)
-	entity := controller.SaveUseCase.Save(controller.presenter.ToEntity(&requestEntity))
-	noteUtilities.SetResponse(
-		controller.presenter.ToNoteResponse(entity),
-		c,
-	)
+
 }
 
 func (controller *NoteController) DeleteNotesByTgId(context *gin.Context, tgId int64) {
-	controller.DeleteUseCase.DeleteNoteByTgId(tgId)
-	context.Status(http.StatusNoContent)
 }
 
 func (controller *NoteController) GetNotesByTgId(context *gin.Context, tgId int64) {
-	obj := controller.GetUseCase.GetNoteByTgId(tgId)
-	noteUtilities.SetResponse(
-		controller.presenter.ToListNoteResponse(obj),
-		context,
-	)
 }
 
 func Create(dao *noteInterface.NoteDao) *NoteController {
 	return &NoteController{
-		SaveUseCase: &services.SaveNoteUCaseImpl{Dao: dao},
-		//DeleteUseCase: &services.DeleteNoteUCaseImpl{Dao: dao},
-		//GetUseCase:    &services.GetNoteUCaseImpl{Dao: dao},
-		//presenter:     notePresenter.Presenter{},
+		delegate:  delegate.Create(dao),
+		presenter: notePresenter.Presenter{},
 	}
 }

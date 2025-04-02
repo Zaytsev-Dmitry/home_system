@@ -23,5 +23,7 @@ func (api *NoteBackendApi) GetNotesByTgId(c *gin.Context, tgId int64) {
 }
 
 func NewNoteBackendApi(dao *dao.NoteDao) *NoteBackendApi {
-	return &NoteBackendApi{controller: controller.Create(dao)}
+	return &NoteBackendApi{
+		controller: controller.Create(dao),
+	}
 }

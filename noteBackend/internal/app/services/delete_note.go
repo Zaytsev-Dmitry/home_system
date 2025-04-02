@@ -1,13 +1,13 @@
 package services
 
 import (
-	"noteBackendApp/internal/app/ports/out/dao"
+	"noteBackendApp/internal/app/ports/out/dao/repository/note"
 )
 
 type DeleteNoteUCaseImpl struct {
-	Dao dao.NoteDao
+	NoteRepo note.NoteRepository
 }
 
 func (d *DeleteNoteUCaseImpl) DeleteNoteByTgId(tgId int64) {
-	d.Dao.NoteRepo.DeleteNotesByTgId(tgId)
+	d.NoteRepo.DeleteNotesByTgId(tgId)
 }

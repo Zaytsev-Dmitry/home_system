@@ -2,13 +2,13 @@ package services
 
 import (
 	"noteBackendApp/internal/app/domain"
-	"noteBackendApp/internal/app/ports/out/dao"
+	"noteBackendApp/internal/app/ports/out/dao/repository/note"
 )
 
 type GetNoteUCaseImpl struct {
-	Dao dao.NoteDao
+	NoteRepo note.NoteRepository
 }
 
 func (g *GetNoteUCaseImpl) GetNoteByTgId(id int64) []domain.Note {
-	return g.Dao.NoteRepo.GetNotesByTgId(id)
+	return g.NoteRepo.GetNotesByTgId(id)
 }
