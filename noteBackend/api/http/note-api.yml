@@ -146,7 +146,9 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
+          format: int64
+          x-go-type: uint
         name:
           type: string
         link:

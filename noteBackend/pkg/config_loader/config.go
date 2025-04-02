@@ -43,7 +43,7 @@ func LoadConfig() *AppConfig {
 
 	var config AppConfig
 	if err := cleanenv.ReadConfig(configPath, &config); err != nil {
-		log.Fatalf("cannot read config: %s", err)
+		log.Fatalf("cannot read configs: %s", err)
 	}
 	return &config
 }

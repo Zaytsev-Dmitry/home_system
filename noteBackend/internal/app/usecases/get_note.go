@@ -5,5 +5,5 @@ import (
 )
 
 type GetNoteUCase interface {
-	GetNoteByTgId(id int64) []domain.Note
+	GetNoteByTgId(id int64) ([]*domain.Note, error)
 }
