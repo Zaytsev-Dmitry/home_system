@@ -1,4 +1,4 @@
-package notePresenter
+package presenter
 
 import (
 	"fmt"

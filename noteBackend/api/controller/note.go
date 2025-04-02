@@ -4,10 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	openapi "noteBackendApp/api/http"
-	notePresenter "noteBackendApp/api/presenter"
 	noteInterface "noteBackendApp/internal/app/ports/out/dao"
 	"noteBackendApp/internal/app/services"
 	"noteBackendApp/internal/app/usecases"
+	notePresenter "noteBackendApp/internal/infrastructure/transport/http/presenter"
 	noteUtilities "noteBackendApp/pkg/utilities"
 )
 
