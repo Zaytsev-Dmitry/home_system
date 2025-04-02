@@ -3,11 +3,11 @@ package sqlx
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"noteBackendApp/configs"
+	"noteBackendApp/pkg/config_loader"
 	"os"
 )
 
-func CreateSqlxPort(config *configs.AppConfig) *SqlxAuthPort {
+func CreateSqlxPort(config *config_loader.AppConfig) *SqlxAuthPort {
 	dbURL := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		config.Database.Username,

@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	generatedApi "noteBackendApp/api/spec"
+	openapi "noteBackendApp/api/http"
 	"time"
 )
 
-func getErrorDto(err string, status int, context *gin.Context) generatedApi.ErrorResponse {
+func getErrorDto(err string, status int, context *gin.Context) openapi.ErrorResponse {
 	nowString := time.Now().String()
-	return generatedApi.ErrorResponse{
+	return openapi.ErrorResponse{
 		Timestamp: &nowString,
 		Status:    &status,
 		Error:     &err,

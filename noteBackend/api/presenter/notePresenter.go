@@ -2,15 +2,15 @@ package notePresenter
 
 import (
 	"fmt"
-	generatedApi "noteBackendApp/api/spec"
+	openapi "noteBackendApp/api/http"
 	noteDomain "noteBackendApp/internal/domain"
 )
 
 type Presenter struct {
 }
 
-func (presenter *Presenter) ToNoteResponse(entity noteDomain.Note) generatedApi.NoteResponse {
-	return generatedApi.NoteResponse{
+func (presenter *Presenter) ToNoteResponse(entity noteDomain.Note) openapi.NoteResponse {
+	return openapi.NoteResponse{
 		Name:        &entity.Name,
 		Link:        &entity.Link,
 		Description: &entity.Description,
@@ -19,7 +19,7 @@ func (presenter *Presenter) ToNoteResponse(entity noteDomain.Note) generatedApi.
 	}
 }
 
-func (presenter *Presenter) ToEntity(requestEntity *generatedApi.CreateNoteRequest) noteDomain.Note {
+func (presenter *Presenter) ToEntity(requestEntity *openapi.CreateNoteRequest) noteDomain.Note {
 	return noteDomain.Note{
 		Name:        *requestEntity.Name,
 		Description: *requestEntity.Description,
@@ -28,11 +28,11 @@ func (presenter *Presenter) ToEntity(requestEntity *generatedApi.CreateNoteReque
 	}
 }
 
-func (presenter *Presenter) ToListNoteResponse(entities []noteDomain.Note) generatedApi.NoteResponseList {
-	var result = make([]generatedApi.NoteResponse, len(entities))
+func (presenter *Presenter) ToListNoteResponse(entities []noteDomain.Note) openapi.NoteResponseList {
+	var result = make([]openapi.NoteResponse, len(entities))
 	for i, value := range entities {
 		id := fmt.Sprint(value.ID)
-		var response = generatedApi.NoteResponse{
+		var response = openapi.NoteResponse{
 			AccountId:   &value.AccountId,
 			TgId:        &value.TelegramId,
 			Link:        &value.Link,
@@ -43,7 +43,7 @@ func (presenter *Presenter) ToListNoteResponse(entities []noteDomain.Note) gener
 		result[i] = response
 	}
 
-	return generatedApi.NoteResponseList{
+	return openapi.NoteResponseList{
 		Objects: &result,
 	}
 }
