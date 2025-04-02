@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"noteBackendApp/internal/domain"
+	"noteBackendApp/internal/app/domain"
 )
 
 type NoteDao interface {

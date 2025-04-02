@@ -3,7 +3,7 @@ package notePresenter
 import (
 	"fmt"
 	openapi "noteBackendApp/api/http"
-	noteDomain "noteBackendApp/internal/domain"
+	noteDomain "noteBackendApp/internal/app/domain"
 )
 
 type Presenter struct {

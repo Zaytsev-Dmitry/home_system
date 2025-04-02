@@ -3,7 +3,7 @@ package sqlx
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"noteBackendApp/internal/domain"
+	"noteBackendApp/internal/app/domain"
 )
 
 const (

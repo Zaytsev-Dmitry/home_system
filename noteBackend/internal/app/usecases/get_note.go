@@ -1,6 +1,8 @@
 package usecases
 
-import "noteBackendApp/internal/domain"
+import (
+	"noteBackendApp/internal/app/domain"
+)
 
 type GetNoteUCase interface {
 	GetNoteByTgId(id int64) []domain.Note

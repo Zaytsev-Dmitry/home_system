@@ -1,6 +1,8 @@
 package usecases
 
-import "noteBackendApp/internal/domain"
+import (
+	"noteBackendApp/internal/app/domain"
+)
 
 type SaveNoteUCase interface {
 	Save(toSave domain.Note) domain.Note

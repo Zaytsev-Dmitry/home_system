@@ -1,8 +1,8 @@
 package services
 
 import (
+	"noteBackendApp/internal/app/domain"
 	"noteBackendApp/internal/dao"
-	"noteBackendApp/internal/domain"
 )
 
 type GetNoteUCaseImpl struct {
