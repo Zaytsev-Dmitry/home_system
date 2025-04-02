@@ -2,12 +2,12 @@ package noteHandlers
 
 import (
 	"github.com/gin-gonic/gin"
-	noteController "noteBackendApp/api/controller"
-	noteInterface "noteBackendApp/internal/dao"
+	"noteBackendApp/api/controller"
+	"noteBackendApp/internal/dao"
 )
 
 type NoteBackendApi struct {
-	controller *noteController.NoteController
+	controller *controller.NoteController
 }
 
 func (api *NoteBackendApi) SaveNote(c *gin.Context) {
@@ -22,6 +22,6 @@ func (api *NoteBackendApi) GetNotesByTgId(c *gin.Context, tgId int64) {
 	api.controller.GetNotesByTgId(c, tgId)
 }
 
-func NewNoteBackendApi(dao noteInterface.NoteDao) *NoteBackendApi {
-	return &NoteBackendApi{controller: noteController.Create(dao)}
+func NewNoteBackendApi(dao dao.NoteDao) *NoteBackendApi {
+	return &NoteBackendApi{controller: controller.Create(dao)}
 }

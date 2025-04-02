@@ -1,4 +1,4 @@
-package config
+package configs
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
@@ -26,7 +26,7 @@ func LoadConfig() *AppConfig {
 	profile := os.Getenv("APP_PROFILE")
 
 	if configPath == "" && profile == "local" {
-		configPath = "config/" + "local.yaml"
+		configPath = "configs/" + "local.yaml"
 	}
 
 	if configPath == "" {
@@ -39,7 +39,7 @@ func LoadConfig() *AppConfig {
 
 	var config AppConfig
 	if err := cleanenv.ReadConfig(configPath, &config); err != nil {
-		log.Fatalf("cannot read config: %s", err)
+		log.Fatalf("cannot read configs: %s", err)
 	}
 	return &config
 }

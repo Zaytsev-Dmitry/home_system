@@ -7,7 +7,7 @@ import (
 	"log"
 	noteHandler "noteBackendApp/api/handlers"
 	generatedApi "noteBackendApp/api/spec"
-	noteConfig "noteBackendApp/config"
+	noteConfig "noteBackendApp/configs"
 	"noteBackendApp/internal/dao/sqlx"
 )
 

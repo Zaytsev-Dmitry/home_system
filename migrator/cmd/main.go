@@ -8,12 +8,12 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	"log"
-	"migrator/config"
+	"migrator/configs"
 	"path/filepath"
 )
 
 func main() {
-	cfg := config.LoadConfig()
+	cfg := configs.LoadConfig()
 	for _, database := range cfg.Databases {
 		db, err := sql.Open(
 			"postgres",

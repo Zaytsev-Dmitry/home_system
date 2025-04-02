@@ -6,8 +6,8 @@ RUN go mod download
 RUN go mod tidy
 COPY . .
 
-# Убеждаемся, что папка `config/` есть
-RUN ls -la /app/config/
+# Убеждаемся, что папка `configs/` есть
+RUN ls -la /app/configs/
 
 RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
 RUN oapi-codegen -package=generatedApi -generate "types,spec,gin" /app/api/spec/openapi/note-api.yml > api/spec/openapi/note-api.gen.go

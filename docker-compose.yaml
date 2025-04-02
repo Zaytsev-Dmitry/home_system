@@ -1,21 +1,5 @@
 version: '3'
 services:
-  vault:
-    image: vault:1.13.3
-    volumes:
-      - ./data/vault:/data/vault
-    ports:
-      - "127.0.0.1:8200:8200"
-    environment:
-      - VAULT_ADDR=http://localhost:8200
-      - VAULT_API_ADDR=http://localhost:8200
-      - VAULT_ADDRESS=http://localhost:8200
-    cap_add:
-      - IPC_LOCK
-    command: vault server -config=data/vault/vault.json
-    networks:
-      - skynet
-
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:4.0.6-management-alpine
@@ -37,7 +21,7 @@ services:
       dockerfile: Dockerfile
     container_name: migrator
     environment:
-      CONFIG_PATH: "/app/config/docker.yaml"
+      CONFIG_PATH: "/app/configs/docker.yaml"
       APP_PROFILE: "docker"
     ports:
       - "8083:8083"
@@ -70,7 +54,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      CONFIG_PATH: "/app/config/docker.yaml"
+      CONFIG_PATH: "/app/configs/docker.yaml"
       APP_PROFILE: "docker"
     restart: unless-stopped
     networks:
