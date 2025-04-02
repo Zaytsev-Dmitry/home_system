@@ -5,9 +5,9 @@ import (
 	"net/http"
 	openapi "noteBackendApp/api/http"
 	notePresenter "noteBackendApp/api/presenter"
+	noteInterface "noteBackendApp/internal/app/ports/out/dao"
 	"noteBackendApp/internal/app/services"
 	"noteBackendApp/internal/app/usecases"
-	noteInterface "noteBackendApp/internal/dao"
 	noteUtilities "noteBackendApp/pkg/utilities"
 )
 

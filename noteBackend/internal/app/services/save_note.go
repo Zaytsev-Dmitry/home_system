@@ -2,7 +2,7 @@ package services
 
 import (
 	"noteBackendApp/internal/app/domain"
-	"noteBackendApp/internal/dao"
+	"noteBackendApp/internal/app/ports/out/dao"
 )
 
 type SaveNoteUCaseImpl struct {

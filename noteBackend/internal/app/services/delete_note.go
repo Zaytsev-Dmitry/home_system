@@ -1,6 +1,8 @@
 package services
 
-import "noteBackendApp/internal/dao"
+import (
+	"noteBackendApp/internal/app/ports/out/dao"
+)
 
 type DeleteNoteUCaseImpl struct {
 	Dao dao.NoteDao
