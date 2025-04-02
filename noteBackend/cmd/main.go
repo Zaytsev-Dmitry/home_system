@@ -5,9 +5,9 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"log"
-	noteHandler "noteBackendApp/api/handlers"
 	openapi "noteBackendApp/api/http"
 	"noteBackendApp/internal/app/ports/out/dao"
+	noteHandler "noteBackendApp/internal/infrastructure/transport/http/handler"
 	"noteBackendApp/pkg/config_loader"
 )
 

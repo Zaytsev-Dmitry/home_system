@@ -1,9 +1,9 @@
-package noteHandlers
+package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"noteBackendApp/api/controller"
 	"noteBackendApp/internal/app/ports/out/dao"
+	"noteBackendApp/internal/infrastructure/transport/http/controller"
 )
 
 type NoteBackendApi struct {
