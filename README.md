@@ -5,3 +5,4 @@
 
 
 go get github.com/Zaytsev-Dmitry/home_system_open_api@v1.0.8
+docker-compose build migrator --build-arg CONFIG_PATH_ARG=/app/configs/docker.yaml --build-arg APP_PROFILE_ARG=docker 
