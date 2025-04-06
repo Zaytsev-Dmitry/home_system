@@ -23,6 +23,7 @@ type AppConfig struct {
 
 func LoadConfig() *AppConfig {
 	configPath := os.Getenv("CONFIG_FILE")
+
 	if configPath == "" {
 		log.Fatalf("CONFIG_PATH environment variable not set")
 	}
