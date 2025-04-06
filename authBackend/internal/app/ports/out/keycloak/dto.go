@@ -1,8 +1,8 @@
 package keycloak
 
 import (
-	generatedApi "authServer/api/http"
-	"authServer/pkg/utilities"
+	generatedApi "authBackend/api/http"
+	"authBackend/pkg/utilities"
 	"net/http"
 	"net/url"
 )

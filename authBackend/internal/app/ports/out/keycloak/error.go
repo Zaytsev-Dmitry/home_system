@@ -1,7 +1,7 @@
 package keycloak
 
 import (
-	"authServer/pkg/utilities"
+	"authBackend/pkg/utilities"
 	"errors"
 	"fmt"
 	"net/http"
