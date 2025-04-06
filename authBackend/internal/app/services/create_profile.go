@@ -2,7 +2,7 @@ package services
 
 import (
 	"authServer/internal/app/domain"
-	"authServer/internal/dao/repository/intefraces"
+	"authServer/internal/app/ports/out/dao/repository/intefraces"
 )
 
 type CreateUseCaseImpl struct {

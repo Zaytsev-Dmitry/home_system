@@ -1,10 +1,10 @@
 package main
 
 import (
-	"authServer/api/handlers"
 	"authServer/api/http"
 	swaggerGenerator "authServer/api/http"
-	"authServer/internal/dao"
+	"authServer/internal/app/ports/out/dao"
+	"authServer/internal/infrastructure/transport/http/handler"
 	"authServer/pkg/config_loader"
 	"authServer/pkg/utilities"
 	_ "embed"
@@ -27,7 +27,7 @@ func main() {
 	defer dao.Close()
 
 	//инициализирую апи
-	router, apiInterface := gin.Default(), handlers.NewAuthServerApi(appConfig, dao)
+	router, apiInterface := gin.Default(), handler.NewAuthServerApi(appConfig, dao)
 	//устанавливаю роут под swagger ui
 	swaggerGenerator.Load(router)
 	//регаю хэндлеры

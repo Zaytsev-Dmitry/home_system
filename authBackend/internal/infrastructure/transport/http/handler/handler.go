@@ -1,16 +1,16 @@
-package handlers
+package handler
 
 import (
-	accountController "authServer/api/controller"
+	daoImpl "authServer/internal/app/ports/out/dao"
 	"authServer/internal/app/ports/out/keycloak"
-	daoImpl "authServer/internal/dao"
+	"authServer/internal/infrastructure/transport/http/controller"
 	"authServer/pkg/config_loader"
 	"github.com/gin-gonic/gin"
 )
 
 type AuthServerApi struct {
-	accController     *accountController.AccountController
-	profileController *accountController.ProfileController
+	accController     *controller.AccountController
+	profileController *controller.ProfileController
 }
 
 func (api *AuthServerApi) GetAccountByTgId(c *gin.Context, telegramId int64) {
@@ -28,7 +28,7 @@ func (api *AuthServerApi) RegisterAccount(context *gin.Context) {
 func NewAuthServerApi(config *config_loader.AppConfig, dao *daoImpl.AuthDao) *AuthServerApi {
 	keycloak := keycloak.New(config)
 	return &AuthServerApi{
-		accController:     accountController.CreateAccountController(keycloak, dao),
-		profileController: accountController.CreateProfileController(dao),
+		accController:     controller.CreateAccountController(keycloak, dao),
+		profileController: controller.CreateProfileController(dao),
 	}
 }

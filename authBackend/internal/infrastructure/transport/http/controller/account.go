@@ -1,11 +1,11 @@
 package controller
 
 import (
-	"authServer/api/presenter"
+	daoImpl "authServer/internal/app/ports/out/dao"
 	"authServer/internal/app/ports/out/keycloak"
 	"authServer/internal/app/services"
 	useCases "authServer/internal/app/usecases"
-	daoImpl "authServer/internal/dao"
+	"authServer/internal/infrastructure/transport/http/presenter"
 	"github.com/gin-gonic/gin"
 )
 

@@ -3,8 +3,8 @@ package services
 import (
 	generatedApi "authServer/api/http"
 	"authServer/internal/app/domain"
+	"authServer/internal/app/ports/out/dao/repository/intefraces"
 	keycloak2 "authServer/internal/app/ports/out/keycloak"
-	"authServer/internal/dao/repository/intefraces"
 	"authServer/pkg/utilities"
 	"errors"
 )

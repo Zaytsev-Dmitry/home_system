@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"authServer/internal/dao/repository/intefraces"
+	intefraces2 "authServer/internal/app/ports/out/dao/repository/intefraces"
 	"authServer/pkg/config_loader"
 	"fmt"
 	"github.com/jmoiron/sqlx"
@@ -9,13 +9,13 @@ import (
 )
 
 type AuthDao struct {
-	AccountRepo intefraces.AccountRepository
-	ProfileRepo intefraces.ProfileRepository
+	AccountRepo intefraces2.AccountRepository
+	ProfileRepo intefraces2.ProfileRepository
 }
 
 func New(config *config_loader.AppConfig) *AuthDao {
-	var accRepo intefraces.AccountRepository
-	var profileRepo intefraces.ProfileRepository
+	var accRepo intefraces2.AccountRepository
+	var profileRepo intefraces2.ProfileRepository
 
 	return &AuthDao{
 		AccountRepo: accRepo,

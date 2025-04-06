@@ -2,9 +2,9 @@ package account
 
 import (
 	authServerDomain "authServer/internal/app/domain"
+	"authServer/internal/app/ports/out/dao/repository"
+	"authServer/internal/app/ports/out/dao/repository/impl/profile"
 	"authServer/internal/app/ports/out/keycloak"
-	"authServer/internal/dao/repository"
-	"authServer/internal/dao/repository/impl/profile"
 	"authServer/pkg/utilities"
 	"database/sql"
 	"errors"

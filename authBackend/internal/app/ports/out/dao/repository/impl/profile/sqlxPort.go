@@ -2,7 +2,7 @@ package profile
 
 import (
 	authServerDomain "authServer/internal/app/domain"
-	"authServer/internal/dao/repository"
+	"authServer/internal/app/ports/out/dao/repository"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 )
