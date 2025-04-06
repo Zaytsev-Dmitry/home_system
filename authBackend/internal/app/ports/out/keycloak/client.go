@@ -1,9 +1,9 @@
 package keycloak
 
 import (
-	generatedApi "authServer/api/http"
-	"authServer/pkg/config_loader"
-	"authServer/pkg/utilities"
+	openapi "authBackend/api/http"
+	"authBackend/pkg/config_loa
+	"authBackend/pkg/utilities"
 	"errors"
 )
 
@@ -29,7 +29,7 @@ func New(config *config_loader.AppConfig) *KeycloakClient {
 	}
 }
 
-func (client KeycloakClient) RegisterAccount(request generatedApi.CreateAccountRequest) (error, KeycloakEntity) {
+func (client KeycloakClient) RegisterAccount(request openapi.CreateAccountRequest) (error, KeycloakEntity) {
 	var result KeycloakEntity
 	serviceAccountToken, err := client.getToken()
 	if err != nil {
