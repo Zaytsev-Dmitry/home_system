@@ -5,6 +5,7 @@ on:
     branches: ["master","dev"]
     paths:
       - 'noteBackend/**'
+  workflow_dispatch:
 
 env:
   REPO_URL: '${{ secrets.NOTE_BACKEND_PROD_DOCKERHUB_REPO }}'
