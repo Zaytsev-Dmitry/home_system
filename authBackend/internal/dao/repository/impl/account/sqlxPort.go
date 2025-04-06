@@ -1,8 +1,8 @@
 package account
 
 import (
-	"authServer/external/keycloak"
 	authServerDomain "authServer/internal/app/domain"
+	"authServer/internal/app/ports/out/keycloak"
 	"authServer/internal/dao/repository"
 	"authServer/internal/dao/repository/impl/profile"
 	"authServer/pkg/utilities"

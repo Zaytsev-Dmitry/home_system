@@ -2,7 +2,7 @@ package handlers
 
 import (
 	accountController "authServer/api/controller"
-	"authServer/external/keycloak"
+	"authServer/internal/app/ports/out/keycloak"
 	daoImpl "authServer/internal/dao"
 	"authServer/pkg/config_loader"
 	"github.com/gin-gonic/gin"

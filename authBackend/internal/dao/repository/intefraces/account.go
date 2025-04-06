@@ -1,8 +1,8 @@
 package intefraces
 
 import (
-	"authServer/external/keycloak"
 	authServerDomain "authServer/internal/app/domain"
+	"authServer/internal/app/ports/out/keycloak"
 )
 
 type AccountRepository interface {

@@ -2,7 +2,7 @@ package controller
 
 import (
 	"authServer/api/presenter"
-	"authServer/external/keycloak"
+	"authServer/internal/app/ports/out/keycloak"
 	"authServer/internal/app/services"
 	useCases "authServer/internal/app/usecases"
 	daoImpl "authServer/internal/dao"
