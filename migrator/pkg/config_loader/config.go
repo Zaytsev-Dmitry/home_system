@@ -6,39 +6,27 @@ import (
 	"os"
 )
 
-type DatabaseConfig struct {
-	Name          string `yaml:"name" env:"DB_NAME" env-required:"true"`
-	User          string `yaml:"user" env:"DB_USER" env-required:"true"`
-	Password      string `yaml:"password" env:"DB_PASSWORD" env-required:"true"`
-	DirectoryName string `yaml:"directoryName"`
-}
-
-type Config struct {
-	App struct {
-		DbUrl string `yaml:"dbUrl" env:"DB_URL" env-required:"true"`
-	} `yaml:"app"`
-	Databases []DatabaseConfig `yaml:"databases"`
-}
-
-func LoadConfig() *Config {
+func LoadConfig(config interface{}) {
 	configPath := os.Getenv("CONFIG_FILE")
 	appProfile := os.Getenv("APP_PROFILE")
 
+	// Если профиль "local", установим локальный путь к конфигу
 	if appProfile == "local" {
 		configPath = "configs/" + "config-local.yaml"
 	}
 
+	// Проверим, что путь к конфигу задан
 	if configPath == "" {
-		log.Fatalf("CONFIG_PATH environment variable not set")
+		log.Fatalf("CONFIG_FILE environment variable not set")
 	}
 
+	// Проверим, существует ли файл конфигурации
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		log.Fatalf("CONFIG_PATH does not exist: %s", configPath)
+		log.Fatalf("CONFIG_FILE does not exist: %s", configPath)
 	}
 
-	var config Config
-	if err := cleanenv.ReadConfig(configPath, &config); err != nil {
-		log.Fatalf("cannot read configs: %s", err)
+	// Прочитаем конфигурацию в переданный интерфейс
+	if err := cleanenv.ReadConfig(configPath, config); err != nil {
+		log.Fatalf("cannot read config: %s", err)
 	}
-	return &config
 }
