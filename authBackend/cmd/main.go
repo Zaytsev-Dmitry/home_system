@@ -2,7 +2,8 @@ package main
 
 import (
 	"authServer/api/handlers"
-	generatedApi "authServer/api/spec"
+	"authServer/api/http"
+	swaggerGenerator "authServer/api/http"
 	"authServer/configs"
 	"authServer/internal/dao"
 	"authServer/pkg/utilities"
@@ -29,9 +30,9 @@ func main() {
 	//инициализирую апи
 	router, apiInterface := gin.Default(), handlers.NewAuthServerApi(appConfig, dao)
 	//устанавливаю роут под swagger ui
-	generatedApi.Load(router)
+	swaggerGenerator.Load(router)
 	//регаю хэндлеры
-	generatedApi.RegisterHandlers(router, apiInterface)
+	http.RegisterHandlers(router, apiInterface)
 
 	logger.Info("Start application",
 		zap.String("name", appConfig.Server.Name),

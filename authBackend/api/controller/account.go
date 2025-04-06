@@ -1,8 +1,8 @@
 package controller
 
 import (
+	generatedApi "authServer/api/http"
 	"authServer/api/presenter"
-	generatedApi "authServer/api/spec"
 	"authServer/external/keycloak"
 	daoImpl "authServer/internal/dao"
 	"authServer/internal/domain"

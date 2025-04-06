@@ -1,7 +1,7 @@
 package keycloak
 
 import (
-	generatedApi "authServer/api/spec"
+	generatedApi "authServer/api/http"
 	authConfig "authServer/configs"
 	"authServer/pkg/utilities"
 	"errors"

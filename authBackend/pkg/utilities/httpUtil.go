@@ -1,7 +1,7 @@
 package utilities
 
 import (
-	generatedApi "authServer/api/spec"
+	generatedApi "authServer/api/http"
 	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"

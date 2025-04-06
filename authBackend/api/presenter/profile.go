@@ -1,7 +1,7 @@
 package presenter
 
 import (
-	generatedApi "authServer/api/spec"
+	generatedApi "authServer/api/http"
 	domain "authServer/internal/domain"
 )
 

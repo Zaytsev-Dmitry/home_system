@@ -1,7 +1,7 @@
 package usecases
 
 import (
-	generatedApi "authServer/api/spec"
+	generatedApi "authServer/api/http"
 	"authServer/external/keycloak"
 	"authServer/internal/dao/repository/intefraces"
 	domain "authServer/internal/domain"
