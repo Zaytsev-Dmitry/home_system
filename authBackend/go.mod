@@ -1,4 +1,4 @@
-module authServer
+module authBackend
 
 go 1.23.0
 

@@ -1,12 +1,12 @@
 package errors
 
 import (
+	openapi "authBackend/api/http"
 	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	openapi "noteBackendApp/api/http"
 	"time"
 )
 

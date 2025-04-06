@@ -1,10 +1,10 @@
 package dao_helper
 
 import (
+	customErr "authBackend/pkg/errors"
 	"database/sql"
 	"errors"
 	"github.com/jmoiron/sqlx"
-	customErr "noteBackendApp/pkg/errors"
 )
 
 const (

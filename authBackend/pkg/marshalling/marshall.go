@@ -1,9 +1,9 @@
 package marshalling
 
 import (
+	"authBackend/pkg/errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"noteBackendApp/pkg/errors"
 )
 
 func HandleMarshalling[T any](c *gin.Context, req *T) error {

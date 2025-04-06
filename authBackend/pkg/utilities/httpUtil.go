@@ -1,14 +1,12 @@
 package utilities
 
 import (
-	generatedApi "authServer/api/http"
 	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 )
 
 var client = &http.Client{}
@@ -71,23 +69,23 @@ func UrlencodedRequest(httpMethod string, urlStr string, data url.Values) (*http
 	return resp, err
 }
 
-func getErrorDto(err string, status int, context *gin.Context) generatedApi.ErrorResponse {
-	nowString := time.Now().String()
-	return generatedApi.ErrorResponse{
-		Timestamp: &nowString,
-		Status:    &status,
-		Error:     &err,
-		Path:      &context.Request.URL.Path,
-	}
-}
+//func getErrorDto(err string, status int, context *gin.Context) generatedApi.ErrorResponse {
+//	nowString := time.Now().String()
+//	return generatedApi.ErrorResponse{
+//		Timestamp: &nowString,
+//		Status:    &status,
+//		Error:     &err,
+//		Path:      &context.Request.URL.Path,
+//	}
+//}
 
-func CatchMarshallErr(err error, context *gin.Context) {
-	if err != nil {
-		var responseError = getErrorDto(err.Error(), http.StatusInternalServerError, context)
-		context.Status(http.StatusInternalServerError)
-		json.NewEncoder(context.Writer).Encode(responseError)
-	}
-}
+//func CatchMarshallErr(err error, context *gin.Context) {
+//	if err != nil {
+//		var responseError = getErrorDto(err.Error(), http.StatusInternalServerError, context)
+//		context.Status(http.StatusInternalServerError)
+//		json.NewEncoder(context.Writer).Encode(responseError)
+//	}
+//}
 
 func SetResponse(v any, context *gin.Context) {
 	json.NewEncoder(context.Writer).Encode(v)
@@ -99,9 +97,9 @@ func SetResponseWithStatus(v any, context *gin.Context, status int) {
 	json.NewEncoder(context.Writer).Encode(v)
 }
 
-func SetResponseError(context *gin.Context, status int) {
-	var responseError = getErrorDto("Oops...что то пошло не так", status, context)
-	context.Writer.Header().Set("Content-Type", "application/json")
-	context.Status(status)
-	json.NewEncoder(context.Writer).Encode(responseError)
-}
+//func SetResponseError(context *gin.Context, status int) {
+//	var responseError = getErrorDto("Oops...что то пошло не так", status, context)
+//	context.Writer.Header().Set("Content-Type", "application/json")
+//	context.Status(status)
+//	json.NewEncoder(context.Writer).Encode(responseError)
+//}
