@@ -1,4 +1,4 @@
-package configs
+package config_loader
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
@@ -21,12 +21,7 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
-	configPath := os.Getenv("CONFIG_PATH")
-	profile := os.Getenv("APP_PROFILE")
-
-	if configPath == "" && profile == "local" {
-		configPath = "configs/" + "local.yaml"
-	}
+	configPath := os.Getenv("CONFIG_FILE")
 
 	if configPath == "" {
 		log.Fatalf("CONFIG_PATH environment variable not set")

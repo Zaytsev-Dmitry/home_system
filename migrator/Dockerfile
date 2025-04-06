@@ -1,39 +1,31 @@
 FROM golang:1.24.0 AS builder
-WORKDIR /app
 
-# Копируем только необходимые файлы
-COPY /cmd/main.go .
-COPY go.mod .
+WORKDIR /migrator
+
+COPY go.mod ./
+COPY go.sum ./
 RUN go mod download
 
-# Копируем весь проект
 COPY . .
 
-# Убеждаемся, что папка `configs/` есть
-RUN ls -la /app/configs/
+RUN ls -la /migrator/configs/
+RUN ls -la /migrator/migrations/
 
-# Убеждаемся, что папка `migrations/` есть
-RUN ls -la /app/migrations/
 
-# Собираем бинарник
-RUN CGO_ENABLED=0 GOOS=linux go build -o /migrator main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o /main ./cmd/main.go
 
-# Минимизируем финальный образ
 FROM scratch
-COPY --from=builder /migrator /bin/migrator
-COPY --from=builder /app/config /app/config
-COPY --from=builder /app/migrations /migrator/migrations
 
-# Объявляем аргументы
-ARG CONFIG_PATH_ARG
+WORKDIR /migrator
+
+COPY --from=builder /main /bin/main
+COPY --from=builder /migrator/configs /migrator/configs
+COPY --from=builder /migrator/migrations /migrator/migrations
+
 ARG APP_PROFILE_ARG
+ENV CONFIG_FILE=/app/configs/config-${APP_PROFILE_ARG}.yaml
 
-# Проверяем, что аргументы переданы (иначе билд прервётся)
-RUN test -n "$CONFIG_PATH_ARG" || (echo "CONFIG_PATH_ARG is empty!")
-RUN test -n "$APP_PROFILE_ARG" || (echo "APP_PROFILE_ARG is empty!")
+EXPOSE 8085
 
-# Устанавливаем переменные среды
-ENV CONFIG_PATH=$CONFIG_PATH_ARG
-ENV APP_PROFILE=$APP_PROFILE_ARG
+ENTRYPOINT ["/bin/main"]
 
-ENTRYPOINT ["/bin/migrator"]

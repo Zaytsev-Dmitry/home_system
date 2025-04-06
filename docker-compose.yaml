@@ -21,8 +21,7 @@ services:
       dockerfile: Dockerfile
     container_name: migrator
     environment:
-      CONFIG_PATH: "/app/configs/docker.yaml"
-      APP_PROFILE: "docker"
+      CONFIG_FILE: /migrator/configs/config-docker-local.yaml
     ports:
       - "8083:8083"
     depends_on:

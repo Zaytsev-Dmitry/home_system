@@ -35,7 +35,7 @@ func LoadConfig() *AppConfig {
 	profile := os.Getenv("APP_PROFILE")
 
 	if configPath == "" && profile == "local" {
-		configPath = "configs/" + "local.yaml"
+		configPath = "configs/" + "config-local.yaml"
 	}
 
 	if configPath == "" {

@@ -8,6 +8,5 @@
 ```
 ## Run in docker local machine
 ```bash
-    docker-compose build migrator --build-arg CONFIG_PATH_ARG=/app/configs/docker.yaml --build-arg APP_PROFILE=docker
-    docker-compose build up migrator
+    docker-compose build migrator && docker-compose up -d migrator && docker image prune -a -f
 ```
