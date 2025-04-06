@@ -47,15 +47,13 @@ services:
       - skynet
 
   note-backend:
-    build:
-      context: noteBackend
-      dockerfile: Dockerfile
+    image: zaytsevdv/home-system-note-backend-dev:latest
     container_name: noteBackend
     ports:
       - "8080:8080"
     restart: unless-stopped
     environment:
-      CONFIG_FILE: /app/configs/docker_local.yaml
+      CONFIG_FILE: /app/configs/config.yaml
     networks:
       - skynet
     depends_on:
