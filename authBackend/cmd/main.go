@@ -1,13 +1,13 @@
 package main
 
 import (
-	"authServer/api/handlers"
-	generatedApi "authServer/api/spec"
-	"authServer/configs"
-	"authServer/internal/dao"
-	"authServer/pkg/utilities"
+	"authBackend/api/http"
+	openapi "authBackend/api/http"
+	"authBackend/internal/app/ports/out/dao"
+	"authBackend/internal/infrastructure/transport/http/handler"
+	"authBackend/pkg/config_loader"
+	"authBackend/pkg/utilities"
 	_ "embed"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
@@ -16,22 +16,22 @@ import (
 
 func main() {
 	//гружу конфиг
-	appConfig := getConfig()
+	appConfig := config_loader.LoadConfig()
 
 	//делаю логер
 	logger := getLogger()
 	defer logger.Sync()
 
 	//создаю DAO
-	dao := getDao(appConfig)
-	defer dao.Close()
+	dao, db := dao.Create(appConfig)
+	defer db.Close()
 
 	//инициализирую апи
-	router, apiInterface := gin.Default(), handlers.NewAuthServerApi(appConfig, dao)
+	router, apiInterface := gin.Default(), handler.NewAuthServerApi(appConfig, dao)
 	//устанавливаю роут под swagger ui
-	generatedApi.Load(router)
+	openapi.Load(router)
 	//регаю хэндлеры
-	generatedApi.RegisterHandlers(router, apiInterface)
+	http.RegisterHandlers(router, apiInterface)
 
 	logger.Info("Start application",
 		zap.String("name", appConfig.Server.Name),
@@ -43,27 +43,10 @@ func main() {
 	}
 }
 
-func getDao(appConfig *configs.AppConfig) *dao.AuthDao {
-	dao := dao.New(appConfig)
-	if dao == nil {
-		panic("dao is nil")
-	}
-	return dao
-}
-
 func getLogger() *zap.Logger {
 	logger := utilities.GetLogger()
 	if logger == nil {
 		panic("logger is nil")
 	}
 	return logger
-}
-
-func getConfig() *configs.AppConfig {
-	appConfig := configs.LoadConfig()
-	fmt.Printf("%+v\n", appConfig)
-	if appConfig == nil {
-		panic("appConfig is nil")
-	}
-	return appConfig
 }
