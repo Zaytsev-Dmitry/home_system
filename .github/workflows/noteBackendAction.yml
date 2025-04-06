@@ -9,7 +9,7 @@ on:
 
 env:
   REPO_URL: '${{ secrets.NOTE_BACKEND_PROD_DOCKERHUB_REPO }}'
-  APP_PROFILE: 'dev'
+  APP_PROFILE: ${{ github.ref == 'refs/heads/master' && 'prod' || 'dev' }}
 
 jobs:
   build-and-test:
@@ -57,11 +57,9 @@ jobs:
         run: |
           mkdir -p ./configs
           if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
-            echo "APP_PROFILE=dev" >> $GITHUB_ENV
             echo "REPO_URL=${{ secrets.NOTE_BACKEND_DEV_DOCKERHUB_REPO }}" >> $GITHUB_ENV
             echo "${{ secrets.NOTE_BACKEND_CONFIG_DEV }}" > noteBackend/configs/config-dev.yaml
           elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
-            echo "APP_PROFILE=prod" >> $GITHUB_ENV
             echo "REPO_URL=${{ secrets.NOTE_BACKEND_PROD_DOCKERHUB_REPO }}" >> $GITHUB_ENV
             echo "${{ secrets.NOTE_BACKEND_CONFIG_PROD }}" > noteBackend/configs/config-prod.yaml
           fi

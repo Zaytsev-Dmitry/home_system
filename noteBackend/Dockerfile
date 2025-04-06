@@ -1,4 +1,4 @@
-FROM golang:1.24.0 as builder
+FROM golang:1.24.0 AS builder
 
 WORKDIR /app
 
@@ -8,15 +8,14 @@ RUN go mod download
 
 COPY . .
 
-RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
-RUN oapi-codegen -package=http -generate "types,spec,gin" api/http/note-api.yml > api/http/note-api.gen.go
-RUN go mod tidy
+RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.5.0 && \
+    oapi-codegen -package=http -generate "types,spec,gin" api/http/note-api.yml > api/http/note-api.gen.go && \
+    go mod tidy
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /main ./cmd/main.go
 
 FROM scratch
 
-# Устанавливаем рабочую директорию
 WORKDIR /app
 
 COPY --from=builder /main /bin/main
@@ -27,6 +26,7 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 ARG APP_PROFILE_ARG
 ENV CONFIG_FILE=/app/configs/config-${APP_PROFILE_ARG}.yaml
+
 EXPOSE 8080
 
 ENTRYPOINT ["/bin/main"]
