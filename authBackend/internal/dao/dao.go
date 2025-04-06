@@ -1,10 +1,10 @@
 package dao
 
 import (
-	authConfig "authServer/configs"
 	"authServer/internal/dao/repository/impl/account"
 	"authServer/internal/dao/repository/impl/profile"
 	"authServer/internal/dao/repository/intefraces"
+	"authServer/pkg/config_loader"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"os"
@@ -15,7 +15,7 @@ type AuthDao struct {
 	ProfileRepo intefraces.ProfileRepository
 }
 
-func New(config *authConfig.AppConfig) *AuthDao {
+func New(config *config_loader.AppConfig) *AuthDao {
 	var accRepo intefraces.AccountRepository
 	var profileRepo intefraces.ProfileRepository
 

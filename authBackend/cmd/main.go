@@ -4,11 +4,10 @@ import (
 	"authServer/api/handlers"
 	"authServer/api/http"
 	swaggerGenerator "authServer/api/http"
-	"authServer/configs"
 	"authServer/internal/dao"
+	"authServer/pkg/config_loader"
 	"authServer/pkg/utilities"
 	_ "embed"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
@@ -17,7 +16,7 @@ import (
 
 func main() {
 	//гружу конфиг
-	appConfig := getConfig()
+	appConfig := config_loader.LoadConfig()
 
 	//делаю логер
 	logger := getLogger()
@@ -44,7 +43,7 @@ func main() {
 	}
 }
 
-func getDao(appConfig *configs.AppConfig) *dao.AuthDao {
+func getDao(appConfig *config_loader.AppConfig) *dao.AuthDao {
 	dao := dao.New(appConfig)
 	if dao == nil {
 		panic("dao is nil")
@@ -58,13 +57,4 @@ func getLogger() *zap.Logger {
 		panic("logger is nil")
 	}
 	return logger
-}
-
-func getConfig() *configs.AppConfig {
-	appConfig := configs.LoadConfig()
-	fmt.Printf("%+v\n", appConfig)
-	if appConfig == nil {
-		panic("appConfig is nil")
-	}
-	return appConfig
 }

@@ -8,9 +8,18 @@ import (
 
 type AppConfig struct {
 	Server struct {
-		Port string `yaml:"port"`
+		Port int    `yaml:"port"`
 		Name string `yaml:"name"`
 	} `yaml:"server"`
+	Keycloak struct {
+		KeycloakUrl     string `yaml:"keycloakUrl",env:"KEYCLOAK_URL"`
+		KeycloakHost    string `yaml:"keycloakHost"`
+		KeycloakRealm   string `yaml:"keycloakRealm"`
+		TokenUrl        string `yaml:"tokenUrl"`
+		ClientId        string `yaml:"clientId"`
+		ClientSecret    string `yaml:"clientSecret"`
+		ServerGrantType string `yaml:"serverGrantType"`
+	}
 	Database struct {
 		Host         string `yaml:"host"`
 		Username     string `yaml:"userName"`

@@ -2,7 +2,7 @@ package keycloak
 
 import (
 	generatedApi "authServer/api/http"
-	authConfig "authServer/configs"
+	"authServer/pkg/config_loader"
 	"authServer/pkg/utilities"
 	"errors"
 )
@@ -17,7 +17,7 @@ type KeycloakClient struct {
 	ServerGrantType string
 }
 
-func New(config *authConfig.AppConfig) *KeycloakClient {
+func New(config *config_loader.AppConfig) *KeycloakClient {
 	return &KeycloakClient{
 		KeycloakUrl:     config.Keycloak.KeycloakUrl,
 		TokenUrl:        config.Keycloak.TokenUrl,
