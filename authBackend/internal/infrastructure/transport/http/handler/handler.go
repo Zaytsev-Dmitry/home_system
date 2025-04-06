@@ -1,10 +1,10 @@
 package handler
 
 import (
-	daoImpl "authServer/internal/app/ports/out/dao"
-	"authServer/internal/app/ports/out/keycloak"
-	"authServer/internal/infrastructure/transport/http/controller"
-	"authServer/pkg/config_loader"
+	daoImpl "authBackend/internal/app/ports/out/dao"
+	"authBackend/internal/app/ports/out/keycloak"
+	"authBackend/internal/infrastructure/transport/http/controller"
+	"authBackend/pkg/config_loader"
 	"github.com/gin-gonic/gin"
 )
 

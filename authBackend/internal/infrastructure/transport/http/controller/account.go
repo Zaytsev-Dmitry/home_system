@@ -1,18 +1,16 @@
 package controller
 
 import (
-	daoImpl "authServer/internal/app/ports/out/dao"
-	"authServer/internal/app/ports/out/keycloak"
-	"authServer/internal/app/services"
-	useCases "authServer/internal/app/usecases"
-	"authServer/internal/infrastructure/transport/http/presenter"
+	daoImpl "authBackend/internal/app/ports/out/dao"
+	"authBackend/internal/app/ports/out/keycloak"
+	"authBackend/internal/app/services"
+	useCases "authBackend/internal/app/usecases"
 	"github.com/gin-gonic/gin"
 )
 
 type AccountController struct {
-	registerAcc  useCases.RegisterAccountUseCase
-	getAccByTgId *services.GetAccountUCaseImpl
-	presenter    *presenter.AccountPresenter
+	register   useCases.RegisterAccountUseCase
+	getAccount useCases.GetAccountUCase
 }
 
 func (controller *AccountController) RegisterAccount(context *gin.Context) {
@@ -41,13 +39,7 @@ func (controller *AccountController) processAccountResult(context *gin.Context, 
 
 func CreateAccountController(keycloakClient *keycloak.KeycloakClient, dao *daoImpl.AuthDao) *AccountController {
 	return &AccountController{
-		registerAcc: &services.RegisterAccountUseCaseImpl{
-			Keycloak: keycloakClient,
-			Repo:     dao.AccountRepo,
-		},
-		getAccByTgId: &services.GetAccountUCaseImpl{
-			Repo: dao.AccountRepo,
-		},
-		presenter: &presenter.AccountPresenter{},
+		register:   &services.RegisterAccountUseCaseImpl{Repo: dao.AccountRepository},
+		getAccount: &services.GetAccountUCaseImpl{Repo: dao.AccountRepository},
 	}
 }
