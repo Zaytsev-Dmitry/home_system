@@ -21,9 +21,9 @@ jobs:
 
       - name: Generate API
         run: |
-          cd noteBackend/api/spec
+          cd noteBackend/api/http
           go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
-          oapi-codegen -package=generatedApi -generate "types,spec,gin" note-api.yml > note-api.gen.go
+          oapi-codegen -package=http -generate "types,spec,gin" note-api.yml > note-api.gen.go
           echo 'noteBackend api is Done'    
 
       - name: Build
