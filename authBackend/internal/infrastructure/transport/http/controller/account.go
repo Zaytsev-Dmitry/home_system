@@ -1,19 +1,25 @@
 package controller
 
 import (
+	"authBackend/internal/app/ports/in/delegate"
 	daoImpl "authBackend/internal/app/ports/out/dao"
 	"authBackend/internal/app/ports/out/keycloak"
-	"authBackend/internal/app/services"
-	useCases "authBackend/internal/app/usecases"
 	"github.com/gin-gonic/gin"
 )
 
 type AccountController struct {
-	register   useCases.RegisterAccountUseCase
-	getAccount useCases.GetAccountUCase
+	delegate *delegate.AccountDelegate
 }
 
-func (controller *AccountController) RegisterAccount(context *gin.Context) {
+func (cntr *AccountController) RegisterAccount(c *gin.Context) {
+	//var req openapi.CreateAccountRequest
+	//if err := marshalling.HandleMarshalling(c, &req); err != nil {
+	//	return
+	//}
+	//marshalling.HandleResponse(c, func() (*domain.Account, error) {
+	//	return cntr.delegate.Save(cntr.presenter.PresentToReq(req))
+	//}, cntr.presenter.PresentToResp)
+
 	//var requestEntity generatedApi.CreateAccountRequest
 	//utilities.CatchMarshallErr(context.BindJSON(&requestEntity), context)
 	//entity, err := controller.registerAcc.Register(requestEntity)
@@ -39,7 +45,6 @@ func (controller *AccountController) processAccountResult(context *gin.Context, 
 
 func CreateAccountController(keycloakClient *keycloak.KeycloakClient, dao *daoImpl.AuthDao) *AccountController {
 	return &AccountController{
-		register:   &services.RegisterAccountUseCaseImpl{Repo: dao.AccountRepository},
-		getAccount: &services.GetAccountUCaseImpl{Repo: dao.AccountRepository},
+		delegate: delegate.CreateAccountDelegate(dao, *keycloakClient),
 	}
 }

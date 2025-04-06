@@ -26,9 +26,8 @@ func (api *AuthServerApi) RegisterAccount(context *gin.Context) {
 }
 
 func NewAuthServerApi(config *config_loader.AppConfig, dao *daoImpl.AuthDao) *AuthServerApi {
-	keycloak := keycloak.New(config)
 	return &AuthServerApi{
-		accController:     controller.CreateAccountController(keycloak, dao),
+		accController:     controller.CreateAccountController(keycloak.New(config), dao),
 		profileController: controller.CreateProfileController(dao),
 	}
 }
