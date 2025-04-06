@@ -8,7 +8,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.5.0 && \
+RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.4.1 && \
     oapi-codegen -package=http -generate "types,spec,gin" api/http/note-api.yml > api/http/note-api.gen.go && \
     go mod tidy
 
