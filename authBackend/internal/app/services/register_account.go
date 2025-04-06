@@ -1,17 +1,17 @@
 package services
 
 import (
-	generatedApi "authServer/api/http"
-	"authServer/internal/app/domain"
-	"authServer/internal/app/ports/out/dao/repository/intefraces"
-	keycloak2 "authServer/internal/app/ports/out/keycloak"
-	"authServer/pkg/utilities"
+	generatedApi "authBackend/api/http"
+	"authBackend/internal/app/domain"
+	"authBackend/internal/app/ports/out/dao/repository/account"
+	"authBackend/internal/app/ports/out/keycloak"
+	"authBackend/pkg/utilities"
 	"errors"
 )
 
 type RegisterAccountUseCaseImpl struct {
-	Keycloak *keycloak2.KeycloakClient
-	Repo     intefraces.AccountRepository
+	Keycloak *keycloak.KeycloakClient
+	Repo     account.AccountRepository
 }
 
 func (u *RegisterAccountUseCaseImpl) Register(request generatedApi.CreateAccountRequest) (domain.Account, error) {
@@ -29,10 +29,10 @@ func (u *RegisterAccountUseCaseImpl) runBusinessLayout(request generatedApi.Crea
 	return result, err
 }
 
-func (u *RegisterAccountUseCaseImpl) getKeycloakUser(request generatedApi.CreateAccountRequest) (error, keycloak2.KeycloakEntity) {
+func (u *RegisterAccountUseCaseImpl) getKeycloakUser(request generatedApi.CreateAccountRequest) (error, keycloak.KeycloakEntity) {
 	err, keycloakEntity := u.Keycloak.RegisterAccount(request)
 	if err != nil {
-		if errors.Is(err, keycloak2.Conflict409) {
+		if errors.Is(err, keycloak.Conflict409) {
 			//пользак уже есть в keycloak и соответственно в базе
 			keycloakEntity, err = u.Keycloak.GetUser(*request.Email)
 			if err != nil {

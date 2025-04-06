@@ -1,12 +1,12 @@
 package services
 
 import (
-	"authServer/internal/app/domain"
-	"authServer/internal/app/ports/out/dao/repository/intefraces"
+	"authBackend/internal/app/domain"
+	"authBackend/internal/app/ports/out/dao/repository/account"
 )
 
 type GetAccountUCaseImpl struct {
-	Repo intefraces.AccountRepository
+	Repo account.AccountRepository
 }
 
 func (controller *GetAccountUCaseImpl) Get(telegramId int64) (domain.Account, error) {

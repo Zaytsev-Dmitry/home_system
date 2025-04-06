@@ -1,12 +1,12 @@
 package services
 
 import (
-	"authServer/internal/app/domain"
-	"authServer/internal/app/ports/out/dao/repository/intefraces"
+	"authBackend/internal/app/domain"
+	"authBackend/internal/app/ports/out/dao/repository/profile"
 )
 
 type GetProfileUseCaseImpl struct {
-	Repo intefraces.ProfileRepository
+	Repo profile.ProfileRepository
 }
 
 func (p *GetProfileUseCaseImpl) GetByTGId(accId int64) domain.Profile {
