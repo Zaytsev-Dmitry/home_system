@@ -9,8 +9,8 @@ RUN go mod download
 # Копируем весь проект
 COPY . .
 
-# Убеждаемся, что папка `config/` есть
-RUN ls -la /app/config/
+# Убеждаемся, что папка `configs/` есть
+RUN ls -la /app/configs/
 
 # Убеждаемся, что папка `migrations/` есть
 RUN ls -la /app/migrations/

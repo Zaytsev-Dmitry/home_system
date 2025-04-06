@@ -94,7 +94,7 @@ func getContext() (ctx context.Context, stop context.CancelFunc) {
 }
 
 func loadConfig(env string) *config.AppConfig {
-	var appProfile = "config/" + "%s" + ".yaml"
+	var appProfile = "configs/" + "%s" + ".yaml"
 	getenv := os.Getenv(env)
 	switch getenv {
 	case "dev":

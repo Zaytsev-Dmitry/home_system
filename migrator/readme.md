@@ -8,6 +8,6 @@
 ```
 ## Run in docker local machine
 ```bash
-    docker-compose build migrator --build-arg CONFIG_PATH_ARG=/app/config/docker.yaml --build-arg APP_PROFILE=docker
+    docker-compose build migrator --build-arg CONFIG_PATH_ARG=/app/configs/docker.yaml --build-arg APP_PROFILE=docker
     docker-compose build up migrator
 ```
