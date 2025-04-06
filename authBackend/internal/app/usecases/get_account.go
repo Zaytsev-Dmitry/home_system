@@ -1,6 +1,6 @@
 package usecases
 
-import "authServer/internal/app/domain"
+import "authBackend/internal/app/domain"
 
 type GetAccountUCase interface {
 	Get(telegramId int64) (domain.Account, error)

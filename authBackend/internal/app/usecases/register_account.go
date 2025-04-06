@@ -1,8 +1,8 @@
 package usecases
 
 import (
-	generatedApi "authServer/api/http"
-	"authServer/internal/app/domain"
+	generatedApi "authBackend/api/http"
+	"authBackend/internal/app/domain"
 )
 
 type RegisterAccountUseCase interface {
