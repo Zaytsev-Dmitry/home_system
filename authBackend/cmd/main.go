@@ -1,12 +1,12 @@
 package main
 
 import (
-	"authServer/api/http"
-	swaggerGenerator "authServer/api/http"
-	"authServer/internal/app/ports/out/dao"
-	"authServer/internal/infrastructure/transport/http/handler"
-	"authServer/pkg/config_loader"
-	"authServer/pkg/utilities"
+	"authBackend/api/http"
+	openapi "authBackend/api/http"
+	"authBackend/internal/app/ports/out/dao"
+	"authBackend/internal/infrastructure/transport/http/handler"
+	"authBackend/pkg/config_loader"
+	"authBackend/pkg/utilities"
 	_ "embed"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -23,13 +23,13 @@ func main() {
 	defer logger.Sync()
 
 	//создаю DAO
-	dao := getDao(appConfig)
-	defer dao.Close()
+	dao, db := dao.Create(appConfig)
+	defer db.Close()
 
 	//инициализирую апи
 	router, apiInterface := gin.Default(), handler.NewAuthServerApi(appConfig, dao)
 	//устанавливаю роут под swagger ui
-	swaggerGenerator.Load(router)
+	openapi.Load(router)
 	//регаю хэндлеры
 	http.RegisterHandlers(router, apiInterface)
 
@@ -41,14 +41,6 @@ func main() {
 	if err := router.Run(":" + strconv.Itoa(appConfig.Server.Port)); err != nil {
 		panic("Failed to start server: " + err.Error())
 	}
-}
-
-func getDao(appConfig *config_loader.AppConfig) *dao.AuthDao {
-	dao := dao.New(appConfig)
-	if dao == nil {
-		panic("dao is nil")
-	}
-	return dao
 }
 
 func getLogger() *zap.Logger {
