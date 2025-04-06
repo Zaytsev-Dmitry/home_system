@@ -25,14 +25,14 @@ func (p *ProfileRepositorySqlx) CreateProfile(account domain.Account) error {
 	return nil
 }
 
-func (p *ProfileRepositorySqlx) GetProfileByAccountId(accId int64) domain.Profile {
+func (p *ProfileRepositorySqlx) GetProfileByAccountId(accId int64) (*domain.Profile, error) {
 	var resp domain.Profile
 	err := p.Db.Get(&resp, queries.SELECT_BY_ACC_ID, accId)
 	if err != nil {
 		//TODO кинуть ошибку и потом создать базовый профиль
 		fmt.Println(err)
 	}
-	return resp
+	return &resp, err
 }
 
 func NewProfileRepositorySqlx(db *sqlx.DB) *ProfileRepositorySqlx {

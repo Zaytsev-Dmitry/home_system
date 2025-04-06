@@ -16,7 +16,7 @@ func (d *ProfileDelegate) Create(acc domain.Account) error {
 	return d.createProfileUCase.Create(acc)
 }
 
-func (d *ProfileDelegate) GetByTGId(accId int64) domain.Profile {
+func (d *ProfileDelegate) GetByTGId(accId int64) (*domain.Profile, error) {
 	return d.getProfileUCase.GetByTGId(accId)
 }
 

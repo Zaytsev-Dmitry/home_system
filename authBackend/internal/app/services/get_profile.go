@@ -9,6 +9,6 @@ type GetProfileUseCaseImpl struct {
 	Repo profile.ProfileRepository
 }
 
-func (p *GetProfileUseCaseImpl) GetByTGId(accId int64) domain.Profile {
+func (p *GetProfileUseCaseImpl) GetByTGId(accId int64) (*domain.Profile, error) {
 	return p.Repo.GetProfileByAccountId(accId)
 }
