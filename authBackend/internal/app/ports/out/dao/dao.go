@@ -1,29 +1,20 @@
 package dao
 
 import (
-	intefraces2 "authServer/internal/app/ports/out/dao/repository/intefraces"
-	"authServer/pkg/config_loader"
+	"authBackend/internal/app/ports/out/dao/repository/account"
+	"authBackend/internal/app/ports/out/dao/repository/profile"
+	"authBackend/pkg/config_loader"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"os"
 )
 
 type AuthDao struct {
-	AccountRepo intefraces2.AccountRepository
-	ProfileRepo intefraces2.ProfileRepository
+	AccountRepository account.AccountRepository
+	ProfileRepository profile.ProfileRepository
 }
 
-func New(config *config_loader.AppConfig) *AuthDao {
-	var accRepo intefraces2.AccountRepository
-	var profileRepo intefraces2.ProfileRepository
-
-	return &AuthDao{
-		AccountRepo: accRepo,
-		ProfileRepo: profileRepo,
-	}
-}
-
-func newSqlxDB(config *config_loader.AppConfig) *sqlx.DB {
+func newDbConnection(config *config_loader.AppConfig) *sqlx.DB {
 	dbURL := fmt.Sprintf(
 		"postgres://%s:%s@%s:5432/%s?sslmode=disable",
 		config.Database.Username,
@@ -39,7 +30,10 @@ func newSqlxDB(config *config_loader.AppConfig) *sqlx.DB {
 	return db
 }
 
-func (dao *AuthDao) Close() {
-	dao.AccountRepo.CloseConnection()
-	dao.ProfileRepo.CloseConnection()
+func Create(config *config_loader.AppConfig) (*AuthDao, *sqlx.DB) {
+	db := newDbConnection(config)
+	return &AuthDao{
+		AccountRepository: account.NewAccountRepositorySqlx(db),
+		ProfileRepository: profile.NewProfileRepositorySqlx(db),
+	}, db
 }
