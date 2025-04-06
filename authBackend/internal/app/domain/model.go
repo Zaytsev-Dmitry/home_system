@@ -1,4 +1,4 @@
-package authServerDomain
+package domain
 
 type Account struct {
 	ID               int64  `db:"id"`

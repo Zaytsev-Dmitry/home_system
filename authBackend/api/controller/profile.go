@@ -2,22 +2,23 @@ package controller
 
 import (
 	"authServer/api/presenter"
+	"authServer/internal/app/services"
+	useCases "authServer/internal/app/usecases"
 	daoImpl "authServer/internal/dao"
-	useCases "authServer/internal/usecases"
 	"authServer/pkg/utilities"
 	"github.com/gin-gonic/gin"
 )
 
 type ProfileController struct {
-	profileUseCase *useCases.ProfileUseCase
-	getAccByTgId   *useCases.GetAccByTelegramId
+	profileUseCase useCases.GetProfileUCase
+	getAccByTgId   *services.GetAccountUCaseImpl
 	Presenter      *presenter.ProfilePresenter
 }
 
 func CreateProfileController(dao *daoImpl.AuthDao) *ProfileController {
 	return &ProfileController{
-		profileUseCase: &useCases.ProfileUseCase{Repo: dao.ProfileRepo},
-		getAccByTgId:   &useCases.GetAccByTelegramId{Repo: dao.AccountRepo},
+		profileUseCase: &services.GetProfileUseCaseImpl{Repo: dao.ProfileRepo},
+		getAccByTgId:   &services.GetAccountUCaseImpl{Repo: dao.AccountRepo},
 		Presenter:      &presenter.ProfilePresenter{},
 	}
 }

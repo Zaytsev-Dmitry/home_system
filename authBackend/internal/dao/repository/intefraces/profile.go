@@ -1,6 +1,8 @@
 package intefraces
 
-import authServerDomain "authServer/internal/domain"
+import (
+	authServerDomain "authServer/internal/app/domain"
+)
 
 type ProfileRepository interface {
 	CreateProfile(account authServerDomain.Account) error

@@ -1,8 +1,8 @@
 package profile
 
 import (
+	authServerDomain "authServer/internal/app/domain"
 	"authServer/internal/dao/repository"
-	authServerDomain "authServer/internal/domain"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 )

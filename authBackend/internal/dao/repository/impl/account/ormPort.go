@@ -1,7 +1,7 @@
 package account
 
 import (
-	authServerDomain "authServer/internal/domain"
+	authServerDomain "authServer/internal/app/domain"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )

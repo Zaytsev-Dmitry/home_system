@@ -2,9 +2,9 @@ package account
 
 import (
 	"authServer/external/keycloak"
+	authServerDomain "authServer/internal/app/domain"
 	"authServer/internal/dao/repository"
 	"authServer/internal/dao/repository/impl/profile"
-	authServerDomain "authServer/internal/domain"
 	"authServer/pkg/utilities"
 	"database/sql"
 	"errors"

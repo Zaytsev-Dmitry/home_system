@@ -1,8 +1,6 @@
 package dao
 
 import (
-	"authServer/internal/dao/repository/impl/account"
-	"authServer/internal/dao/repository/impl/profile"
 	"authServer/internal/dao/repository/intefraces"
 	"authServer/pkg/config_loader"
 	"fmt"
@@ -19,19 +17,13 @@ func New(config *config_loader.AppConfig) *AuthDao {
 	var accRepo intefraces.AccountRepository
 	var profileRepo intefraces.ProfileRepository
 
-	if config.Database.Impl == "sqlx" {
-		db := newSqlxDB(config)
-		accRepo = account.New(db)
-		profileRepo = profile.New(db)
-	}
-
 	return &AuthDao{
 		AccountRepo: accRepo,
 		ProfileRepo: profileRepo,
 	}
 }
 
-func newSqlxDB(config *authConfig.AppConfig) *sqlx.DB {
+func newSqlxDB(config *config_loader.AppConfig) *sqlx.DB {
 	dbURL := fmt.Sprintf(
 		"postgres://%s:%s@%s:5432/%s?sslmode=disable",
 		config.Database.Username,

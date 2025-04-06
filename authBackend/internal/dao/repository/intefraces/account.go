@@ -2,7 +2,7 @@ package intefraces
 
 import (
 	"authServer/external/keycloak"
-	authServerDomain "authServer/internal/domain"
+	authServerDomain "authServer/internal/app/domain"
 )
 
 type AccountRepository interface {

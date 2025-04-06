@@ -2,7 +2,7 @@ package presenter
 
 import (
 	generatedApi "authServer/api/http"
-	domain "authServer/internal/domain"
+	"authServer/internal/app/domain"
 )
 
 type ProfilePresenter struct {

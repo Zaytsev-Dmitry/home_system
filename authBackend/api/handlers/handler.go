@@ -2,9 +2,9 @@ package handlers
 
 import (
 	accountController "authServer/api/controller"
-	authConfig "authServer/configs"
 	"authServer/external/keycloak"
 	daoImpl "authServer/internal/dao"
+	"authServer/pkg/config_loader"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,7 +25,7 @@ func (api *AuthServerApi) RegisterAccount(context *gin.Context) {
 	api.accController.RegisterAccount(context)
 }
 
-func NewAuthServerApi(config *authConfig.AppConfig, dao *daoImpl.AuthDao) *AuthServerApi {
+func NewAuthServerApi(config *config_loader.AppConfig, dao *daoImpl.AuthDao) *AuthServerApi {
 	keycloak := keycloak.New(config)
 	return &AuthServerApi{
 		accController:     accountController.CreateAccountController(keycloak, dao),
