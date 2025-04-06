@@ -1,3 +1,5 @@
+[![Note backend App](https://github.com/Zaytsev-Dmitry/home_system/actions/workflows/noteBackendAction.yml/badge.svg?branch=dev)](https://github.com/Zaytsev-Dmitry/home_system/actions/workflows/noteBackendAction.yml)
+
 * сгенерировать сущности апи из файла open api
  - выполнять из goHomeSystem(root)
  - oapi-codegen -package=generatedApi -generate "types,spec,gin" noteBackendApp/api/docs/note-api.yml > noteBackendApp/api/docs/note-backend-api.gen.go
