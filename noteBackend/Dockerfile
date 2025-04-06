@@ -1,37 +1,30 @@
 FROM golang:1.24.0 as builder
+
 WORKDIR /app
-COPY /cmd/main.go .
-COPY go.mod .
+
+COPY go.mod ./
+COPY go.sum ./
 RUN go mod download
-RUN go mod tidy
+
 COPY . .
 
-# Убеждаемся, что папка `configs/` есть
-RUN ls -la /app/configs/
-
 RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
-RUN oapi-codegen -package=http -generate "types,spec,gin" /app/api/http/note-api.yml > api/http/note-api.gen.go
-
+RUN oapi-codegen -package=http -generate "types,spec,gin" api/http/note-api.yml > api/http/note-api.gen.go
 RUN go mod tidy
-RUN CGO_ENABLED=0 GOOS=linux go build -o /main main.go
 
-ENV GIN_MODE=release
+RUN CGO_ENABLED=0 GOOS=linux go build -o /main ./cmd/main.go
 
 FROM scratch
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+COPY --from=builder /main /bin/main
+COPY --from=builder /app/configs /app/configs
+COPY --from=builder /app/third_party/swagger_ui /app/third_party/swagger_ui
+COPY --from=builder /app/api/http/note-api.yml /app/api/http/note-api.yml
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder main /bin/main
+
 EXPOSE 8080
-
-# Объявляем аргументы
-ARG CONFIG_PATH_ARG
-ARG APP_PROFILE_ARG
-
-# Проверяем, что аргументы переданы (иначе билд прервётся)
-RUN test -n "$CONFIG_PATH_ARG" || (echo "CONFIG_PATH_ARG is empty!")
-RUN test -n "$APP_PROFILE_ARG" || (echo "APP_PROFILE_ARG is empty!")
-
-# Устанавливаем переменные среды
-ENV CONFIG_PATH=$CONFIG_PATH_ARG
-ENV APP_PROFILE=$APP_PROFILE_ARG
 
 ENTRYPOINT ["/bin/main"]

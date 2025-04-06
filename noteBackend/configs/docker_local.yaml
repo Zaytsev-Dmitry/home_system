@@ -1,11 +1,11 @@
 server:
+  name: "Note backend app"
   port: 8080
 
 database:
   host: "postgresServer"
-  user: "notes_user"
+  userName: "notes_user"
   password: "5fea3e86-29b6-4f85-a5ed-3117d7ff7c7f"
   dataBaseName: "notes"
   dialect: "postgres"
-  impl: "sqlx"
   port: "5432"
