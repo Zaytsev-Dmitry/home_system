@@ -2,7 +2,7 @@ package keycloak
 
 import (
 	openapi "authBackend/api/http"
-	"authBackend/pkg/config_loa
+	"authBackend/pkg/config_loader"
 	"authBackend/pkg/utilities"
 	"errors"
 )
