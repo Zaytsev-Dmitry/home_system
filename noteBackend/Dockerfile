@@ -25,6 +25,7 @@ COPY --from=builder /app/third_party/swagger_ui /app/third_party/swagger_ui
 COPY --from=builder /app/api/http/note-api.yml /app/api/http/note-api.yml
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
+ENV CONFIG_FILE=/app/configs/config.yaml
 EXPOSE 8080
 
 ENTRYPOINT ["/bin/main"]

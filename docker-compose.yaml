@@ -55,7 +55,7 @@ services:
       - "8080:8080"
     restart: unless-stopped
     environment:
-      APP_PROFILE: "docker_local"
+      CONFIG_FILE: /app/configs/docker_local.yaml
     networks:
       - skynet
     depends_on:

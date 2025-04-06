@@ -53,10 +53,13 @@ jobs:
 
       - name: Set Up Env
         run: |
+          mkdir -p ./configs
           if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
             echo "REPO_URL=${{ secrets.NOTE_BACKEND_DEV_DOCKERHUB_REPO }}" >> $GITHUB_ENV
+            echo "${{ secrets.CONFIG_YAML_DEV }}" > ./configs/config.yaml
           elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
             echo "REPO_URL=${{ secrets.NOTE_BACKEND_PROD_DOCKERHUB_REPO }}" >> $GITHUB_ENV
+            echo "${{ secrets.CONFIG_YAML_PROD }}" > ./configs/config.yaml
           fi
 
       - name: Docker Build and Push to DockerHub

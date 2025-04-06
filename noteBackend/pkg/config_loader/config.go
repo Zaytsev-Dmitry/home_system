@@ -1,7 +1,6 @@
 package config_loader
 
 import (
-	"fmt"
 	"github.com/ilyakaznacheev/cleanenv"
 	"log"
 	"os"
@@ -23,26 +22,9 @@ type AppConfig struct {
 }
 
 func LoadConfig() *AppConfig {
-	profile := os.Getenv("APP_PROFILE")
-
-	if profile == "" {
-		log.Fatalf("APP_PROFILE environment variable not set")
-	}
-
-	fmt.Println("Profile:", profile)
-
-	var configPath string
-	switch profile {
-	case "prod":
-		configPath = "configs/prod.yaml"
-	case "dev":
-		configPath = "configs/dev.yaml"
-	case "local":
-		configPath = "configs/local.yaml"
-	case "docker_local":
-		configPath = "configs/docker_local.yaml"
-	default:
-		log.Fatalf("Unknown profile %s", profile)
+	configPath := os.Getenv("CONFIG_FILE")
+	if configPath == "" {
+		log.Fatalf("CONFIG_PATH environment variable not set")
 	}
 
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
