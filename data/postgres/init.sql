@@ -13,3 +13,7 @@ GRANT ALL PRIVILEGES ON DATABASE keycloak TO keycloak_user;
 create database telegram_bot;
 CREATE USER telegram_bot_user WITH LOGIN PASSWORD '9876c88e-94a6-45c0-8e88-161d7519bf12';
 GRANT ALL PRIVILEGES ON DATABASE telegram_bot TO telegram_bot_user;
+
+create database expensia_db;
+CREATE USER expensia_user WITH LOGIN PASSWORD '4a3cac82-eeb2-4b5e-b05f-8c3a5d608c82';
+GRANT ALL PRIVILEGES ON DATABASE expensia_db TO expensia_user;

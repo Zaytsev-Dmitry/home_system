@@ -15,3 +15,8 @@ databases:
     user: "telegram_bot_user"
     password: "9876c88e-94a6-45c0-8e88-161d7519bf12"
     directoryName: "telegram"
+
+  - name: "expensia_db"
+    user: "expensia_user"
+    password: "4a3cac82-eeb2-4b5e-b05f-8c3a5d608c82"
+    directoryName: "expensia"
