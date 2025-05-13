@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"net/http"
 	"strconv"
 	"telegramCLient/external/dto"
@@ -29,12 +28,12 @@ func NewAuthServerClient(authServerUrl string) *AuthServerClient {
 }
 
 // TODO отловаить ошибки
-func (serverClient *AuthServerClient) RegisterUser(source authSpec.CreateAccountRequest) (dto.AccountDTO, error) {
+func (serverClient *AuthServerClient) RegisterUser(source dto.CreateAccountRequest) (dto.AccountDTO, error) {
 	response, err := post(source, serverClient.AuthServerUrl+"/account")
 	if err != nil {
 		fmt.Println(err)
 	}
-	var respDto authSpec.AccountResponse
+	var respDto dto.AccountResponse
 	util.ParseResponseToStruct(response, &respDto)
 	return dto.AccountDTO{
 		ID:         respDto.Id,
@@ -60,7 +59,7 @@ func (serverClient *AuthServerClient) GetAccountByTgId(tgId int64) (dto.AccountD
 		return dto.AccountDTO{}, UNKNOWN
 	}
 
-	var respDto authSpec.AccountResponse
+	var respDto dto.AccountResponse
 	util.ParseResponseToStruct(response, &respDto)
 	return dto.AccountDTO{
 		ID:         respDto.Id,
@@ -74,12 +73,12 @@ func (serverClient *AuthServerClient) GetAccountByTgId(tgId int64) (dto.AccountD
 }
 
 // TODO отловаить ошибки
-func (serverClient *AuthServerClient) GetProfileByTelegramId(tgId int) authSpec.ProfileResponse {
+func (serverClient *AuthServerClient) GetProfileByTelegramId(tgId int) dto.ProfileResponse {
 	response, err := get(serverClient.AuthServerUrl + "/profile/" + strconv.Itoa(tgId))
 	if err != nil {
 		fmt.Println(err)
 	}
-	var respDto authSpec.ProfileResponse
+	var respDto dto.ProfileResponse
 	util.ParseResponseToStruct(response, &respDto)
 	return respDto
 }

@@ -1,6 +1,6 @@
 server:
   botToken: "7283192097:AAEXgZuC77bjQK-fq1s9CNWvfa5byo7cpRk"
-  commandsToInit: [TEST,MENU,TUTORIAL,PROFILE,NOTES,START]
+  commandsToInit: [MENU,START]
   authServerUrl: "http://localhost:8081"
   noteBackendUrl: "http://localhost:8080"
 
