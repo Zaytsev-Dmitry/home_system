@@ -29,11 +29,11 @@ services:
     networks:
       - skynet
 
-  auth-backend:
+  user-service:
     build:
-      context: authBackend
+      context: userService
       dockerfile: Dockerfile
-    container_name: authBackend
+    container_name: userService
     ports:
       - "8081:8081"
     environment:
