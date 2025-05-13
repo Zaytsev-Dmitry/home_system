@@ -1,0 +1,67 @@
+openapi: 3.0.1
+info:
+  title: Expensia server API
+  version: '1.0.0'
+servers:
+  - url: 'http://localhost:8085'
+    description: local
+
+paths:
+
+#--------------------------------------------------------------------------------------------------------#
+components:
+  responses:
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BackendErrorResponse'
+    '401':
+      description: UNAUTHORIZED
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BackendErrorResponse'
+    404:
+      description: NOT_FOUND
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BackendErrorResponse'
+    '500':
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BackendErrorResponse'
+#--------------------------------------------------------------------------------------------------------#
+  schemas:
+    BackendErrorResponse:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/MetaData'
+        errorCode:
+          type: integer
+        description:
+          type: string
+#--------------------------------------------------------------------------------------------------------#
+    MetaData:
+      type: object
+      properties:
+        timestamp:
+          type: string
+        path:
+          type: string
+#--------------------------------------------------------------------------------------------------------#
+    BasicBackendResponse:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/MetaData'
+        errorCode:
+          type: string
+        description:
+          type: string
+#--------------------------------------------------------------------------------------------------------#

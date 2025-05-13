@@ -1,0 +1,11 @@
+database:
+  host: "localhost"
+  userName: "expensia_user"
+  password: "4a3cac82-eeb2-4b5e-b05f-8c3a5d608c82"
+  dataBaseName: "expensia_db"
+  dialect: "postgres"
+  port: "5432"
+
+server:
+  name: "expensia backend server"
+  port: 8085
