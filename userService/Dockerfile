@@ -1,24 +1,32 @@
-FROM golang:1.23.5 as builder
-WORKDIR /build
-COPY /cmd/main.go .
-COPY go.mod .
+FROM golang:1.24.0 AS builder
+
+WORKDIR /app
+
+COPY go.mod ./
+COPY go.sum ./
 RUN go mod download
-RUN go mod tidy
+
 COPY . .
 
-RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
-RUN oapi-codegen -package=http -generate "types,spec,gin" /build/api/http/user-service-api.yml > api/http/user-service-api.gen.go
+RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.4.1 && \
+    oapi-codegen -package=http -generate "types,spec,gin" api/http/user-service-api.yml > api/http/user-service-api.gen.go && \
+    go mod tidy
 
-RUN go mod tidy
-RUN CGO_ENABLED=0 GOOS=linux go build -o /main main.go
-EXPOSE 8081
-ENV GIN_MODE=release
+RUN CGO_ENABLED=0 GOOS=linux go build -o /main ./cmd/main.go
 
 FROM scratch
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder main /bin/main
 
-ARG APP_CONFIG_ARG
-ENV APP_CONFIG=$APP_CONFIG_ARG
+WORKDIR /app
+
+COPY --from=builder /main /bin/main
+COPY --from=builder /app/configs /app/configs
+COPY --from=builder /app/third_party/swagger_ui /app/third_party/swagger_ui
+COPY --from=builder /app/api/http/user-service-api.yml /app/api/http/user-service-api.yml
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+ARG APP_PROFILE
+ENV CONFIG_PATH=/app/configs/config-${APP_PROFILE}.yaml
+
+EXPOSE 8080
 
 ENTRYPOINT ["/bin/main"]

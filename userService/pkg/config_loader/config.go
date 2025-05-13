@@ -43,7 +43,7 @@ func LoadConfig() *AppConfig {
 	}
 
 	if profile == "" {
-		log.Fatalf("CONFIG_PATH environment variable not set")
+		log.Fatalf("APP_PROFILE environment variable not set")
 	}
 
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {

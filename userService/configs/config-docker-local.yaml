@@ -1,0 +1,20 @@
+keycloak:
+  keycloakUrl: "http://localhost:7080/realms/home-system/protocol/openid-connect"
+  keycloakHost: "http://localhost:7080"
+  keycloakRealm: "home-system"
+  tokenUrl: "/token"
+  clientId: "d3f1202c-d7d6-4694-9a6c-6e1575321baf"
+  clientSecret: "W2aXh7r5NrGPPROdgS1x1Ic5cMXqCZHx"
+  serverGrantType: "client_credentials"
+
+database:
+  host: "postgresServer"
+  userName: "notes_user"
+  password: "5fea3e86-29b6-4f85-a5ed-3117d7ff7c7f"
+  dataBaseName: "notes"
+  dialect: "postgres"
+  port: "5432"
+
+server:
+  name: "auth backend server"
+  port: 8080
