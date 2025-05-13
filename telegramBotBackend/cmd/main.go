@@ -13,7 +13,7 @@ import (
 	"os/signal"
 	"telegramCLient/config"
 	"telegramCLient/external"
-	command2 "telegramCLient/internal/command"
+	command "telegramCLient/internal/command"
 	"telegramCLient/internal/command/menu"
 	"telegramCLient/internal/command/notes"
 	"telegramCLient/internal/command/profile"
@@ -45,19 +45,19 @@ func main() {
 		panic(err)
 	}
 
-	ua := command2.NewAction(*dao)
+	ua := command.NewAction(*dao)
 	createAndRegisterCommands(ua, appConfig, bot, ctx, *dao)
 	bot.Start(ctx)
 	defer dao.Close()
 }
 
-func createAndRegisterCommands(a *command2.Action, conf *config.AppConfig, b *bot.Bot, ctx context.Context, dao dao.TelegramBotDao) {
+func createAndRegisterCommands(a *command.Action, conf *config.AppConfig, b *bot.Bot, ctx context.Context, dao dao.TelegramBotDao) {
 	storage := *storage.NewStorage()
 	authServerClient := external.NewAuthServerClient(conf.Server.AuthServerUrl)
 	noteBackendClient := external.NewNoteBackendClient(conf.Server.NoteBackendUrl)
 
 	for i, value := range conf.Server.CommandsToInit {
-		var newCommand command2.BaseCommand
+		var newCommand command.BaseCommand
 		log.Println(fmt.Sprintf("Create command : %s. With order: %x", value, i+1))
 		switch value {
 		case TEST_COMMAND:
