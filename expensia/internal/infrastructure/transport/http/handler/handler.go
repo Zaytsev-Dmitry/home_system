@@ -1,12 +1,21 @@
 package handler
 
 import (
-	"expensia/pkg/config_loader"
+	"expensia/internal/app/ports/out/dao"
+	"expensia/internal/infrastructure/transport/http/controller"
+	"github.com/gin-gonic/gin"
 )
 
 type ExpensiaApi struct {
+	boardController *controller.BoardController
 }
 
-func NewExpensiaApi(config *config_loader.AppConfig) *ExpensiaApi {
-	return &ExpensiaApi{}
+func (api ExpensiaApi) GetAllBoards(c *gin.Context) {
+	api.boardController.GetAllBoards(c)
+}
+
+func NewExpensiaApi(dao *dao.ExpensiaDao) *ExpensiaApi {
+	return &ExpensiaApi{
+		boardController: controller.Create(dao),
+	}
 }

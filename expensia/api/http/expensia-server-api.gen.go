@@ -16,8 +16,36 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// BackendErrorResponse defines model for BackendErrorResponse.
+type BackendErrorResponse struct {
+	Description *string   `json:"description,omitempty"`
+	ErrorCode   *int      `json:"errorCode,omitempty"`
+	Meta        *MetaData `json:"meta,omitempty"`
+}
+
+// MetaData defines model for MetaData.
+type MetaData struct {
+	Path      *string `json:"path,omitempty"`
+	Timestamp *string `json:"timestamp,omitempty"`
+}
+
+// N400 defines model for 400.
+type N400 = BackendErrorResponse
+
+// N401 defines model for 401.
+type N401 = BackendErrorResponse
+
+// N404 defines model for 404.
+type N404 = BackendErrorResponse
+
+// N500 defines model for 500.
+type N500 = BackendErrorResponse
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+
+	// (GET /board)
+	GetAllBoards(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -28,6 +56,19 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(c *gin.Context)
+
+// GetAllBoards operation middleware
+func (siw *ServerInterfaceWrapper) GetAllBoards(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetAllBoards(c)
+}
 
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
@@ -43,15 +84,34 @@ func RegisterHandlers(router gin.IRouter, si ServerInterface) {
 
 // RegisterHandlersWithOptions creates http.Handler with additional options
 func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options GinServerOptions) {
+	errorHandler := options.ErrorHandler
+	if errorHandler == nil {
+		errorHandler = func(c *gin.Context, err error, statusCode int) {
+			c.JSON(statusCode, gin.H{"msg": err.Error()})
+		}
+	}
 
+	wrapper := ServerInterfaceWrapper{
+		Handler:            si,
+		HandlerMiddlewares: options.Middlewares,
+		ErrorHandler:       errorHandler,
+	}
+
+	router.GET(options.BaseURL+"/board", wrapper.GetAllBoards)
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/yTMsQrCMBCH8Vcp/zmkKSKU2xwc3NzFIdSTBmISctcihLy7YNcPvl/Dkj8lJ04qoNYN",
-	"QnpnUIMGjQzC9Vs4SfCDcN25Dpf7DQY7Vwk5gTBZZx26QS6cfAkgnKyzEwyK11VAaYvR4NgF9Gh4sSw1",
-	"FD2EmBcfYbDVCMKqWmgc/3HNojS7+Yz+7L8AAAD//3Xwb5GrAAAA",
+	"H4sIAAAAAAAC/8RTwW7TQBD9FWvgaGIHUqnaW0ID5ECCSnMBVWhrT5Mt9u6yO61AkQ+FAxf+gX9AIFUg",
+	"9RvsP0KzDm3aBHIrp2z2Pb95s/NmAZkprdGoyYNYgENvjfYY/vTSlH8yowk18VFaW6hMkjI6OfFG853P",
+	"5lhKPt13eAwC7iXXmkmL+mQgs7eo86Fzxu0vi0BVVTHk6DOnLGuCgIHMI4fvTtETVDH00u6dW5iO+9OD",
+	"Z5P90avhXuuhd+cexpODN08m03EwsPMf5jDShE7LInqJ7gxdFD4A5i2VuNBGMbEA64xFR6qN0Q3hBdAH",
+	"iyDAk1N6xu0hf/7Y5LiCKk04Q8dwibS1q+dIck+SDAaXEuboBLMQoit0zZqVNN/oiVSJnmRpN6DrJfhK",
+	"6WMTyIoKxobvLWqvZOTbB+y/GEEMZ+h8+8DdTtpJuZSxqKVVIOBRJ+10IQ6ugr3kyEiX82mGtPaUUH+t",
+	"L+tfzafmc33RfGy+RPW35rz+EdXf68vmvP5ZX0CQdyEooxwEPEXqF8WAZT3EN9f9YZvzW0E00Z/chVVI",
+	"/zaKK6mESderu43bXVmxbdzeyjb8m8ukMCg58yBeQ+j4AWdZZQiHYWLtYBi+3XRhMllADKeuAAFzIiuS",
+	"JFzOjSexm+7uQHVY/Q4AAP//bkcm4j0FAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

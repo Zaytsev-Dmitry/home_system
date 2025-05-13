@@ -7,7 +7,23 @@ servers:
     description: local
 
 paths:
-
+  /board:
+    get:
+      tags:
+        - Board-Service
+      operationId: getAllBoards
+      description: 'Получить все доски'
+      responses:
+        '204':
+          description: No content
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
 #--------------------------------------------------------------------------------------------------------#
 components:
   responses:
