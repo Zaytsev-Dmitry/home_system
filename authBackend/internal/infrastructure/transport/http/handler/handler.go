@@ -14,7 +14,7 @@ type AuthServerApi struct {
 }
 
 func (api *AuthServerApi) GetAccountByTgId(c *gin.Context, telegramId int64) {
-	api.accController.GetAccountByTgId(c, telegramId)
+	api.accController.GetAccountByTgId(telegramId)
 }
 
 func (api *AuthServerApi) GetProfileByTgId(c *gin.Context, telegramId int64) {

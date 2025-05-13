@@ -10,14 +10,14 @@ import (
 type AccountPresenter struct {
 }
 
-func (p *AccountPresenter) PresentToSingleResp(domain *domain.Account, context *gin.Context) http.SingleAccountBackendResponse {
+func (p *AccountPresenter) PresentToSingleResp(domain domain.Account, context *gin.Context) http.SingleAccountBackendResponse {
 	return http.SingleAccountBackendResponse{
 		Meta:    p.toMetaData(context),
 		Payload: p.toAccountResponse(domain),
 	}
 }
 
-func (p *AccountPresenter) toAccountResponse(note *domain.Account) *http.AccountResponse {
+func (p *AccountPresenter) toAccountResponse(note domain.Account) *http.AccountResponse {
 	return &http.AccountResponse{}
 }
 
