@@ -1,0 +1,6 @@
+server:
+  name: "Bot core service"
+  port: 8085
+telegram:
+  botToken: "7283192097:AAEXgZuC77bjQK-fq1s9CNWvfa5byo7cpRk"
+  commandsToInit: [MENU,START]
