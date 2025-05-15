@@ -6,6 +6,7 @@ import (
 	"github.com/Nerzal/gocloak/v13"
 	generatedApi "userService/api/http"
 	"userService/pkg/config_loader"
+	"userService/pkg/errors"
 )
 
 type KeycloakClient struct {
@@ -26,6 +27,16 @@ func (k *KeycloakClient) getToken(ctx context.Context) (*gocloak.JWT, error) {
 		k.config.Keycloak.ClientId,
 		k.config.Keycloak.ClientSecret,
 		k.config.Keycloak.Realm,
+	)
+}
+
+func (k *KeycloakClient) Introspect(ctx context.Context, config *config_loader.AppConfig, token string) (*gocloak.IntroSpectTokenResult, error) {
+	return k.client.RetrospectToken(
+		ctx,
+		token,
+		config.Keycloak.ClientId,
+		config.Keycloak.ClientSecret,
+		config.Keycloak.Realm,
 	)
 }
 
@@ -55,6 +66,9 @@ func (k *KeycloakClient) CreateUser(req generatedApi.CreateAccountRequest) (*goc
 				return users[0], nil
 			}
 			return nil, fmt.Errorf("user exists but could not retrieve")
+		}
+		if apiErr, ok := err.(*gocloak.APIError); ok && apiErr.Code == 403 {
+			return nil, errors.ForbiddenError
 		}
 		return nil, fmt.Errorf("create user failed: %w", err)
 	}

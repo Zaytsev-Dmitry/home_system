@@ -31,6 +31,8 @@ paths:
           $ref: '#/components/responses/401'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - bearer-key: [ ]
   /account/{telegramId}:
     get:
       tags:
@@ -93,6 +95,12 @@ components:
   responses:
     '409':
       description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BackendErrorResponse'
+    '403':
+      description: FORBIDDEN
       content:
         application/json:
           schema:
@@ -213,3 +221,8 @@ components:
         username:
           type: string
 #--------------------------------------------------------------------------------------------------------#
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

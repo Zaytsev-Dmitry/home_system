@@ -14,12 +14,19 @@ var (
 	ValidationError = errors.New("ошибка валидации")
 	MarshallError   = errors.New("ошибка маршалинга")
 	ConflictError   = errors.New("запись с такими данными уже существует")
+	ForbiddenError  = errors.New("доступ запрещен")
+	Unauthorized    = errors.New("нет прав доступа")
 )
 
 func HandleError(c *gin.Context, err error) {
 	status, msg := getErrorMsgAndStatus(err)
 	responseError := getErrorDto(msg, status, c)
 	c.JSON(status, responseError)
+}
+
+func GetErrorDto(c *gin.Context, err error) openapi.BackendErrorResponse {
+	status, msg := getErrorMsgAndStatus(err)
+	return getErrorDto(msg, status, c)
 }
 
 func getErrorMsgAndStatus(err error) (int, string) {
@@ -30,6 +37,10 @@ func getErrorMsgAndStatus(err error) (int, string) {
 		return http.StatusBadRequest, err.Error()
 	case errors.Is(err, ConflictError):
 		return http.StatusConflict, err.Error()
+	case errors.Is(err, Unauthorized):
+		return http.StatusUnauthorized, err.Error()
+	case errors.Is(err, ForbiddenError):
+		return http.StatusForbidden, err.Error()
 	default:
 		return http.StatusInternalServerError, "Oops... что-то пошло не так"
 	}
