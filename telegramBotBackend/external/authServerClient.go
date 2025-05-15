@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	UNKNOWN   = errors.New("Unknown error. Can`t take account from keycloak")
+	UNKNOWN   = errors.New("Unknown error. Can`t take identity from keycloak")
 	NOT_FOUND = errors.New("404")
 )
 
@@ -29,7 +29,7 @@ func NewAuthServerClient(authServerUrl string) *AuthServerClient {
 
 // TODO отловаить ошибки
 func (serverClient *AuthServerClient) RegisterUser(source dto.CreateAccountRequest) (dto.AccountDTO, error) {
-	response, err := post(source, serverClient.AuthServerUrl+"/account")
+	response, err := post(source, serverClient.AuthServerUrl+"/identity")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -48,7 +48,7 @@ func (serverClient *AuthServerClient) RegisterUser(source dto.CreateAccountReque
 
 // TODO отловаить ошибки
 func (serverClient *AuthServerClient) GetAccountByTgId(tgId int64) (dto.AccountDTO, error) {
-	response, err := get(serverClient.AuthServerUrl + "/account/" + strconv.FormatInt(tgId, 10))
+	response, err := get(serverClient.AuthServerUrl + "/identity/" + strconv.FormatInt(tgId, 10))
 	if err != nil {
 		return dto.AccountDTO{}, UNKNOWN
 	}

@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"time"
 )
 
 func Load(r *gin.Engine) {
@@ -16,6 +17,8 @@ func Load(r *gin.Engine) {
 	r.StaticFile("/spec/user-service-api.yml", "api/http/user-service-api.yml")
 
 	r.GET("/docs", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tmpl", gin.H{})
+		c.HTML(http.StatusOK, "index.tmpl", gin.H{
+			"SpecVersion": time.Now().Unix(), // кеш-бастер
+		})
 	})
 }

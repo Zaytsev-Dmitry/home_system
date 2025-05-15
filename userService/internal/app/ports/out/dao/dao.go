@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"os"
-	"userService/internal/app/ports/out/dao/repository/account"
+	"userService/internal/app/ports/out/dao/repository/identity"
 	"userService/internal/app/ports/out/dao/repository/profile"
 	"userService/pkg/config_loader"
 )
 
-type AuthDao struct {
-	AccountRepository account.AccountRepository
+type UserDao struct {
+	IdentityRepo      identity.UserIdentityLinkRepository
 	ProfileRepository profile.ProfileRepository
 }
 
@@ -30,10 +30,10 @@ func newDbConnection(config *config_loader.AppConfig) *sqlx.DB {
 	return db
 }
 
-func Create(config *config_loader.AppConfig) (*AuthDao, *sqlx.DB) {
+func Create(config *config_loader.AppConfig) (*UserDao, *sqlx.DB) {
 	db := newDbConnection(config)
-	return &AuthDao{
-		AccountRepository: account.NewAccountRepositorySqlx(db),
+	return &UserDao{
+		IdentityRepo:      identity.NewUserIdentityLinkRepositorySqlx(db),
 		ProfileRepository: profile.NewProfileRepositorySqlx(db),
 	}, db
 }

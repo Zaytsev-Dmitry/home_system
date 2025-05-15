@@ -16,5 +16,5 @@ database:
   port: "5432"
 
 server:
-  name: "auth backend server"
+  name: "userService backend server"
   port: 8081

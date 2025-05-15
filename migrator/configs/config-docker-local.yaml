@@ -1,10 +1,10 @@
 app:
   dbUrl: "postgres_server:5432"
 databases:
-  - name: "auth"
-    user: "auth_user"
+  - name: "user_service_db"
+    user: "user_service_user"
     password: "8c6b18ac-84ff-4436-8916-6e11aaa41e92"
-    directoryName: "auth"
+    directoryName: "userService"
 
   - name: "notes"
     user: "notes_user"

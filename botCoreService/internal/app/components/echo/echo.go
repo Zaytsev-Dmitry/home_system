@@ -37,6 +37,7 @@ func NewEcho(b *bot.Bot, questions []QuestionItem, textP TextMeta, registry regi
 	return e
 }
 
+// TODO сделать поддержку кастомной клавиатуры
 func (e *Echo) Start(ctx context.Context, b *bot.Bot, update *models.Update) {
 	sourceMessage := util.GetChatMessage(update)
 	_, err := b.SendMessage(ctx, &bot.SendMessageParams{

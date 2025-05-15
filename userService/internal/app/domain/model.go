@@ -1,15 +1,13 @@
 package domain
 
-type Account struct {
-	ID               int64  `db:"id"`
-	FirstName        string `db:"first_name"`
-	LastName         string `db:"last_name"`
-	Username         string `db:"username"`
-	TelegramUserName string `db:"telegram_user_name"`
-	Email            string `db:"email"`
-	TelegramId       int64  `db:"telegram_id"`
-	KeycloakId       string `db:"keycloak_id"`
-	IsActive         bool   `db:"is_active"`
+import "time"
+
+type UserIdentityLink struct {
+	ID             int64     `db:"id" json:"id"`
+	Email          string    `db:"email" json:"email"`
+	KeycloakUserID string    `db:"keycloak_user_id" json:"keycloakUserId"`
+	TelegramUserID int64     `db:"telegram_user_id" json:"telegramUserId"`
+	CreatedAt      time.Time `db:"created_at" json:"createdAt"`
 }
 
 type Profile struct {

@@ -11,27 +11,23 @@ import (
 	"userService/pkg/marshalling"
 )
 
-type AccountController struct {
-	delegate  *delegate.AccountDelegate
+type IdentityUserController struct {
+	delegate  *delegate.UserDelegate
 	presenter presenter.AccountPresenter
 }
 
-func (cntr *AccountController) GetAccountByTgId(telegramId int64) {
-	cntr.delegate.GetAccountIdByTgId(telegramId)
-}
-
-func (cntr *AccountController) RegisterAccount(context *gin.Context) {
+func (cntr *IdentityUserController) RegisterAccount(context *gin.Context) {
 	var req generatedApi.CreateAccountRequest
 	if err := marshalling.HandleMarshalling(context, &req); err != nil {
 		return
 	}
-	marshalling.HandleResponse(context, func() (domain.Account, error) {
+	marshalling.HandleResponse(context, func() (*domain.UserIdentityLink, error) {
 		return cntr.delegate.Register(req)
 	}, cntr.presenter.PresentToSingleResp)
 }
 
-func CreateAccountController(keycloakClient *keycloak.KeycloakClient, dao *daoImpl.AuthDao) *AccountController {
-	return &AccountController{
+func CreateAccountController(keycloakClient *keycloak.KeycloakClient, dao *daoImpl.UserDao) *IdentityUserController {
+	return &IdentityUserController{
 		delegate:  delegate.CreateAccountDelegate(dao, *keycloakClient),
 		presenter: presenter.AccountPresenter{},
 	}

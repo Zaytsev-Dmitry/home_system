@@ -11,19 +11,19 @@ type ProfileRepositorySqlx struct {
 	Db *sqlx.DB
 }
 
-func (p *ProfileRepositorySqlx) CreateProfile(account domain.Account) error {
-	//var result domain.Profile
-	//var resultErr error
-	//
-	//tx := p.Db.MustBegin()
-	//if p.GetProfileByAccountId(account.ID).ID == 0 {
-	//	insertErr := tx.QueryRowx(queries.INSERT_PROFILE, account.ID, "USER", true, account.Username).StructScan(&result)
-	//	resultErr = repository.ProceedErrorWithRollback(insertErr, tx)
-	//}
-	//resultErr = repository.CommitAndProceedErrors(tx, resultErr)
-	//return resultErr
-	return nil
-}
+//func (p *ProfileRepositorySqlx) CreateProfile(account domain.Account) error {
+//	//var result domain.Profile
+//	//var resultErr error
+//	//
+//	//tx := p.Db.MustBegin()
+//	//if p.GetProfileByAccountId(identity.ID).ID == 0 {
+//	//	insertErr := tx.QueryRowx(queries.INSERT_PROFILE, identity.ID, "USER", true, identity.Username).StructScan(&result)
+//	//	resultErr = repository.ProceedErrorWithRollback(insertErr, tx)
+//	//}
+//	//resultErr = repository.CommitAndProceedErrors(tx, resultErr)
+//	//return resultErr
+//	return nil
+//}
 
 func (p *ProfileRepositorySqlx) GetProfileByAccountId(accId int64) (*domain.Profile, error) {
 	var resp domain.Profile

@@ -1,75 +1,63 @@
 package keycloak
 
 import (
-	"errors"
-	openapi "userService/api/http"
+	"context"
+	"fmt"
+	"github.com/Nerzal/gocloak/v13"
+	generatedApi "userService/api/http"
 	"userService/pkg/config_loader"
-	"userService/pkg/utilities"
 )
 
 type KeycloakClient struct {
-	KeycloakUrl     string
-	KeycloakHost    string
-	KeycloakRealm   string
-	TokenUrl        string
-	ClientId        string
-	ClientSecret    string
-	ServerGrantType string
+	config *config_loader.AppConfig
+	client *gocloak.GoCloak
 }
 
-func New(config *config_loader.AppConfig) *KeycloakClient {
+func NewKeycloakClient(config *config_loader.AppConfig) *KeycloakClient {
 	return &KeycloakClient{
-		KeycloakUrl:     config.Keycloak.KeycloakUrl,
-		TokenUrl:        config.Keycloak.TokenUrl,
-		KeycloakHost:    config.Keycloak.KeycloakHost,
-		KeycloakRealm:   config.Keycloak.KeycloakRealm,
-		ClientId:        config.Keycloak.ClientId,
-		ClientSecret:    config.Keycloak.ClientSecret,
-		ServerGrantType: config.Keycloak.ServerGrantType,
+		config: config,
+		client: gocloak.NewClient(config.Keycloak.Host),
 	}
 }
 
-func (client KeycloakClient) RegisterAccount(request openapi.CreateAccountRequest) (error, KeycloakEntity) {
-	var result KeycloakEntity
-	serviceAccountToken, err := client.getToken()
-	if err != nil {
-		return errors.Join(Internal, errors.New("Wrap error: "+err.Error())), KeycloakEntity{}
-	}
-	resp, err := utilities.PostWithBearerAuthorization(
-		serviceAccountToken.AccessToken,
-		newKeycloakUserCreateRequest(request),
-		client.KeycloakHost+"/admin/realms/"+client.KeycloakRealm+"/users",
+func (k *KeycloakClient) getToken(ctx context.Context) (*gocloak.JWT, error) {
+	return k.client.LoginClient(
+		ctx,
+		k.config.Keycloak.ClientId,
+		k.config.Keycloak.ClientSecret,
+		k.config.Keycloak.Realm,
 	)
-	if err != nil {
-		return errors.Join(Internal, errors.New("Wrap error: "+err.Error())), KeycloakEntity{}
-	}
-
-	err = client.catchHttpStatus(resp)
-	if err != nil {
-		return err, KeycloakEntity{}
-	}
-	defer resp.Body.Close()
-	return err, result
 }
-func (client KeycloakClient) GetUser(mail string) (KeycloakEntity, error) {
-	result := make([]KeycloakEntity, 0)
 
-	var resultErr error
-	serviceAccountToken, err := client.getToken()
+func (k *KeycloakClient) CreateUser(req generatedApi.CreateAccountRequest) (*gocloak.User, error) {
+	ctx := context.Background()
+
+	// Получаем токен
+	token, err := k.getToken(ctx)
 	if err != nil {
-		resultErr = errors.Join(Internal, errors.New("Wrap error: "+err.Error()))
-		return KeycloakEntity{}, resultErr
+		return nil, fmt.Errorf("login failed: %w", err)
 	}
 
-	resp, err := utilities.GetWithBearerAuthorization(
-		serviceAccountToken.AccessToken,
-		client.KeycloakHost+"/admin/realms/"+client.KeycloakRealm+"/users?email="+mail,
-	)
-
+	// Создаём пользователя
+	userID, err := k.client.CreateUser(ctx, token.AccessToken, k.config.Keycloak.Realm, gocloak.User{
+		Username: gocloak.StringP(*req.Username),
+		Email:    gocloak.StringP(*req.Email),
+		Enabled:  gocloak.BoolP(true),
+	})
 	if err != nil {
-		resultErr = errors.Join(Internal, errors.New("Wrap error: "+err.Error()))
+		// Если пользователь уже существует (409)
+		if apiErr, ok := err.(*gocloak.APIError); ok && apiErr.Code == 409 {
+			users, _ := k.client.GetUsers(ctx, token.AccessToken, k.config.Keycloak.Realm, gocloak.GetUsersParams{
+				Email:    gocloak.StringP(*req.Email),
+				Username: gocloak.StringP(*req.Username),
+			})
+			if len(users) > 0 {
+				return users[0], nil
+			}
+			return nil, fmt.Errorf("user exists but could not retrieve")
+		}
+		return nil, fmt.Errorf("create user failed: %w", err)
 	}
 
-	utilities.ParseResponseToStruct(resp, &result)
-	return result[0], resultErr
+	return k.client.GetUserByID(ctx, token.AccessToken, k.config.Keycloak.Realm, userID)
 }

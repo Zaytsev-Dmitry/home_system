@@ -5,6 +5,6 @@ import (
 	"userService/internal/app/domain"
 )
 
-type RegisterAccountUseCase interface {
-	Register(request generatedApi.CreateAccountRequest) (domain.Account, error)
+type RegisterUserUseCase interface {
+	Register(request generatedApi.CreateAccountRequest) (*domain.UserIdentityLink, error)
 }

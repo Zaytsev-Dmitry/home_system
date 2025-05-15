@@ -10,15 +10,18 @@ import (
 type AccountPresenter struct {
 }
 
-func (p *AccountPresenter) PresentToSingleResp(domain domain.Account, context *gin.Context) http.SingleAccountBackendResponse {
-	return http.SingleAccountBackendResponse{
+func (p *AccountPresenter) PresentToSingleResp(domain *domain.UserIdentityLink, context *gin.Context) http.SingleUserIdentityBackendResponse {
+	return http.SingleUserIdentityBackendResponse{
 		Meta:    p.toMetaData(context),
-		Payload: p.toAccountResponse(domain),
+		Payload: p.toUserIdentityResponse(domain),
 	}
 }
 
-func (p *AccountPresenter) toAccountResponse(note domain.Account) *http.AccountResponse {
-	return &http.AccountResponse{}
+func (p *AccountPresenter) toUserIdentityResponse(obj *domain.UserIdentityLink) *http.UserIdentityResponse {
+	return &http.UserIdentityResponse{
+		Email:          &obj.Email,
+		TelegramUserId: &obj.TelegramUserID,
+	}
 }
 
 func (p *AccountPresenter) toMetaData(context *gin.Context) *http.MetaData {

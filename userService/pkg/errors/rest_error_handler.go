@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"time"
 	openapi "userService/api/http"
@@ -14,10 +13,10 @@ var (
 	RowNotFound     = errors.New("запись не найдена")
 	ValidationError = errors.New("ошибка валидации")
 	MarshallError   = errors.New("ошибка маршалинга")
+	ConflictError   = errors.New("запись с такими данными уже существует")
 )
 
 func HandleError(c *gin.Context, err error) {
-	log.Printf(err.Error())
 	status, msg := getErrorMsgAndStatus(err)
 	responseError := getErrorDto(msg, status, c)
 	c.JSON(status, responseError)
@@ -29,6 +28,8 @@ func getErrorMsgAndStatus(err error) (int, string) {
 		return http.StatusNotFound, err.Error()
 	case errors.Is(err, MarshallError), errors.Is(err, ValidationError):
 		return http.StatusBadRequest, err.Error()
+	case errors.Is(err, ConflictError):
+		return http.StatusConflict, err.Error()
 	default:
 		return http.StatusInternalServerError, "Oops... что-то пошло не так"
 	}

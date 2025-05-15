@@ -18,24 +18,6 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
-// Defines values for CreateAccountRequestAccountType.
-const (
-	TG  CreateAccountRequestAccountType = "TG"
-	WEB CreateAccountRequestAccountType = "WEB"
-)
-
-// AccountResponse defines model for AccountResponse.
-type AccountResponse struct {
-	Email            *string `json:"email,omitempty"`
-	FirstName        *string `json:"firstName,omitempty"`
-	Id               *int64  `json:"id,omitempty"`
-	KeycloakId       *string `json:"keycloakId,omitempty"`
-	LastName         *string `json:"lastName,omitempty"`
-	TelegramId       *int64  `json:"telegramId,omitempty"`
-	TelegramUserName *string `json:"telegramUserName,omitempty"`
-	Username         *string `json:"username,omitempty"`
-}
-
 // BackendErrorResponse defines model for BackendErrorResponse.
 type BackendErrorResponse struct {
 	Description *string   `json:"description,omitempty"`
@@ -52,17 +34,10 @@ type BasicBackendResponse struct {
 
 // CreateAccountRequest defines model for CreateAccountRequest.
 type CreateAccountRequest struct {
-	AccountType      *CreateAccountRequestAccountType `json:"accountType,omitempty"`
-	Email            *string                          `json:"email,omitempty"`
-	FirstName        *string                          `json:"firstName,omitempty"`
-	LastName         *string                          `json:"lastName,omitempty"`
-	TelegramId       *int64                           `json:"telegramId,omitempty"`
-	TelegramUserName *string                          `json:"telegramUserName,omitempty"`
-	Username         *string                          `json:"username,omitempty"`
+	Email          *string `json:"email,omitempty"`
+	TelegramUserId *int64  `json:"telegramUserId,omitempty"`
+	Username       *string `json:"username,omitempty"`
 }
-
-// CreateAccountRequestAccountType defines model for CreateAccountRequest.AccountType.
-type CreateAccountRequestAccountType string
 
 // MetaData defines model for MetaData.
 type MetaData struct {
@@ -78,20 +53,26 @@ type ProfileResponse struct {
 	Username  *string `json:"username,omitempty"`
 }
 
-// SingleAccountBackendResponse defines model for SingleAccountBackendResponse.
-type SingleAccountBackendResponse struct {
-	Description *string          `json:"description,omitempty"`
-	ErrorCode   *string          `json:"errorCode,omitempty"`
-	Meta        *MetaData        `json:"meta,omitempty"`
-	Payload     *AccountResponse `json:"payload,omitempty"`
-}
-
 // SingleProfileBackendResponse defines model for SingleProfileBackendResponse.
 type SingleProfileBackendResponse struct {
 	Description *string          `json:"description,omitempty"`
 	ErrorCode   *string          `json:"errorCode,omitempty"`
 	Meta        *MetaData        `json:"meta,omitempty"`
 	Payload     *ProfileResponse `json:"payload,omitempty"`
+}
+
+// SingleUserIdentityBackendResponse defines model for SingleUserIdentityBackendResponse.
+type SingleUserIdentityBackendResponse struct {
+	Description *string               `json:"description,omitempty"`
+	ErrorCode   *string               `json:"errorCode,omitempty"`
+	Meta        *MetaData             `json:"meta,omitempty"`
+	Payload     *UserIdentityResponse `json:"payload,omitempty"`
+}
+
+// UserIdentityResponse defines model for UserIdentityResponse.
+type UserIdentityResponse struct {
+	Email          *string `json:"email,omitempty"`
+	TelegramUserId *int64  `json:"telegramUserId,omitempty"`
 }
 
 // N400 defines model for 400.
@@ -112,11 +93,11 @@ type RegisterAccountJSONRequestBody = CreateAccountRequest
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
-	// (POST /account)
-	RegisterAccount(c *gin.Context)
-
 	// (GET /account/{telegramId})
 	GetAccountByTgId(c *gin.Context, telegramId int64)
+
+	// (POST /identity/user/register)
+	RegisterAccount(c *gin.Context)
 
 	// (GET /profile/{telegramId})
 	GetProfileByTgId(c *gin.Context, telegramId int64)
@@ -130,19 +111,6 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(c *gin.Context)
-
-// RegisterAccount operation middleware
-func (siw *ServerInterfaceWrapper) RegisterAccount(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.RegisterAccount(c)
-}
 
 // GetAccountByTgId operation middleware
 func (siw *ServerInterfaceWrapper) GetAccountByTgId(c *gin.Context) {
@@ -166,6 +134,19 @@ func (siw *ServerInterfaceWrapper) GetAccountByTgId(c *gin.Context) {
 	}
 
 	siw.Handler.GetAccountByTgId(c, telegramId)
+}
+
+// RegisterAccount operation middleware
+func (siw *ServerInterfaceWrapper) RegisterAccount(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.RegisterAccount(c)
 }
 
 // GetProfileByTgId operation middleware
@@ -219,29 +200,29 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.POST(options.BaseURL+"/account", wrapper.RegisterAccount)
 	router.GET(options.BaseURL+"/account/:telegramId", wrapper.GetAccountByTgId)
+	router.POST(options.BaseURL+"/identity/user/register", wrapper.RegisterAccount)
 	router.GET(options.BaseURL+"/profile/:telegramId", wrapper.GetProfileByTgId)
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"DgAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

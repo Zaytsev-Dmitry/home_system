@@ -7,10 +7,10 @@ servers:
     description: local
 
 paths:
-  /account:
+  /identity/user/register:
     post:
       tags:
-        - Account
+        - User-Identity-Service
       operationId: registerAccount
       description: 'Зарегистрировать аккаунт'
       requestBody:
@@ -24,13 +24,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SingleAccountBackendResponse'
-        '400':
-          $ref: '#/components/responses/400'
+                $ref: '#/components/schemas/SingleUserIdentityBackendResponse'
+        '409':
+          $ref: '#/components/responses/409'
         '401':
           $ref: '#/components/responses/401'
-        '404':
-          $ref: '#/components/responses/404'
         '500':
           $ref: '#/components/responses/500'
   /account/{telegramId}:
@@ -52,7 +50,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SingleAccountBackendResponse'
+                $ref: '#/components/schemas/SingleUserIdentityBackendResponse'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -93,8 +91,8 @@ paths:
   #--------------------------------------------------------------------------------------------------------#
 components:
   responses:
-    '400':
-      description: Bad request
+    '409':
+      description: Conflict
       content:
         application/json:
           schema:
@@ -150,53 +148,31 @@ components:
     CreateAccountRequest:
       type: object
       properties:
-        firstName:
-          type: string
-        lastName:
-          type: string
         email:
           type: string
         username:
           type: string
-        accountType:
-          type: string
-          enum: [ "TG", "WEB" ]
-        telegramId:
+        telegramUserId:
           type: integer
           format: int64
-        telegramUserName:
-          type: string
 #--------------------------------------------------------------------------------------------------------#
-    AccountResponse:
+    UserIdentityResponse:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
-        keycloakId:
-          type: string
-        username:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
         email:
           type: string
-        telegramUserName:
-          type: string
-        telegramId:
+        telegramUserId:
           type: integer
           format: int64
 #--------------------------------------------------------------------------------------------------------#
-    SingleAccountBackendResponse:
+    SingleUserIdentityBackendResponse:
       allOf:
         - $ref: '#/components/schemas/BasicBackendResponse'
         - type: object
           properties:
             payload:
-              $ref: '#/components/schemas/AccountResponse'
-    ListAccountBackendResponse:
+              $ref: '#/components/schemas/UserIdentityResponse'
+    ListUserIdentityBackendResponse:
       allOf:
         - $ref: '#/components/schemas/BasicBackendResponse'
         - type: object
@@ -204,7 +180,7 @@ components:
             payload:
               type: array
               items:
-                $ref: '#/components/schemas/AccountResponse'
+                $ref: '#/components/schemas/UserIdentityResponse'
 #--------------------------------------------------------------------------------------------------------#
     SingleProfileBackendResponse:
       allOf:
