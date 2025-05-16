@@ -1,4 +1,4 @@
-package expenseShare
+package repository
 
 type ExpenseShareRepository interface {
 }

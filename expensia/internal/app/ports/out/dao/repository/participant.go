@@ -1,4 +1,4 @@
-package participant
+package repository
 
 type ParticipantRepository interface {
 }

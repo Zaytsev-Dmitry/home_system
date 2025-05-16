@@ -2,26 +2,27 @@ package dao
 
 import (
 	"expensia/configs"
-	"expensia/internal/app/ports/out/dao/repository/board"
-	"expensia/internal/app/ports/out/dao/repository/boardParticipant"
-	"expensia/internal/app/ports/out/dao/repository/category"
-	"expensia/internal/app/ports/out/dao/repository/currency"
-	"expensia/internal/app/ports/out/dao/repository/expense"
-	"expensia/internal/app/ports/out/dao/repository/expenseShare"
-	"expensia/internal/app/ports/out/dao/repository/participant"
+	"expensia/internal/app/ports/out/dao/repository"
+	"expensia/internal/infrastructure/persistence/board"
+	"expensia/internal/infrastructure/persistence/boardParticipant"
+	"expensia/internal/infrastructure/persistence/category"
+	"expensia/internal/infrastructure/persistence/currency"
+	"expensia/internal/infrastructure/persistence/expense"
+	"expensia/internal/infrastructure/persistence/expenseShare"
+	"expensia/internal/infrastructure/persistence/participant"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"os"
 )
 
 type ExpensiaDao struct {
-	BoardRepo            board.BoardRepository
-	BoardParticipantRepo boardParticipant.BoardParticipantRepository
-	CategoryRepo         category.CategoryRepository
-	CurrencyRepo         currency.CurrencyRepository
-	ExpenseRepo          expense.ExpenseRepository
-	ExpenseShareRepo     expenseShare.ExpenseShareRepository
-	ParticipantRepo      participant.ParticipantRepository
+	BoardRepo            repository.BoardRepository
+	BoardParticipantRepo repository.BoardParticipantRepository
+	CategoryRepo         repository.CategoryRepository
+	CurrencyRepo         repository.CurrencyRepository
+	ExpenseRepo          repository.ExpenseRepository
+	ExpenseShareRepo     repository.ExpenseShareRepository
+	ParticipantRepo      repository.ParticipantRepository
 }
 
 func newDbConnection(config *configs.AppConfig) *sqlx.DB {
@@ -43,12 +44,12 @@ func newDbConnection(config *configs.AppConfig) *sqlx.DB {
 func Create(config *configs.AppConfig) (*ExpensiaDao, *sqlx.DB) {
 	db := newDbConnection(config)
 	return &ExpensiaDao{
-		BoardRepo:            board.NewBoardSqlx(db),
-		BoardParticipantRepo: boardParticipant.NewBoardParticipantSqlx(db),
-		CategoryRepo:         category.NewCategorySqlx(db),
-		CurrencyRepo:         currency.NewCurrencySqlx(db),
-		ExpenseRepo:          expense.NewExpenseSqlx(db),
-		ExpenseShareRepo:     expenseShare.NewExpenseShareSqlx(db),
-		ParticipantRepo:      participant.NewParticipantSqlx(db),
+		BoardRepo:            board.NewBoardRepositorySqlx(db),
+		BoardParticipantRepo: boardParticipant.NewBoardParticipantRepositorySqlx(db),
+		CategoryRepo:         category.NewCategoryRepositorySqlx(db),
+		CurrencyRepo:         currency.NewCurrencyRepositorySqlx(db),
+		ExpenseRepo:          expense.NewExpenseRepositorySqlx(db),
+		ExpenseShareRepo:     expenseShare.NewExpenseShareRepositorySqlx(db),
+		ParticipantRepo:      participant.NewParticipantRepositorySqlx(db),
 	}, db
 }

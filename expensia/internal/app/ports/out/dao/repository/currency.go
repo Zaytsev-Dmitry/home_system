@@ -1,4 +1,4 @@
-package currency
+package repository
 
 type CurrencyRepository interface {
 }

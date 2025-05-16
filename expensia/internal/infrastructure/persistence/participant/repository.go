@@ -6,6 +6,6 @@ type ParticipantRepositorySqlx struct {
 	db *sqlx.DB
 }
 
-func NewParticipantSqlx(db *sqlx.DB) *ParticipantRepositorySqlx {
+func NewParticipantRepositorySqlx(db *sqlx.DB) *ParticipantRepositorySqlx {
 	return &ParticipantRepositorySqlx{db: db}
 }

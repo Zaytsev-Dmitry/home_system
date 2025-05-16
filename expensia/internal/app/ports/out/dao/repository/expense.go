@@ -1,4 +1,4 @@
-package expense
+package repository
 
 type ExpenseRepository interface {
 }

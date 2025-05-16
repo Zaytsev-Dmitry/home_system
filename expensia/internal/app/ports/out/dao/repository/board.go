@@ -1,4 +1,4 @@
-package board
+package repository
 
 type BoardRepository interface {
 }

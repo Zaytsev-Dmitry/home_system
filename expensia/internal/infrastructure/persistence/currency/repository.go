@@ -6,6 +6,6 @@ type CurrencyRepositorySqlx struct {
 	db *sqlx.DB
 }
 
-func NewCurrencySqlx(db *sqlx.DB) *CurrencyRepositorySqlx {
+func NewCurrencyRepositorySqlx(db *sqlx.DB) *CurrencyRepositorySqlx {
 	return &CurrencyRepositorySqlx{db: db}
 }

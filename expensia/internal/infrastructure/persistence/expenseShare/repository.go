@@ -6,6 +6,6 @@ type ExpenseShareRepositorySqlx struct {
 	db *sqlx.DB
 }
 
-func NewExpenseShareSqlx(db *sqlx.DB) *ExpenseShareRepositorySqlx {
+func NewExpenseShareRepositorySqlx(db *sqlx.DB) *ExpenseShareRepositorySqlx {
 	return &ExpenseShareRepositorySqlx{db: db}
 }

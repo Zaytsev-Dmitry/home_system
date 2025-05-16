@@ -16,7 +16,7 @@ func (api ExpensiaApi) GetAllBoards(c *gin.Context) {
 }
 
 func (api ExpensiaApi) CreateBoard(c *gin.Context, params rest.CreateBoardParams) {
-
+	api.boardController.CreateBoard(c, params)
 }
 
 func NewExpensiaApi(dao *dao.ExpensiaDao) *ExpensiaApi {
