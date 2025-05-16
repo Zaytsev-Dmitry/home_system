@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"os"
+	"userService/configs"
 	"userService/internal/app/ports/out/dao/repository/identity"
 	"userService/internal/app/ports/out/dao/repository/profile"
-	"userService/pkg/config_loader"
 )
 
 type UserDao struct {
@@ -14,7 +14,7 @@ type UserDao struct {
 	ProfileRepository profile.ProfileRepository
 }
 
-func newDbConnection(config *config_loader.AppConfig) *sqlx.DB {
+func newDbConnection(config *configs.AppConfig) *sqlx.DB {
 	dbURL := fmt.Sprintf(
 		"postgres://%s:%s@%s:5432/%s?sslmode=disable",
 		config.Database.Username,
@@ -30,7 +30,7 @@ func newDbConnection(config *config_loader.AppConfig) *sqlx.DB {
 	return db
 }
 
-func Create(config *config_loader.AppConfig) (*UserDao, *sqlx.DB) {
+func Create(config *configs.AppConfig) (*UserDao, *sqlx.DB) {
 	db := newDbConnection(config)
 	return &UserDao{
 		IdentityRepo:      identity.NewUserIdentityLinkRepositorySqlx(db),

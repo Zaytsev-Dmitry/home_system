@@ -2,22 +2,23 @@ package main
 
 import (
 	_ "embed"
+	"github.com/Zaytsev-Dmitry/configkit"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
 	"strconv"
 	"userService/api/http"
 	openapi "userService/api/http"
+	"userService/configs"
 	"userService/internal/app/ports/out/dao"
 	"userService/internal/app/ports/out/keycloak"
 	"userService/internal/infrastructure/transport/http/handler"
 	"userService/internal/infrastructure/transport/http/middleware"
-	"userService/pkg/config_loader"
 )
 
 func main() {
 	//гружу конфиг
-	appConfig := config_loader.LoadConfig()
+	appConfig, _ := configkit.LoadConfig[configs.AppConfig]("configs/config-local.yaml")
 
 	//делаю логер
 	logger, _ := zap.NewProduction()

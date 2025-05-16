@@ -6,15 +6,15 @@ import (
 	"github.com/Nerzal/gocloak/v13"
 	apikitErr "github.com/Zaytsev-Dmitry/apikit/custom_errors"
 	generatedApi "userService/api/http"
-	"userService/pkg/config_loader"
+	"userService/configs"
 )
 
 type KeycloakClient struct {
-	config *config_loader.AppConfig
+	config *configs.AppConfig
 	client *gocloak.GoCloak
 }
 
-func NewKeycloakClient(config *config_loader.AppConfig) *KeycloakClient {
+func NewKeycloakClient(config *configs.AppConfig) *KeycloakClient {
 	return &KeycloakClient{
 		config: config,
 		client: gocloak.NewClient(config.Keycloak.Host),
@@ -30,7 +30,7 @@ func (k *KeycloakClient) getToken(ctx context.Context) (*gocloak.JWT, error) {
 	)
 }
 
-func (k *KeycloakClient) Introspect(ctx context.Context, config *config_loader.AppConfig, token string) (*gocloak.IntroSpectTokenResult, error) {
+func (k *KeycloakClient) Introspect(ctx context.Context, config *configs.AppConfig, token string) (*gocloak.IntroSpectTokenResult, error) {
 	return k.client.RetrospectToken(
 		ctx,
 		token,
