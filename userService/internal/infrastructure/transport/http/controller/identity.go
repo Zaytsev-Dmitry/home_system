@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	generatedApi "userService/api/http"
 	"userService/internal/app/domain"
 	"userService/internal/app/ports/in/delegate"
@@ -21,8 +22,9 @@ func (cntr *IdentityUserController) RegisterAccount(context *gin.Context) {
 	if err := marshalling.HandleMarshalling(context, &req); err != nil {
 		return
 	}
+	logger, _ := context.MustGet("logger").(*zap.Logger)
 	marshalling.HandleResponse(context, func() (*domain.UserIdentityLink, error) {
-		return cntr.delegate.Register(req)
+		return cntr.delegate.Register(req, logger)
 	}, cntr.presenter.PresentToSingleResp)
 }
 

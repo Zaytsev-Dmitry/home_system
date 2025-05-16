@@ -1,6 +1,7 @@
 package delegate
 
 import (
+	"go.uber.org/zap"
 	generatedApi "userService/api/http"
 	"userService/internal/app/domain"
 	"userService/internal/app/ports/out/dao"
@@ -13,7 +14,8 @@ type UserDelegate struct {
 	regUserUCase useCases.RegisterUserUseCase
 }
 
-func (cd *UserDelegate) Register(request generatedApi.CreateAccountRequest) (*domain.UserIdentityLink, error) {
+func (cd *UserDelegate) Register(request generatedApi.CreateAccountRequest, logger *zap.Logger) (*domain.UserIdentityLink, error) {
+	logger.Info("Run register account delegate")
 	return cd.regUserUCase.Register(request)
 }
 

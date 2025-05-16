@@ -1,7 +1,7 @@
 keycloak:
   realm: home-system-realm-dev
   clientId: user-service-clientid-dev
-  clientSecret: z66uwfBV6OTSvehFVXFU33NbzW9ZCv1R
+  clientSecret: 4MnOI4hyl3buuaPUbGDeOHyZJge4aA3T
   host: http://localhost:7080
 
 database:

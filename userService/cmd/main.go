@@ -36,6 +36,8 @@ func main() {
 
 	//устанавливаю middlewares
 	router.Use(middleware.TokenIntrospectionMiddleware(keycloakClient, appConfig))
+	router.Use(middleware.TraceMiddleware(logger))
+	router.Use(middleware.LogParamsAndResponseMiddleware(logger))
 
 	//устанавливаю роут под swagger ui
 	openapi.Load(router)
