@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/Nerzal/gocloak/v13"
+	apikitErr "github.com/Zaytsev-Dmitry/apikit/custom_errors"
 	generatedApi "userService/api/http"
 	"userService/pkg/config_loader"
-	"userService/pkg/errors"
 )
 
 type KeycloakClient struct {
@@ -68,7 +68,7 @@ func (k *KeycloakClient) CreateUser(req generatedApi.CreateAccountRequest) (*goc
 			return nil, fmt.Errorf("user exists but could not retrieve")
 		}
 		if apiErr, ok := err.(*gocloak.APIError); ok && apiErr.Code == 403 {
-			return nil, errors.ForbiddenError
+			return nil, apikitErr.ForbiddenError
 		}
 		return nil, fmt.Errorf("create user failed: %w", err)
 	}

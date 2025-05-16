@@ -1,6 +1,7 @@
 package controller
 
 import (
+	apikitHandler "github.com/Zaytsev-Dmitry/apikit/handlers"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	generatedApi "userService/api/http"
@@ -9,7 +10,6 @@ import (
 	daoImpl "userService/internal/app/ports/out/dao"
 	"userService/internal/app/ports/out/keycloak"
 	"userService/internal/infrastructure/transport/http/presenter"
-	"userService/pkg/marshalling"
 )
 
 type IdentityUserController struct {
@@ -19,11 +19,11 @@ type IdentityUserController struct {
 
 func (cntr *IdentityUserController) RegisterAccount(context *gin.Context) {
 	var req generatedApi.CreateAccountRequest
-	if err := marshalling.HandleMarshalling(context, &req); err != nil {
+	if err := apikitHandler.HandleMarshalling(context, &req); err != nil {
 		return
 	}
 	logger, _ := context.MustGet("logger").(*zap.Logger)
-	marshalling.HandleResponse(context, func() (*domain.UserIdentityLink, error) {
+	apikitHandler.HandleResponse(context, func() (*domain.UserIdentityLink, error) {
 		return cntr.delegate.Register(req, logger)
 	}, cntr.presenter.PresentToSingleResp)
 }

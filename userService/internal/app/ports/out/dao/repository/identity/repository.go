@@ -2,12 +2,12 @@ package identity
 
 import (
 	"github.com/Nerzal/gocloak/v13"
+	apikitErr "github.com/Zaytsev-Dmitry/apikit/custom_errors"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"log"
 	"userService/internal/app/domain"
 	"userService/internal/app/ports/out/dao/queries"
-	customErr "userService/pkg/errors"
 )
 
 type UserIdentityLinkRepositorySqlx struct {
@@ -20,7 +20,7 @@ func (u *UserIdentityLinkRepositorySqlx) Save(user *gocloak.User, tgId *int64) (
 
 	if dbErr, ok := err.(*pq.Error); ok && dbErr.Code == "23505" {
 		log.Printf("UserIdentityLinkRepositorySqlx.Save conflict: %s (Detail: %s)", dbErr.Code, dbErr.Detail)
-		return nil, customErr.ConflictError
+		return nil, apikitErr.ConflictError
 	} else {
 		return &saved, err
 	}

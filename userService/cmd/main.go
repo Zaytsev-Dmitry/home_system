@@ -13,7 +13,6 @@ import (
 	"userService/internal/infrastructure/transport/http/handler"
 	"userService/internal/infrastructure/transport/http/middleware"
 	"userService/pkg/config_loader"
-	"userService/pkg/utilities"
 )
 
 func main() {
@@ -21,7 +20,7 @@ func main() {
 	appConfig := config_loader.LoadConfig()
 
 	//делаю логер
-	logger := getLogger()
+	logger, _ := zap.NewProduction()
 	defer logger.Sync()
 
 	//создаю DAO
@@ -54,12 +53,4 @@ func main() {
 	if err := router.Run(":" + strconv.Itoa(appConfig.Server.Port)); err != nil {
 		panic("Failed to start server: " + err.Error())
 	}
-}
-
-func getLogger() *zap.Logger {
-	logger := utilities.GetLogger()
-	if logger == nil {
-		panic("logger is nil")
-	}
-	return logger
 }
