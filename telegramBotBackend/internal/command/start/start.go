@@ -2,10 +2,10 @@ package start
 
 import (
 	"context"
-	authSpec "github.com/Zaytsev-Dmitry/home_system_open_api/authServerBackend"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"telegramCLient/external"
+	"telegramCLient/external/dto"
 	"telegramCLient/internal/command"
 	"telegramCLient/internal/command/loader"
 	"telegramCLient/internal/components/echo"
@@ -57,8 +57,8 @@ func (s *StartCommand) setUserInput(userInput bool, chatId int64) {
 }
 
 func (s *StartCommand) proceedResult(result echo.Result) {
-	accType := authSpec.TG
-	request := authSpec.CreateAccountRequest{
+	accType := dto.TG
+	request := dto.CreateAccountRequest{
 		AccountType:      &accType,
 		TelegramId:       &result.ChatId,
 		FirstName:        &result.UserFirstName,

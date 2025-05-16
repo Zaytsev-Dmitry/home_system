@@ -1,0 +1,22 @@
+app:
+  dbUrl: "postgres_server:5432"
+databases:
+  - name: "user_service_db"
+    user: "user_service_user"
+    password: "8c6b18ac-84ff-4436-8916-6e11aaa41e92"
+    directoryName: "userService"
+
+  - name: "notes"
+    user: "notes_user"
+    password: "5fea3e86-29b6-4f85-a5ed-3117d7ff7c7f"
+    directoryName: "notes"
+
+  - name: "telegram_bot"
+    user: "telegram_bot_user"
+    password: "9876c88e-94a6-45c0-8e88-161d7519bf12"
+    directoryName: "telegram"
+
+  - name: "expensia_db"
+    user: "expensia_user"
+    password: "4a3cac82-eeb2-4b5e-b05f-8c3a5d608c82"
+    directoryName: "expensia"

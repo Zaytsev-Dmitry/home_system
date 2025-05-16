@@ -1,0 +1,17 @@
+keycloak:
+  realm: home-system-realm-dev
+  clientId: user-service-clientid-dev
+  clientSecret: 4MnOI4hyl3buuaPUbGDeOHyZJge4aA3T
+  host: http://localhost:7080
+
+database:
+  host: "localhost"
+  userName: "user_service_user"
+  password: "8c6b18ac-84ff-4436-8916-6e11aaa41e92"
+  dataBaseName: "user_service_db"
+  dialect: "postgres"
+  port: "5432"
+
+server:
+  name: "userService backend server"
+  port: 8081

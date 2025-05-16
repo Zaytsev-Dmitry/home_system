@@ -1,0 +1,9 @@
+.git
+.gitignore
+*.md
+*.log
+test/
+node_modules
+*.swp
+.idea
+.vscode

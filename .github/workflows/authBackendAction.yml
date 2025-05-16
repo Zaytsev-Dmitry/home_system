@@ -1,0 +1,72 @@
+name: Auth backend App
+
+on:
+  push:
+    branches: ["master","dev"]
+    paths:
+      - '../../userService/**'
+
+env:
+  REPO_URL: '${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}'
+  APP_CONFIG: '${{ secrets.KEYCLOAK_PROD_URL }}'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23.0'
+
+      - name: Generate API
+        run: |
+          cd authBackend/api/spec
+          go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
+          oapi-codegen -package=generatedApi -generate "types,spec,gin" auth-server-api.yml > auth-server-api.gen.go
+          echo 'authBackend api is Done'    
+
+      - name: Build
+        run: |
+          cd authBackend/cmd
+          go get .
+          go mod verify
+          cd ..
+          go build -v ./...
+
+      - name: Test
+        run: |
+          cd authBackend/cmd
+          go test -v ./...
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set Up Env
+        run: |
+          if [[ ${{ github.ref }} == 'refs/heads/dev' ]]; then
+            echo "REPO_URL=${{ secrets.AUTH_BACKEND_DEV_DOCKERHUB_REPO }}" >> $GITHUB_ENV
+            echo "APP_CONFIG=${{ secrets.AUTH_BACKEND_APP_CONFIG_DEV }}" >> $GITHUB_ENV
+          elif [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
+            echo "REPO_URL=${{ secrets.AUTH_BACKEND_PROD_DOCKERHUB_REPO }}" >> $GITHUB_ENV
+            echo "APP_CONFIG=${{ secrets.AUTH_BACKEND_APP_CONFIG_PROD }}" >> $GITHUB_ENV
+          fi
+
+      - name: Docker Build and Push to DockerHub
+        run: |
+          cd authBackend
+          docker build \
+          --build-arg APP_CONFIG_ARG="$APP_CONFIG" \
+          -t $REPO_URL:latest .
+          
+          docker push $REPO_URL:latest

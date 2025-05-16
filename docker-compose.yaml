@@ -1,21 +1,5 @@
 version: '3'
 services:
-  vault:
-    image: vault:1.13.3
-    volumes:
-      - ./data/vault:/data/vault
-    ports:
-      - "127.0.0.1:8200:8200"
-    environment:
-      - VAULT_ADDR=http://localhost:8200
-      - VAULT_API_ADDR=http://localhost:8200
-      - VAULT_ADDRESS=http://localhost:8200
-    cap_add:
-      - IPC_LOCK
-    command: vault server -config=data/vault/vault.json
-    networks:
-      - skynet
-
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:4.0.6-management-alpine
@@ -31,15 +15,30 @@ services:
     networks:
       - skynet
 
-  auth-backend:
+  migrator:
     build:
-      context: authBackend
+      context: migrator
       dockerfile: Dockerfile
-    container_name: authBackend
-    ports:
-      - "8081:8081"
+    container_name: migrator
     environment:
-      MODE: docker
+      CONFIG_FILE: /migrator/configs/config-docker-local.yaml
+    ports:
+      - "8083:8083"
+    depends_on:
+      - postgres_server
+    networks:
+      - skynet
+
+  user-service:
+    build:
+      context: userService
+      dockerfile: Dockerfile
+    container_name: userService
+    ports:
+      - "8080:8080"
+    environment:
+      CONFIG_PATH: /app/configs/config-docker-local.yaml
+      APP_PROFILE: docker-local
     restart: unless-stopped
     depends_on:
       - keycloak
@@ -54,15 +53,14 @@ services:
     container_name: noteBackend
     ports:
       - "8080:8080"
-    environment:
-      MODE: docker
     restart: unless-stopped
+    environment:
+      CONFIG_FILE: /app/configs/config-docker-local.yaml
     networks:
       - skynet
     depends_on:
       - postgres_server
-      - keycloak
-      - auth-backend
+      - migrator
 
   telegram-bot-backend:
     build:
@@ -89,7 +87,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 1s
@@ -99,10 +97,10 @@ services:
       - skynet
 
   keycloak:
-    image: quay.io/keycloak/keycloak:24.0
+    image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
     environment:
-      KEYCLOAK_IMPORT: /opt/keycloak/data/import/create-realm.json
+#      KEYCLOAK_IMPORT: /opt/keycloak/data/import/create-realm.json
       KC_HOSTNAME: localhost
       KC_HOSTNAME_PORT: 7080
       KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
@@ -119,7 +117,7 @@ services:
       interval: 15s
       timeout: 2s
       retries: 15
-    command: [ "start-dev", "--import-realm", "--http-port", "7080", "--https-port", "7443" ]
+    command: [ "start-dev", "--http-port", "7080", "--https-port", "7443" ]
     ports:
       - "7080:7080"
       - "7443:7443"
