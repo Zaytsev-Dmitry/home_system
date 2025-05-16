@@ -18,7 +18,7 @@
     window.onload = function() {
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
-        url: "/spec/expensia-server-api.yml",
+        url: "/rest/expensia-server-api.yml?v={{ .SpecVersion }}",
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [

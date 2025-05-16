@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"expensia/configs"
 	"expensia/internal/app/ports/out/dao/repository/board"
 	"expensia/internal/app/ports/out/dao/repository/boardParticipant"
 	"expensia/internal/app/ports/out/dao/repository/category"
@@ -8,7 +9,6 @@ import (
 	"expensia/internal/app/ports/out/dao/repository/expense"
 	"expensia/internal/app/ports/out/dao/repository/expenseShare"
 	"expensia/internal/app/ports/out/dao/repository/participant"
-	"expensia/pkg/config_loader"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"os"
@@ -24,7 +24,7 @@ type ExpensiaDao struct {
 	ParticipantRepo      participant.ParticipantRepository
 }
 
-func newDbConnection(config *config_loader.AppConfig) *sqlx.DB {
+func newDbConnection(config *configs.AppConfig) *sqlx.DB {
 	dbURL := fmt.Sprintf(
 		"postgres://%s:%s@%s:5432/%s?sslmode=disable",
 		config.Database.Username,
@@ -40,7 +40,7 @@ func newDbConnection(config *config_loader.AppConfig) *sqlx.DB {
 	return db
 }
 
-func Create(config *config_loader.AppConfig) (*ExpensiaDao, *sqlx.DB) {
+func Create(config *configs.AppConfig) (*ExpensiaDao, *sqlx.DB) {
 	db := newDbConnection(config)
 	return &ExpensiaDao{
 		BoardRepo:            board.NewBoardSqlx(db),

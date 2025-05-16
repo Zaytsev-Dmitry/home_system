@@ -16,6 +16,31 @@ paths:
       responses:
         '204':
           description: No content
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+    post:
+      tags:
+        - Board-Service
+      operationId: createBoard
+      description: 'Создать доску'
+      parameters:
+        - name: name
+          schema:
+            type: string
+          in: query
+          required: true
+        - name: currency
+          schema:
+            $ref: '#/components/schemas/CurrencyEnum'
+          in: query
+          required: true
+      responses:
+        '204':
+          description: No content
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -51,7 +76,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/BackendErrorResponse'
-#--------------------------------------------------------------------------------------------------------#
+  #--------------------------------------------------------------------------------------------------------#
   schemas:
     BackendErrorResponse:
       type: object
@@ -62,7 +87,7 @@ components:
           type: integer
         description:
           type: string
-#--------------------------------------------------------------------------------------------------------#
+    #--------------------------------------------------------------------------------------------------------#
     MetaData:
       type: object
       properties:
@@ -70,7 +95,7 @@ components:
           type: string
         path:
           type: string
-#--------------------------------------------------------------------------------------------------------#
+    #--------------------------------------------------------------------------------------------------------#
     BasicBackendResponse:
       type: object
       properties:
@@ -80,4 +105,10 @@ components:
           type: string
         description:
           type: string
+    #--------------------------------------------------------------------------------------------------------#
+    CurrencyEnum:
+      type: string
+      enum:
+        - RUB
+        - USD
 #--------------------------------------------------------------------------------------------------------#
