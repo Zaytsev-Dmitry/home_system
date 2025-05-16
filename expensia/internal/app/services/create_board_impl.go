@@ -1,15 +1,14 @@
 package services
 
 import (
-	"expensia/api/rest"
 	"expensia/internal/app/domain"
 	"expensia/internal/app/ports/out/dao/repository"
 )
 
 type CreateBoardUCaseImpl struct {
-	Repo *repository.BoardRepository
+	Repo repository.BoardRepository
 }
 
-func (c CreateBoardUCaseImpl) Create(params rest.CreateBoardParams) (*domain.Board, error) {
-	return nil, nil
+func (c CreateBoardUCaseImpl) CreateAndReturnBoard(req repository.CreateBoardUCaseIn) (*domain.Board, error) {
+	return c.Repo.SaveAndFlush(req)
 }

@@ -31,8 +31,38 @@ type BackendErrorResponse struct {
 	Meta        *MetaData `json:"meta,omitempty"`
 }
 
+// BasicBackendResponse defines model for BasicBackendResponse.
+type BasicBackendResponse struct {
+	Description *string   `json:"description,omitempty"`
+	ErrorCode   *string   `json:"errorCode,omitempty"`
+	Meta        *MetaData `json:"meta,omitempty"`
+}
+
+// BoardResponse defines model for BoardResponse.
+type BoardResponse struct {
+	Currency *string `json:"currency,omitempty"`
+	Name     *string `json:"name,omitempty"`
+	Owner    *int64  `json:"owner,omitempty"`
+}
+
+// CreateBoardBackendResponse defines model for CreateBoardBackendResponse.
+type CreateBoardBackendResponse struct {
+	Description *string        `json:"description,omitempty"`
+	ErrorCode   *string        `json:"errorCode,omitempty"`
+	Meta        *MetaData      `json:"meta,omitempty"`
+	Payload     *BoardResponse `json:"payload,omitempty"`
+}
+
 // CurrencyEnum defines model for CurrencyEnum.
 type CurrencyEnum string
+
+// ListBoardBackendResponse defines model for ListBoardBackendResponse.
+type ListBoardBackendResponse struct {
+	Description *string          `json:"description,omitempty"`
+	ErrorCode   *string          `json:"errorCode,omitempty"`
+	Meta        *MetaData        `json:"meta,omitempty"`
+	Payload     *[]BoardResponse `json:"payload,omitempty"`
+}
 
 // MetaData defines model for MetaData.
 type MetaData struct {
@@ -49,6 +79,9 @@ type N401 = BackendErrorResponse
 // N404 defines model for 404.
 type N404 = BackendErrorResponse
 
+// N409 defines model for 409.
+type N409 = BackendErrorResponse
+
 // N500 defines model for 500.
 type N500 = BackendErrorResponse
 
@@ -56,16 +89,17 @@ type N500 = BackendErrorResponse
 type CreateBoardParams struct {
 	Name     string       `form:"name" json:"name"`
 	Currency CurrencyEnum `form:"currency" json:"currency"`
+	TgUserId int64        `form:"tgUserId" json:"tgUserId"`
 }
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
-	// (GET /board)
-	GetAllBoards(c *gin.Context)
-
 	// (POST /board)
 	CreateBoard(c *gin.Context, params CreateBoardParams)
+
+	// (GET /board/{tgUserId})
+	GetAllBoards(c *gin.Context, tgUserId int64)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -76,19 +110,6 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(c *gin.Context)
-
-// GetAllBoards operation middleware
-func (siw *ServerInterfaceWrapper) GetAllBoards(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetAllBoards(c)
-}
 
 // CreateBoard operation middleware
 func (siw *ServerInterfaceWrapper) CreateBoard(c *gin.Context) {
@@ -128,6 +149,21 @@ func (siw *ServerInterfaceWrapper) CreateBoard(c *gin.Context) {
 		return
 	}
 
+	// ------------- Required query parameter "tgUserId" -------------
+
+	if paramValue := c.Query("tgUserId"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument tgUserId is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "tgUserId", c.Request.URL.Query(), &params.TgUserId)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter tgUserId: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -136,6 +172,30 @@ func (siw *ServerInterfaceWrapper) CreateBoard(c *gin.Context) {
 	}
 
 	siw.Handler.CreateBoard(c, params)
+}
+
+// GetAllBoards operation middleware
+func (siw *ServerInterfaceWrapper) GetAllBoards(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "tgUserId" -------------
+	var tgUserId int64
+
+	err = runtime.BindStyledParameter("simple", false, "tgUserId", c.Param("tgUserId"), &tgUserId)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter tgUserId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetAllBoards(c, tgUserId)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -165,24 +225,27 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.GET(options.BaseURL+"/board", wrapper.GetAllBoards)
 	router.POST(options.BaseURL+"/board", wrapper.CreateBoard)
+	router.GET(options.BaseURL+"/board/:tgUserId", wrapper.GetAllBoards)
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/8xUwW7UPBB+lWj+/xg2KWylKrduu8AeaFHbvYBWyE2muy6J7Y6dimqVQ+mBC++AeAOE",
-	"iqhA6jM4b4TsLG2XRC3iUDjZ8Uw+fzPfN55DKgslBQqjIZkDoVZSaPQf/Th2SyqFQWHclimV85QZLkV0",
-	"qKVwZzqdYcHc7n/CA0jgv+gaM2qiOhqw9DWKbEgkaWdxCVRVFUKGOiWuHCYkMGBZQHhUojZQhdCPV+6d",
-	"wnhrfbz3dHtn9GK42XDo3zuHre29V4+3x1uewOpf0GEkDJJgebCLdIwU+B/A5S2Q3EWdYMkcFEmFZHhj",
-	"oyXgOZgThZCANsTF1JWH7vcNmeGNKBcGp0guXKC5s6pnaNgmM8wTXEDI/UNMvYk2SiIU6clQlIVDQr++",
-	"hJ3xAEIY727CJGzTusJsFaSYmXVWYniB2rBCdUTbxNwRFwfSJ3OTu9jwjUKhOQt00/b15yMI4RhJN7Ks",
-	"9OJe7K6SCgVTHBJ41It7KxB6Vp5etC8ZZW43RdMSAOwHe2m/12f1O3tRv63fB/ZzfWq/BPbcXtan9pu9",
-	"AA9P3l6jDBJ4gmY9zwcOVkO4/Eg8bKbjF/vK4Kdbr4e4S8ArqMglXQ/bXbn9G3Nxe65L8s1nU+1E91U8",
-	"cK7mKcKkCkFJ3dWmj/bSfrXn9lPTpEV36rNWdzYImUGP62UgVqBBcrfNgTusoxLpBEIQrHAi+8W18ajk",
-	"hBkkhkoMbwxwyzrdOOnC17di3TY2S4NRVZM/kTb+Hbnif94G/mXzM9fotlx0LlOWQwgl5ZDAzBiVRJE/",
-	"nEltkrV4bRWqSfUjAAD//5vKpzFOBwAA",
+	"H4sIAAAAAAAC/9RW3W7aShB+FTTnXPpgcw45SnwXEs4pahuqJNw0QtXGHmBTe9eZXdIixEWai970Haq+",
+	"QVWlatRK9BXMG1W7JvwUA6pEqXpl8Iy/+Wb2m5ntQyDjRAoUWoHfB0KVSKHQ/il7nnkEUmgU2vxkSRLx",
+	"gGkuhXuhpDDvVNDBmJlffxK2wIc/3Cmmm1mVW2HBcxRhlUjS8TgIDAYDB0JUAfHEYIIPFRYWCC+7qDQM",
+	"HCh7pa1TaBztN04f1I9rT6uHGYfy1jkc1U+f/VdvHI0J7G2dwIEUrYgH9hB2foEOakIjCRYVTpCukAr2",
+	"AzB+YyQTKBfM70NCMkHSPJPxHHAfdC9B8EFp4qJt0kPz+YEMccbKhcY2kjHHqNdm9Rg1O2SaWYJjCHl+",
+	"gVn9KkzxYMx1szSn1g2wlIxW0Au6RCiCXm50weJ8WvKFQDKWlqSY6ayy/5bBWSh0HqUDQqbREsspH4ui",
+	"egv8s3WCyyn+wPk+vYT1IsnCtfKdK1IO6aahPS5VVXRjA4j2eQbHjQo40Dg5hKazWKpHXOltp8o1xuoH",
+	"c55QZ0Sst6wGE635i+F1J1crmseoNIuTHOtiEPOKi5a0zlxHxlZ9maBQnBVUNjT2n9TAgSsklQ2VUtEr",
+	"elaWCQqWcPDhn6JXLIFjWVl67rlJ1xKVSi80JqTv0mH6Kb1N349ejd4U0tt0OLpOP49uwMKSHYq10IzQ",
+	"qXptAGIxaiRlz5EbrMsuUg/u2yd7OGDWHycMwdfURWdmsC4UJR9n0qqrsFad+JyAl4bR7YZCqoUrw6zv",
+	"+6Yzf+v4e4PbZsUAydk59YfZtvWWwU54usZpej1Z51uauUas8y3PbNzVvsbJNgZrG01lA/wvsy95gNA0",
+	"pkzMbv/+qAYGtY15sn6bDtMvo5vR6/QuE/aH0XX6caLv9K6Qfk2HhZlDn1f7/6j3o8hyUEvkbjv/d5LP",
+	"0pG8Qjw/RxDjK+A6373NicfctOwUzQ5wPtlIBiwCB7oUgQ8drRPfde3LjlTa3/V2d8wa+BYAAP//5Ju1",
+	"Il4MAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

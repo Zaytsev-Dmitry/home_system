@@ -7,21 +7,35 @@ servers:
     description: local
 
 paths:
-  /board:
+  /board/{tgUserId}:
     get:
       tags:
         - Board-Service
       operationId: getAllBoards
-      description: 'Получить все доски'
+      description: 'Получить все доски по tgUserId'
+      parameters:
+        - name: tgUserId
+          schema:
+            type: integer
+            format: int64
+          in: path
+          required: true
       responses:
-        '204':
-          description: No content
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListBoardBackendResponse'
+        '409':
+          $ref: '#/components/responses/409'
         '401':
           $ref: '#/components/responses/401'
         '404':
           $ref: '#/components/responses/404'
         '500':
           $ref: '#/components/responses/500'
+  /board:
     post:
       tags:
         - Board-Service
@@ -38,9 +52,19 @@ paths:
             $ref: '#/components/schemas/CurrencyEnum'
           in: query
           required: true
+        - name: tgUserId
+          schema:
+            type: integer
+            format: int64
+          in: query
+          required: true
       responses:
-        '204':
-          description: No content
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateBoardBackendResponse'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -54,6 +78,12 @@ components:
   responses:
     '400':
       description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BackendErrorResponse'
+    '409':
+      description: Conflict
       content:
         application/json:
           schema:
@@ -76,7 +106,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/BackendErrorResponse'
-  #--------------------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------------------#
   schemas:
     BackendErrorResponse:
       type: object
@@ -87,7 +117,7 @@ components:
           type: integer
         description:
           type: string
-    #--------------------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------------------#
     MetaData:
       type: object
       properties:
@@ -95,7 +125,7 @@ components:
           type: string
         path:
           type: string
-    #--------------------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------------------#
     BasicBackendResponse:
       type: object
       properties:
@@ -105,10 +135,38 @@ components:
           type: string
         description:
           type: string
-    #--------------------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------------------#
     CurrencyEnum:
       type: string
       enum:
         - RUB
         - USD
+#--------------------------------------------------------------------------------------------------------#
+    CreateBoardBackendResponse:
+      allOf:
+        - $ref: '#/components/schemas/BasicBackendResponse'
+        - type: object
+          properties:
+            payload:
+              $ref: '#/components/schemas/BoardResponse'
+    ListBoardBackendResponse:
+      allOf:
+        - $ref: '#/components/schemas/BasicBackendResponse'
+        - type: object
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: '#/components/schemas/BoardResponse'
+#--------------------------------------------------------------------------------------------------------#
+    BoardResponse:
+      type: object
+      properties:
+        owner:
+          type: integer
+          format: int64
+        name:
+          type: string
+        currency:
+          type: string
 #--------------------------------------------------------------------------------------------------------#

@@ -6,9 +6,9 @@ import (
 )
 
 type GetBoardUCaseImpl struct {
-	Repo *repository.BoardRepository
+	Repo repository.BoardRepository
 }
 
-func (c GetBoardUCaseImpl) All() *[]domain.Board {
-	return nil
+func (c GetBoardUCaseImpl) All(ownerId int64) ([]domain.Board, error) {
+	return c.Repo.GetAllByTgUserId(ownerId)
 }
