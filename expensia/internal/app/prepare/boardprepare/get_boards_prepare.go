@@ -3,6 +3,7 @@ package boardprepare
 import (
 	"expensia/internal/app/ports/out/dao/repository"
 	"expensia/internal/app/prepare"
+	"fmt"
 )
 
 type GetBoardsPreparer struct {
@@ -13,10 +14,10 @@ func RegisterGetBoardsPreparer(reg *prepare.PrepareRegistry, repo repository.Par
 	prepare.RegisterPreparer(reg, "get_boards", GetBoardsPreparer{ParticipantRepo: repo})
 }
 
-func (g GetBoardsPreparer) Prepare(input int64) (int64, error) {
-	id, err := g.ParticipantRepo.GetIdByTgUserId(input)
-	if err != nil {
-		return 0, err
+func (g GetBoardsPreparer) Prepare(input interface{}) (interface{}, error) {
+	idTyped, ok := input.(int64)
+	if !ok {
+		return nil, fmt.Errorf("invalid input type for GetBoardsPreparer")
 	}
-	return id, nil
+	return g.ParticipantRepo.GetIdByTgUserId(idTyped)
 }

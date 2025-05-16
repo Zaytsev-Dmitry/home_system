@@ -17,7 +17,7 @@ type BoardDelegate struct {
 }
 
 func CreateBoardDelegate(dao *dao.ExpensiaDao, registry *prepare.PrepareRegistry) *BoardDelegate {
-	boardprepare.RegisterBoardPreparer(registry, dao.ParticipantRepo)
+	boardprepare.RegisterCreateBoardPreparer(registry, dao.ParticipantRepo)
 	boardprepare.RegisterGetBoardsPreparer(registry, dao.ParticipantRepo)
 
 	return &BoardDelegate{

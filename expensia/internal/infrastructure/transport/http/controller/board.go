@@ -28,6 +28,7 @@ func (bc BoardController) CreateBoard(context *gin.Context, params rest.CreateBo
 	apikitHandler.HandleResponse(context, func() (*domain.Board, error) {
 		return bc.delegate.CreateAndReturnBoard(
 			repository.CreateBoardUCaseIn{
+				TgUserId: params.TgUserId,
 				Name:     params.Name,
 				Currency: string(params.Currency),
 			},

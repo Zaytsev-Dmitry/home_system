@@ -1,27 +1,28 @@
 package boardprepare
 
 import (
-	"expensia/api/rest"
 	"expensia/internal/app/ports/out/dao/repository"
 	"expensia/internal/app/prepare"
+	"fmt"
 )
 
 type CreateBoardPreparer struct {
 	ParticipantRepo repository.ParticipantRepository
 }
 
-func RegisterBoardPreparer(reg *prepare.PrepareRegistry, repo repository.ParticipantRepository) {
+func RegisterCreateBoardPreparer(reg *prepare.PrepareRegistry, repo repository.ParticipantRepository) {
 	prepare.RegisterPreparer(reg, "create_board", CreateBoardPreparer{ParticipantRepo: repo})
 }
 
-func (p CreateBoardPreparer) Prepare(input rest.CreateBoardParams) (repository.CreateBoardUCaseIn, error) {
-	id, err := p.ParticipantRepo.GetIdByTgUserId(input.TgUserId)
+func (p CreateBoardPreparer) Prepare(input interface{}) (interface{}, error) {
+	req, ok := input.(repository.CreateBoardUCaseIn)
+	if !ok {
+		return nil, fmt.Errorf("invalid input type for CreateBoardPreparer")
+	}
+	id, err := p.ParticipantRepo.GetIdByTgUserId(req.TgUserId)
 	if err != nil {
 		return repository.CreateBoardUCaseIn{}, err
 	}
-	return repository.CreateBoardUCaseIn{
-		OwnerId:  id,
-		Name:     input.Name,
-		Currency: string(input.Currency),
-	}, nil
+	req.OwnerId = id
+	return req, nil
 }

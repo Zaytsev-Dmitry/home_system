@@ -16,18 +16,8 @@ func NewPrepareRegistry() *PrepareRegistry {
 	}
 }
 
-func (r *PrepareRegistry) register(name string, fn PrepareFunc) {
-	r.preparers[name] = fn
-}
-
-func RegisterPreparer[In any, Out any](r *PrepareRegistry, name string, p Preparer[In, Out]) {
-	r.register(name, func(input interface{}) (interface{}, error) {
-		inTyped, ok := input.(In)
-		if !ok {
-			return nil, fmt.Errorf("invalid input type for preparer %q", name)
-		}
-		return p.Prepare(inTyped)
-	})
+func RegisterPreparer(r *PrepareRegistry, name string, p Preparer) {
+	r.preparers[name] = p.Prepare
 }
 
 // Prepare вызывает preparer и делает кастинг уже на стороне вызывающего
