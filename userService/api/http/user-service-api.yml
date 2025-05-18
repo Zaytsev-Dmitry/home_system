@@ -13,6 +13,13 @@ paths:
         - User-Identity-Service
       operationId: registerAccount
       description: 'Зарегистрировать аккаунт'
+      parameters:
+        - name: tgUserId
+          schema:
+            type: integer
+            format: int64
+          in: header
+          required: true
       requestBody:
         content:
           application/json:
@@ -93,6 +100,12 @@ paths:
   #--------------------------------------------------------------------------------------------------------#
 components:
   responses:
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BackendErrorResponse'
     '409':
       description: Conflict
       content:

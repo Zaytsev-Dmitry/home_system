@@ -7,7 +7,7 @@ servers:
     description: local
 
 paths:
-  /board/{tgUserId}:
+  /board:
     get:
       tags:
         - Board-Service
@@ -18,7 +18,7 @@ paths:
           schema:
             type: integer
             format: int64
-          in: path
+          in: header
           required: true
       responses:
         '200':
@@ -35,7 +35,6 @@ paths:
           $ref: '#/components/responses/404'
         '500':
           $ref: '#/components/responses/500'
-  /board:
     post:
       tags:
         - Board-Service
@@ -56,7 +55,7 @@ paths:
           schema:
             type: integer
             format: int64
-          in: query
+          in: header
           required: true
       responses:
         '200':
