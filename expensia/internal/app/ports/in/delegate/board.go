@@ -31,25 +31,28 @@ func CreateBoardDelegate(dao *dao.ExpensiaDao, registry *prepare.PrepareRegistry
 }
 
 func (d BoardDelegate) CreateAndReturnBoard(req repository.CreateBoardUCaseIn) (*domain.Board, error) {
-	result, err := d.registry.Prepare("create_board", req)
-	if err != nil {
-		return nil, err
-	}
-	return d.create.CreateAndReturnBoard(result.(repository.CreateBoardUCaseIn))
+	return prepare.WithPrepared(
+		d.registry,
+		"create_board",
+		req,
+		d.create.CreateAndReturnBoard,
+	)
 }
 
 func (d BoardDelegate) AddParticipantsToBoard(req repository.AddParticipantsInput) error {
-	result, err := d.registry.Prepare("add_participant_to_board", req)
-	if err != nil {
-		return err
-	}
-	return d.addParticipant.AddParticipantsToBoard(result.(repository.AddParticipantsInput))
+	return prepare.WithPreparedNoResult(
+		d.registry,
+		"add_participant_to_board",
+		req,
+		d.addParticipant.AddParticipantsToBoard,
+	)
 }
 
 func (d BoardDelegate) GetAllBoards(tgUserId int64) ([]*domain.Board, error) {
-	result, err := d.registry.Prepare("get_boards", tgUserId)
-	if err != nil {
-		return nil, err
-	}
-	return d.get.GetAllBoards(result.(int64))
+	return prepare.WithPrepared(
+		d.registry,
+		"get_boards",
+		tgUserId,
+		d.get.GetAllBoards,
+	)
 }
