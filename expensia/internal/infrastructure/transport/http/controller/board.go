@@ -19,7 +19,7 @@ type BoardController struct {
 }
 
 func (bc BoardController) GetAllBoards(context *gin.Context, params openapi.GetAllBoardsParams) {
-	apikitHandler.HandleResponse(context, func() ([]domain.Board, error) {
+	apikitHandler.HandleResponse(context, func() ([]*domain.Board, error) {
 		return bc.delegate.GetAllBoards(params.TgUserId)
 	}, bc.getBoardPresenter.Present)
 }

@@ -10,7 +10,7 @@ import (
 type GetBoardPresenter struct {
 }
 
-func (c *GetBoardPresenter) Present(domains []domain.Board, context *gin.Context) openapi.ListBoardBackendResponse {
+func (c *GetBoardPresenter) Present(domains []*domain.Board, context *gin.Context) openapi.ListBoardBackendResponse {
 	var boardsResp []openapi.BoardResponse
 	for _, d := range domains {
 		boardsResp = append(boardsResp, *c.toBoardResponse(d))
@@ -21,7 +21,7 @@ func (c *GetBoardPresenter) Present(domains []domain.Board, context *gin.Context
 	}
 }
 
-func (c *GetBoardPresenter) toBoardResponse(domain domain.Board) *openapi.BoardResponse {
+func (c *GetBoardPresenter) toBoardResponse(domain *domain.Board) *openapi.BoardResponse {
 	return &openapi.BoardResponse{
 		Currency: &domain.Currency,
 		Name:     &domain.Name,

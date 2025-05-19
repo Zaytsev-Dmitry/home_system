@@ -4,6 +4,8 @@ import (
 	"expensia/internal/app/domain"
 	"expensia/internal/app/ports/out/dao/repository"
 	apikitErr "github.com/Zaytsev-Dmitry/apikit/custom_errors"
+	"github.com/Zaytsev-Dmitry/dbkit"
+	"github.com/Zaytsev-Dmitry/dbkit/custom_error"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"log"
@@ -17,15 +19,13 @@ func NewBoardRepositorySqlx(db *sqlx.DB) *BoardRepositorySqlx {
 	return &BoardRepositorySqlx{db: db}
 }
 
-func (b BoardRepositorySqlx) GetAllByTgUserId(ownerId int64) ([]domain.Board, error) {
-	var boards []domain.Board
-	err := b.db.Select(&boards, SELECT_ALL_BY_OWNER_ID, ownerId)
-
-	if len(boards) == 0 {
-		return nil, apikitErr.RowNotFound
-	}
-
-	return boards, err
+func (b BoardRepositorySqlx) GetAllByTgUserId(ownerId int64) ([]*domain.Board, *custom_error.CustomError) {
+	return dbkit.ExecuteQuerySlice[domain.Board](
+		b.db,
+		SELECT_ALL_BY_OWNER_ID,
+		"Получение все досок по telegram user id",
+		ownerId,
+	)
 }
 
 func (b BoardRepositorySqlx) SaveAndFlush(req repository.CreateBoardUCaseIn) (*domain.Board, error) {

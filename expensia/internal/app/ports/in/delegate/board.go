@@ -46,7 +46,7 @@ func (d BoardDelegate) AddParticipantsToBoard(req repository.AddParticipantsInpu
 	return d.addParticipant.AddParticipantsToBoard(result.(repository.AddParticipantsInput))
 }
 
-func (d BoardDelegate) GetAllBoards(tgUserId int64) ([]domain.Board, error) {
+func (d BoardDelegate) GetAllBoards(tgUserId int64) ([]*domain.Board, error) {
 	result, err := d.registry.Prepare("get_boards", tgUserId)
 	if err != nil {
 		return nil, err
