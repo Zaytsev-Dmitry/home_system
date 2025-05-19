@@ -1,14 +1,17 @@
 package board
 
 import (
+	"database/sql"
+	"errors"
 	"expensia/internal/app/domain"
 	"expensia/internal/app/ports/out/dao/repository"
-	apikitErr "github.com/Zaytsev-Dmitry/apikit/custom_errors"
+	apikit "github.com/Zaytsev-Dmitry/apikit/custom_errors"
 	"github.com/Zaytsev-Dmitry/dbkit"
 	"github.com/Zaytsev-Dmitry/dbkit/custom_error"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"log"
+	"strconv"
 )
 
 type BoardRepositorySqlx struct {
@@ -29,27 +32,38 @@ func (b BoardRepositorySqlx) GetAllByTgUserId(ownerId int64) ([]*domain.Board, *
 }
 
 func (b BoardRepositorySqlx) SaveAndFlush(req repository.CreateBoardUCaseIn) (*domain.Board, error) {
-	var result domain.Board
-
-	tx := b.db.MustBegin()
-	defer tx.Rollback()
-
-	err := tx.QueryRowx(INSERT_BOARD, req.OwnerId, req.Name, req.Currency).StructScan(&result)
+	query, err := dbkit.ExecuteQuery[domain.Board](
+		true,
+		"QueryRowx",
+		b.db,
+		INSERT_BOARD,
+		"Создание доски для пользователя с telegram id == "+strconv.FormatInt(req.TgUserId, 10)+" и именем: "+req.Name,
+		req.OwnerId, req.Name, req.Currency,
+	)
 	if err != nil {
-		if dbErr, ok := err.(*pq.Error); ok && dbErr.Code == "23505" {
-			log.Printf("BoardRepositorySqlx.Save conflict: %s (Detail: %s)", dbErr.Code, dbErr.Detail)
-			return nil, apikitErr.ConflictError
+		if dbErr, ok := err.WrapErr.(*pq.Error); ok && dbErr.Code == "23505" {
+			log.Printf("409 CONFLICT: %s: (Detail: %s)", err.Action, dbErr.Detail)
+			return nil, apikit.ConflictError
 		} else {
-			return nil, err
+			return nil, err.WrapErr
 		}
-	} else {
-		tx.Commit()
-		return &result, err
 	}
+	return query, nil
 }
 
 func (b BoardRepositorySqlx) GetById(boardId int64) (*domain.Board, error) {
-	var result domain.Board
-	err := b.db.Get(&result, SELECT_BY_ID, boardId)
-	return &result, err
+	result, err := dbkit.ExecuteQuery[domain.Board](
+		false,
+		"Get",
+		b.db,
+		SELECT_BY_ID,
+		"Получение доски по id == "+strconv.FormatInt(boardId, 10),
+		boardId,
+	)
+
+	if err != nil && errors.Is(err.WrapErr, sql.ErrNoRows) {
+		return nil, apikit.RowNotFound
+	}
+
+	return result, nil
 }

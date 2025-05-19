@@ -28,8 +28,13 @@ func (a AddParticipantPreparer) Prepare(input interface{}) (interface{}, error) 
 	}
 	_, err := a.BoardRepo.GetById(req.BoardID)
 
-	if err != nil && errors.Is(err, sql.ErrNoRows) {
-		return nil, custom_errors.RowNotFound
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = a.ParticipantRepo.GetIdByTgUserId(req.BoardOwnerTgUserID)
+	if err != nil {
+		return nil, err
 	}
 
 	list, err := a.ParticipantRepo.GetIdByTgUserIdList(req.ParticipantTgUserIDs)
