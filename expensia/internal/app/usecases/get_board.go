@@ -5,5 +5,5 @@ import (
 )
 
 type GetBoardUCase interface {
-	All(ownerId int64) ([]domain.Board, error)
+	GetAllBoards(ownerId int64) ([]domain.Board, error)
 }

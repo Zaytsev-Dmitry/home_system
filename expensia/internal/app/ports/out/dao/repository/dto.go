@@ -6,3 +6,11 @@ type CreateBoardUCaseIn struct {
 	Name     string
 	Currency string
 }
+
+type AddParticipantsInput struct {
+	ParticipantTgUserIDs []int64
+	BoardID              int64
+	BoardOwnerTgUserID   int64
+	//prepared data
+	ParticipantsDB []int64
+}

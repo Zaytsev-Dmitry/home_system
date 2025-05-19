@@ -3,7 +3,7 @@ module expensia
 go 1.24.0
 
 require (
-	github.com/Zaytsev-Dmitry/apikit v1.0.0
+	github.com/Zaytsev-Dmitry/apikit v1.0.1
 	github.com/Zaytsev-Dmitry/configkit v1.0.0
 	github.com/getkin/kin-openapi v0.132.0
 	github.com/gin-gonic/gin v1.10.0

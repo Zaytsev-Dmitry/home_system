@@ -21,7 +21,7 @@ func (api ExpensiaApi) CreateBoard(c *gin.Context, params openapi.CreateBoardPar
 }
 
 func (api ExpensiaApi) AddParticipantToBoard(c *gin.Context, params openapi.AddParticipantToBoardParams) {
-
+	api.boardController.AddParticipantToBoard(c, params)
 }
 
 func NewExpensiaApi(dao *dao.ExpensiaDao, registry *prepare.PrepareRegistry) *ExpensiaApi {

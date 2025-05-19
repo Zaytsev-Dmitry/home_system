@@ -20,7 +20,7 @@ type BoardController struct {
 
 func (bc BoardController) GetAllBoards(context *gin.Context, params openapi.GetAllBoardsParams) {
 	apikitHandler.HandleResponse(context, func() ([]domain.Board, error) {
-		return bc.delegate.All(params.TgUserId)
+		return bc.delegate.GetAllBoards(params.TgUserId)
 	}, bc.getBoardPresenter.Present)
 }
 
@@ -37,7 +37,18 @@ func (bc BoardController) CreateBoard(context *gin.Context, params openapi.Creat
 }
 
 func (bc BoardController) AddParticipantToBoard(context *gin.Context, params openapi.AddParticipantToBoardParams) {
-
+	apikitHandler.HandleResponseWithoutPresent(
+		context,
+		func() error {
+			return bc.delegate.AddParticipantsToBoard(
+				repository.AddParticipantsInput{
+					ParticipantTgUserIDs: params.ParticipantTgUserIdList,
+					BoardID:              params.BoardId,
+					BoardOwnerTgUserID:   params.TgUserId,
+				},
+			)
+		},
+	)
 }
 
 func Create(dao *dao.ExpensiaDao, registry *prepare.PrepareRegistry) *BoardController {

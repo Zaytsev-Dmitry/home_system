@@ -33,13 +33,23 @@ func (b BoardRepositorySqlx) SaveAndFlush(req repository.CreateBoardUCaseIn) (*d
 
 	tx := b.db.MustBegin()
 	defer tx.Rollback()
-	err := tx.QueryRowx(INSERT_BOARD, req.OwnerId, req.Name, req.Currency).StructScan(&result)
-	tx.Commit()
 
-	if dbErr, ok := err.(*pq.Error); ok && dbErr.Code == "23505" {
-		log.Printf("BoardRepositorySqlx.Save conflict: %s (Detail: %s)", dbErr.Code, dbErr.Detail)
-		return nil, apikitErr.ConflictError
+	err := tx.QueryRowx(INSERT_BOARD, req.OwnerId, req.Name, req.Currency).StructScan(&result)
+	if err != nil {
+		if dbErr, ok := err.(*pq.Error); ok && dbErr.Code == "23505" {
+			log.Printf("BoardRepositorySqlx.Save conflict: %s (Detail: %s)", dbErr.Code, dbErr.Detail)
+			return nil, apikitErr.ConflictError
+		} else {
+			return nil, err
+		}
 	} else {
+		tx.Commit()
 		return &result, err
 	}
+}
+
+func (b BoardRepositorySqlx) GetById(boardId int64) (*domain.Board, error) {
+	var result domain.Board
+	err := b.db.Get(&result, SELECT_BY_ID, boardId)
+	return &result, err
 }
