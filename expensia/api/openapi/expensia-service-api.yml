@@ -14,12 +14,7 @@ paths:
       operationId: getAllBoards
       description: 'Получить все доски по tgUserId'
       parameters:
-        - name: tgUserId
-          schema:
-            type: integer
-            format: int64
-          in: header
-          required: true
+        - $ref: '#/components/parameters/tgUserIdHeader'
       responses:
         '200':
           description: OK
@@ -51,19 +46,14 @@ paths:
             $ref: '#/components/schemas/CurrencyEnum'
           in: query
           required: true
-        - name: tgUserId
-          schema:
-            type: integer
-            format: int64
-          in: header
-          required: true
+        - $ref: '#/components/parameters/tgUserIdHeader'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateBoardBackendResponse'
+                $ref: '#/components/schemas/SingleBoardBackendResponse'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -72,8 +62,47 @@ paths:
           $ref: '#/components/responses/404'
         '500':
           $ref: '#/components/responses/500'
+  /board/add/participant:
+    post:
+      tags:
+        - Board-Service
+      operationId: addParticipantToBoard
+      description: 'Добавить участников на доску'
+      parameters:
+        - $ref: '#/components/parameters/tgUserIdHeader'
+        - name: boardId
+          schema:
+            type: integer
+            format: int64
+          in: query
+          required: true
+        - name: participantTgUserIdList
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
+      responses:
+        '204':
+          description: NO CONTENT
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
 #--------------------------------------------------------------------------------------------------------#
 components:
+  parameters:
+    tgUserIdHeader:
+      name: tgUserId
+      in: header
+      required: true
+      schema:
+        type: integer
+        format: int64
   responses:
     '400':
       description: Bad request
@@ -141,7 +170,7 @@ components:
         - RUB
         - USD
 #--------------------------------------------------------------------------------------------------------#
-    CreateBoardBackendResponse:
+    SingleBoardBackendResponse:
       allOf:
         - $ref: '#/components/schemas/BasicBackendResponse'
         - type: object

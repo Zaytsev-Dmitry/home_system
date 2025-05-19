@@ -40,7 +40,8 @@ IN PROGRESS
 ## 📌 Установка и запуск
  - Генерация openapi сущностей
     ```bash
-    oapi-codegen -package=rest -generate "types,spec,gin" expensia/api/rest/expensia-server-api.yml > expensia/api/rest/expensia-server-api.gen.go
+    oapi-codegen -package=rest -generate "types,spec,gin" userService/api/http/user-service-api.yml > userService/api/http/user-service-api.gen.go
+    oapi-codegen -package=openapi -generate "types,spec,gin" expensia/api/openapi/expensia-service-api.yml > expensia/api/openapi/expensia-service-api.gen.go
    ```
    
 IN PROGRESS

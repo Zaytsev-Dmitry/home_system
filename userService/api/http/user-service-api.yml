@@ -14,12 +14,7 @@ paths:
       operationId: registerAccount
       description: 'Зарегистрировать аккаунт'
       parameters:
-        - name: tgUserId
-          schema:
-            type: integer
-            format: int64
-          in: header
-          required: true
+        - $ref: '#/components/parameters/tgUserIdHeader'
       requestBody:
         content:
           application/json:
@@ -99,6 +94,14 @@ paths:
           $ref: '#/components/responses/500'
   #--------------------------------------------------------------------------------------------------------#
 components:
+  parameters:
+    tgUserIdHeader:
+      name: tgUserId
+      in: header
+      required: true
+      schema:
+        type: integer
+        format: int64
   responses:
     '400':
       description: Bad request

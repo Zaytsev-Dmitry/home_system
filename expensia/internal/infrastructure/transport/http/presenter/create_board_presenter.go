@@ -1,7 +1,7 @@
 package presenter
 
 import (
-	"expensia/api/rest"
+	"expensia/api/openapi"
 	"expensia/internal/app/domain"
 	"github.com/gin-gonic/gin"
 	"time"
@@ -10,24 +10,24 @@ import (
 type CreateBoardPresenter struct {
 }
 
-func (c *CreateBoardPresenter) Present(domain *domain.Board, context *gin.Context) rest.CreateBoardBackendResponse {
-	return rest.CreateBoardBackendResponse{
+func (c *CreateBoardPresenter) Present(domain *domain.Board, context *gin.Context) openapi.SingleBoardBackendResponse {
+	return openapi.SingleBoardBackendResponse{
 		Meta:    c.toMetaData(context),
 		Payload: c.toBoardResponse(domain),
 	}
 }
 
-func (c *CreateBoardPresenter) toBoardResponse(domain *domain.Board) *rest.BoardResponse {
-	return &rest.BoardResponse{
+func (c *CreateBoardPresenter) toBoardResponse(domain *domain.Board) *openapi.BoardResponse {
+	return &openapi.BoardResponse{
 		Currency: &domain.Currency,
 		Name:     &domain.Name,
 		Owner:    &domain.OwnerId,
 	}
 }
 
-func (c *CreateBoardPresenter) toMetaData(context *gin.Context) *rest.MetaData {
+func (c *CreateBoardPresenter) toMetaData(context *gin.Context) *openapi.MetaData {
 	nowString := time.Now().String()
-	return &rest.MetaData{
+	return &openapi.MetaData{
 		Path:      &context.Request.URL.Path,
 		Timestamp: &nowString,
 	}

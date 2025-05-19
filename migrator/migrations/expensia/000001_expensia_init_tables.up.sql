@@ -37,6 +37,7 @@ CREATE TABLE board_participant
 CREATE TABLE expense
 (
     id             SERIAL PRIMARY KEY,
+    type           varchar(20)                        not null,
     title          varchar(1000)                      not null,
     participant_id bigint                             NOT NULL references participant (id),
     board_id       bigint                             NOT NULL references board (id),

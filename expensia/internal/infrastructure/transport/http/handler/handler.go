@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"expensia/api/rest"
+	"expensia/api/openapi"
 	"expensia/internal/app/ports/out/dao"
 	"expensia/internal/app/prepare"
 	"expensia/internal/infrastructure/transport/http/controller"
@@ -12,12 +12,16 @@ type ExpensiaApi struct {
 	boardController *controller.BoardController
 }
 
-func (api ExpensiaApi) GetAllBoards(c *gin.Context, tgUserId int64) {
-	api.boardController.GetAllBoards(c, tgUserId)
+func (api ExpensiaApi) GetAllBoards(c *gin.Context, params openapi.GetAllBoardsParams) {
+	api.boardController.GetAllBoards(c, params)
 }
 
-func (api ExpensiaApi) CreateBoard(c *gin.Context, params rest.CreateBoardParams) {
+func (api ExpensiaApi) CreateBoard(c *gin.Context, params openapi.CreateBoardParams) {
 	api.boardController.CreateBoard(c, params)
+}
+
+func (api ExpensiaApi) AddParticipantToBoard(c *gin.Context, params openapi.AddParticipantToBoardParams) {
+
 }
 
 func NewExpensiaApi(dao *dao.ExpensiaDao, registry *prepare.PrepareRegistry) *ExpensiaApi {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"expensia/api/rest"
+	"expensia/api/openapi"
 	"expensia/configs"
 	"expensia/internal/app/ports/out/dao"
 	"expensia/internal/app/prepare"
@@ -26,10 +26,10 @@ func main() {
 	router, apiInterface := gin.Default(), handler.NewExpensiaApi(dao, registry)
 
 	//устанавливаю роут под swagger ui
-	rest.Load(router)
+	openapi.Load(router)
 
 	//регаю хэндлеры
-	rest.RegisterHandlers(router, apiInterface)
+	openapi.RegisterHandlers(router, apiInterface)
 
 	//старт сервера
 	if err := router.Run(":" + strconv.Itoa(appConfig.Server.Port)); err != nil {

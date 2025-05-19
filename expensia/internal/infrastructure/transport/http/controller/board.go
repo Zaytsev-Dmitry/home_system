@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"expensia/api/rest"
+	"expensia/api/openapi"
 	"expensia/internal/app/domain"
 	"expensia/internal/app/ports/in/delegate"
 	"expensia/internal/app/ports/out/dao"
@@ -18,13 +18,13 @@ type BoardController struct {
 	getBoardPresenter presenter.GetBoardPresenter
 }
 
-func (bc BoardController) GetAllBoards(context *gin.Context, tgUserId int64) {
+func (bc BoardController) GetAllBoards(context *gin.Context, params openapi.GetAllBoardsParams) {
 	apikitHandler.HandleResponse(context, func() ([]domain.Board, error) {
-		return bc.delegate.All(tgUserId)
+		return bc.delegate.All(params.TgUserId)
 	}, bc.getBoardPresenter.Present)
 }
 
-func (bc BoardController) CreateBoard(context *gin.Context, params rest.CreateBoardParams) {
+func (bc BoardController) CreateBoard(context *gin.Context, params openapi.CreateBoardParams) {
 	apikitHandler.HandleResponse(context, func() (*domain.Board, error) {
 		return bc.delegate.CreateAndReturnBoard(
 			repository.CreateBoardUCaseIn{
@@ -34,6 +34,9 @@ func (bc BoardController) CreateBoard(context *gin.Context, params rest.CreateBo
 			},
 		)
 	}, bc.presenter.Present)
+}
+
+func (bc BoardController) AddParticipantToBoard(context *gin.Context, params openapi.AddParticipantToBoardParams) {
 
 }
 

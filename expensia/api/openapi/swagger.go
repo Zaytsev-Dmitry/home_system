@@ -1,4 +1,4 @@
-package rest
+package openapi
 
 import (
 	"github.com/gin-gonic/gin"
@@ -14,7 +14,7 @@ func Load(r *gin.Engine) {
 
 	r.SetHTMLTemplate(templ)
 	r.StaticFS("/public", http.Dir("third_party/swagger_ui"))
-	r.StaticFile("/rest/expensia-server-api.yml", "api/rest/expensia-server-api.yml")
+	r.StaticFile("/openapi/expensia-service-api.yml", "api/openapi/expensia-service-api.yml")
 
 	r.GET("/docs", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
