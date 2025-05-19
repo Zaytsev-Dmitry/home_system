@@ -7,14 +7,12 @@ import (
 	"expensia/internal/app/prepare"
 	"expensia/internal/app/prepare/boardprepare"
 	"expensia/internal/app/services"
-	"expensia/internal/app/usecases"
 )
 
 type BoardDelegate struct {
-	create         usecases.CreateBoardUCase
-	get            usecases.GetBoardUCase
-	addParticipant usecases.AddParticipantUCase
-	registry       *prepare.PrepareRegistry
+	CreateBoard           func(repository.CreateBoardUCaseIn) (*domain.Board, error)
+	AddParticipantToBoard func(repository.AddParticipantsInput) error
+	GetBoardsByTgId       func(int64) ([]*domain.Board, error)
 }
 
 func CreateBoardDelegate(dao *dao.ExpensiaDao, registry *prepare.PrepareRegistry) *BoardDelegate {
@@ -23,36 +21,20 @@ func CreateBoardDelegate(dao *dao.ExpensiaDao, registry *prepare.PrepareRegistry
 	boardprepare.RegisterAddParticipantPreparer(registry, dao.ParticipantRepo, dao.BoardRepo)
 
 	return &BoardDelegate{
-		create:         services.CreateBoardUCaseImpl{Repo: dao.BoardRepo},
-		get:            services.GetBoardUCaseImpl{Repo: dao.BoardRepo},
-		addParticipant: services.AddParticipantUCaseImpl{Repo: dao.BoardParticipantRepo},
-		registry:       registry,
+		CreateBoard: MakeDelegateWithResult(
+			registry,
+			"create_board",
+			services.CreateBoardUCaseImpl{Repo: dao.BoardRepo}.CreateAndReturnBoard,
+		),
+		AddParticipantToBoard: MakeDelegateNoResult(
+			registry,
+			"add_participant_to_board",
+			services.AddParticipantUCaseImpl{Repo: dao.BoardParticipantRepo}.AddParticipantsToBoard,
+		),
+		GetBoardsByTgId: MakeDelegateWithResult(
+			registry,
+			"get_boards",
+			services.GetBoardUCaseImpl{Repo: dao.BoardRepo}.GetAllBoards,
+		),
 	}
-}
-
-func (d BoardDelegate) CreateAndReturnBoard(req repository.CreateBoardUCaseIn) (*domain.Board, error) {
-	return prepare.WithPrepared(
-		d.registry,
-		"create_board",
-		req,
-		d.create.CreateAndReturnBoard,
-	)
-}
-
-func (d BoardDelegate) AddParticipantsToBoard(req repository.AddParticipantsInput) error {
-	return prepare.WithPreparedNoResult(
-		d.registry,
-		"add_participant_to_board",
-		req,
-		d.addParticipant.AddParticipantsToBoard,
-	)
-}
-
-func (d BoardDelegate) GetAllBoards(tgUserId int64) ([]*domain.Board, error) {
-	return prepare.WithPrepared(
-		d.registry,
-		"get_boards",
-		tgUserId,
-		d.get.GetAllBoards,
-	)
 }
