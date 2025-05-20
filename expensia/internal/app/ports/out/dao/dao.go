@@ -3,13 +3,7 @@ package dao
 import (
 	"expensia/configs"
 	"expensia/internal/app/ports/out/dao/repository"
-	"expensia/internal/infrastructure/persistence/board"
-	"expensia/internal/infrastructure/persistence/boardParticipant"
-	"expensia/internal/infrastructure/persistence/category"
-	"expensia/internal/infrastructure/persistence/currency"
-	"expensia/internal/infrastructure/persistence/expense"
-	"expensia/internal/infrastructure/persistence/expenseShare"
-	"expensia/internal/infrastructure/persistence/participant"
+	"expensia/internal/infrastructure/persistence"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"os"
@@ -44,12 +38,12 @@ func newDbConnection(config *configs.AppConfig) *sqlx.DB {
 func Create(config *configs.AppConfig) (*ExpensiaDao, *sqlx.DB) {
 	db := newDbConnection(config)
 	return &ExpensiaDao{
-		BoardRepo:            board.NewBoardRepositorySqlx(db),
-		BoardParticipantRepo: boardParticipant.NewBoardParticipantRepositorySqlx(db),
-		CategoryRepo:         category.NewCategoryRepositorySqlx(db),
-		CurrencyRepo:         currency.NewCurrencyRepositorySqlx(db),
-		ExpenseRepo:          expense.NewExpenseRepositorySqlx(db),
-		ExpenseShareRepo:     expenseShare.NewExpenseShareRepositorySqlx(db),
-		ParticipantRepo:      participant.NewParticipantRepositorySqlx(db),
+		BoardRepo:            persistence.NewBoardRepositorySqlx(db),
+		BoardParticipantRepo: persistence.NewBoardParticipantRepositorySqlx(db),
+		CategoryRepo:         persistence.NewCategoryRepositorySqlx(db),
+		CurrencyRepo:         persistence.NewCurrencyRepositorySqlx(db),
+		ExpenseRepo:          persistence.NewExpenseRepositorySqlx(db),
+		ExpenseShareRepo:     persistence.NewExpenseShareRepositorySqlx(db),
+		ParticipantRepo:      persistence.NewParticipantRepositorySqlx(db),
 	}, db
 }

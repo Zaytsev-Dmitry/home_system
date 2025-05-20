@@ -1,4 +1,4 @@
-package board
+package persistence
 
 import (
 	"database/sql"
@@ -25,7 +25,7 @@ func NewBoardRepositorySqlx(db *sqlx.DB) *BoardRepositorySqlx {
 func (b BoardRepositorySqlx) GetAllByTgUserId(ownerId int64) ([]*domain.Board, *custom_error.CustomError) {
 	return dbkit.ExecuteQuerySlice[domain.Board](
 		b.db,
-		SELECT_ALL_BY_OWNER_ID,
+		BOARD_SELECT_ALL_BY_OWNER_ID,
 		"Получение все досок по telegram user id",
 		ownerId,
 	)
@@ -36,7 +36,7 @@ func (b BoardRepositorySqlx) SaveAndFlush(req usecases.CreateBoardInput) (*domai
 		true,
 		"QueryRowx",
 		b.db,
-		INSERT_BOARD,
+		BOARD_INSERT,
 		"Создание доски для пользователя с telegram id == "+strconv.FormatInt(req.TgUserId, 10)+" и именем: "+req.Name,
 		req.OwnerId, req.Name, req.Currency,
 	)
@@ -56,7 +56,7 @@ func (b BoardRepositorySqlx) GetById(boardId int64) (*domain.Board, error) {
 		false,
 		"Get",
 		b.db,
-		SELECT_BY_ID,
+		BOARD_SELECT_BY_ID,
 		"Получение доски по id == "+strconv.FormatInt(boardId, 10),
 		boardId,
 	)

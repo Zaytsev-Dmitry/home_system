@@ -1,4 +1,4 @@
-package expenseShare
+package persistence
 
 import "github.com/jmoiron/sqlx"
 

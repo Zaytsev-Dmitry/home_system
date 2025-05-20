@@ -1,4 +1,4 @@
-package participant
+package persistence
 
 import (
 	"database/sql"
@@ -17,7 +17,7 @@ func NewParticipantRepositorySqlx(db *sqlx.DB) *ParticipantRepositorySqlx {
 
 func (r *ParticipantRepositorySqlx) GetIdByTgUserId(userId int64) (int64, error) {
 	var result int64
-	err := r.db.Get(&result, SELECT_ID_BY_TG_USER_ID, userId)
+	err := r.db.Get(&result, PARTICIPANT_SELECT_ID_BY_TG_USER_ID, userId)
 	if errors.Is(err, sql.ErrNoRows) {
 		return 0, custom_errors.RowNotFound
 	}
@@ -27,7 +27,7 @@ func (r *ParticipantRepositorySqlx) GetIdByTgUserId(userId int64) (int64, error)
 
 func (r *ParticipantRepositorySqlx) GetIdByTgUserIdList(userIds []int64) ([]int64, error) {
 	var result []int64
-	query, args, err := sqlx.In(SELECT_IDS_BY_TG_USER_ID, userIds)
+	query, args, err := sqlx.In(PARTICIPANT_SELECT_IDS_BY_TG_USER_ID, userIds)
 	if err != nil {
 		return nil, err
 	}

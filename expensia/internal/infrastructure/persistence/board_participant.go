@@ -1,4 +1,4 @@
-package boardParticipant
+package persistence
 
 import (
 	apikitErr "github.com/Zaytsev-Dmitry/apikit/custom_errors"
@@ -20,7 +20,7 @@ func (bp BoardParticipantRepositorySqlx) AddParticipantsToBoard(boardId int64, p
 	defer tx.Rollback()
 
 	for _, id := range participantIds {
-		_, err := tx.Exec(INSERT_BOARD_PARTICIPANT, boardId, id)
+		_, err := tx.Exec(BOARD_PARTICIPANT_INSERT, boardId, id)
 		if err != nil {
 			if dbErr, ok := err.(*pq.Error); ok && dbErr.Code == "23505" {
 				log.Printf("BoardRepositorySqlx.Save conflict: %s (Detail: %s)", dbErr.Code, dbErr.Detail)
