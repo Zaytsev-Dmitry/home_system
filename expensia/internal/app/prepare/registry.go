@@ -3,7 +3,6 @@ package prepare
 import (
 	"fmt"
 	"reflect"
-	"sync"
 )
 
 // Обёртка для функции-препарера
@@ -17,7 +16,6 @@ type preparerEntry struct {
 
 // Универсальный потокобезопасный реестр
 type PrepareRegistry struct {
-	mu        sync.RWMutex
 	preparers map[string]*preparerEntry
 }
 
@@ -29,8 +27,6 @@ func NewPrepareRegistry() *PrepareRegistry {
 
 // Регистрация препарера как структуры
 func RegisterPreparer[I any, O any](r *PrepareRegistry, name string, p Preparer[I, O]) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
 	var in I
 	var out O
 	r.preparers[name] = &preparerEntry{
@@ -42,8 +38,6 @@ func RegisterPreparer[I any, O any](r *PrepareRegistry, name string, p Preparer[
 
 // Регистрация препарера как функции
 func RegisterPrepareFunc[I any, O any](r *PrepareRegistry, name string, fn PrepareFunc[I, O]) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
 	var in I
 	var out O
 	r.preparers[name] = &preparerEntry{
@@ -55,10 +49,7 @@ func RegisterPrepareFunc[I any, O any](r *PrepareRegistry, name string, fn Prepa
 
 // Типобезопасный вызов препарера
 func Prepare[I any, O any](r *PrepareRegistry, name string, input I) (O, error) {
-	r.mu.RLock()
 	entry, ok := r.preparers[name]
-	r.mu.RUnlock()
-
 	var zeroO O
 	if !ok {
 		return zeroO, fmt.Errorf("preparer %q not found", name)
