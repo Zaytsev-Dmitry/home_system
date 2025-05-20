@@ -2,7 +2,7 @@ package delegate
 
 import "expensia/internal/app/prepare"
 
-// For usecases with result
+// Обёртки для usecase-функций с подготовкой
 func MakeDelegateWithResult[Req any, Resp any](
 	registry *prepare.PrepareRegistry,
 	key string,
@@ -10,14 +10,17 @@ func MakeDelegateWithResult[Req any, Resp any](
 ) func(Req) (Resp, error) {
 	if key == "" || registry == nil {
 		return usecase
-	} else {
-		return func(req Req) (Resp, error) {
-			return prepare.WithPrepared(registry, key, req, usecase)
+	}
+	return func(req Req) (Resp, error) {
+		prepared, err := prepare.Prepare[Req, Req](registry, key, req)
+		if err != nil {
+			var zero Resp
+			return zero, err
 		}
+		return usecase(prepared)
 	}
 }
 
-// For usecases without result
 func MakeDelegateNoResult[Req any](
 	registry *prepare.PrepareRegistry,
 	key string,
@@ -25,9 +28,12 @@ func MakeDelegateNoResult[Req any](
 ) func(Req) error {
 	if key == "" || registry == nil {
 		return usecase
-	} else {
-		return func(req Req) error {
-			return prepare.WithPreparedNoResult(registry, key, req, usecase)
+	}
+	return func(req Req) error {
+		prepared, err := prepare.Prepare[Req, Req](registry, key, req)
+		if err != nil {
+			return err
 		}
+		return usecase(prepared)
 	}
 }

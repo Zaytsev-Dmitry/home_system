@@ -1,5 +1,6 @@
 package prepare
 
-type Preparer interface {
-	Prepare(input interface{}) (interface{}, error)
+// Универсальный интерфейс препарера
+type Preparer[I any, O any] interface {
+	Prepare(input I) (O, error)
 }

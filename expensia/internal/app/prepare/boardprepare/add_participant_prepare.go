@@ -3,7 +3,6 @@ package boardprepare
 import (
 	"expensia/internal/app/ports/out/dao/repository"
 	"expensia/internal/app/prepare"
-	"fmt"
 )
 
 type AddParticipantPreparer struct {
@@ -18,12 +17,7 @@ func RegisterAddParticipantPreparer(reg *prepare.PrepareRegistry, repo repositor
 	})
 }
 
-func (a AddParticipantPreparer) Prepare(input interface{}) (interface{}, error) {
-	req, ok := input.(repository.AddParticipantsInput)
-	if !ok {
-		return nil, fmt.Errorf("invalid input type for AddParticipantPreparer")
-	}
-
+func (a AddParticipantPreparer) Prepare(req repository.AddParticipantsInput) (repository.AddParticipantsInput, error) {
 	err := ReturnFirstError(
 		func() error { _, err := a.BoardRepo.GetById(req.BoardID); return err },
 		func() error { _, err := a.ParticipantRepo.GetIdByTgUserId(req.BoardOwnerTgUserID); return err },
@@ -37,7 +31,7 @@ func (a AddParticipantPreparer) Prepare(input interface{}) (interface{}, error) 
 	)
 
 	if err != nil {
-		return nil, err
+		return repository.AddParticipantsInput{}, err
 	}
 	return req, nil
 }
