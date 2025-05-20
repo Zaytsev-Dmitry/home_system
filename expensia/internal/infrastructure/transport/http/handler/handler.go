@@ -3,7 +3,6 @@ package handler
 import (
 	"expensia/api/openapi"
 	"expensia/internal/app/ports/out/dao"
-	"expensia/internal/app/prepare"
 	"expensia/internal/infrastructure/transport/http/controller"
 	"github.com/gin-gonic/gin"
 )
@@ -24,8 +23,8 @@ func (api ExpensiaApi) AddParticipantToBoard(c *gin.Context, params openapi.AddP
 	api.boardController.AddParticipantToBoard(c, params)
 }
 
-func NewExpensiaApi(dao *dao.ExpensiaDao, registry *prepare.PrepareRegistry) *ExpensiaApi {
+func NewExpensiaApi(dao *dao.ExpensiaDao) *ExpensiaApi {
 	return &ExpensiaApi{
-		boardController: controller.Create(dao, registry),
+		boardController: controller.Create(dao),
 	}
 }

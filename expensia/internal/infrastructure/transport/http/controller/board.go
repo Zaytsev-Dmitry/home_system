@@ -5,7 +5,6 @@ import (
 	"expensia/internal/app/domain"
 	"expensia/internal/app/ports/in/delegate"
 	"expensia/internal/app/ports/out/dao"
-	"expensia/internal/app/prepare"
 	"expensia/internal/app/usecases"
 	"expensia/internal/infrastructure/transport/http/presenter"
 	apikitHandler "github.com/Zaytsev-Dmitry/apikit/handlers"
@@ -51,9 +50,9 @@ func (bc BoardController) AddParticipantToBoard(context *gin.Context, params ope
 	)
 }
 
-func Create(dao *dao.ExpensiaDao, registry *prepare.PrepareRegistry) *BoardController {
+func Create(dao *dao.ExpensiaDao) *BoardController {
 	return &BoardController{
-		delegate:  delegate.CreateBoardDelegate(dao, registry),
+		delegate:  delegate.CreateBoardDelegate(dao),
 		presenter: presenter.CreateBoardPresenter{},
 	}
 }

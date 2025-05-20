@@ -4,7 +4,6 @@ import (
 	"expensia/internal/app/domain"
 	"expensia/internal/app/ports/out/dao"
 	"expensia/internal/app/prepare"
-	"expensia/internal/app/prepare/boardprepare"
 	"expensia/internal/app/services"
 	"expensia/internal/app/usecases"
 )
@@ -15,26 +14,28 @@ type BoardDelegate struct {
 	GetBoardsByTgId       func(int64) ([]*domain.Board, error)
 }
 
-func CreateBoardDelegate(dao *dao.ExpensiaDao, registry *prepare.PrepareRegistry) *BoardDelegate {
-	boardprepare.RegisterCreateBoardPreparer(registry, dao.ParticipantRepo)
-	boardprepare.RegisterGetBoardsPreparer(registry, dao.ParticipantRepo)
-	boardprepare.RegisterAddParticipantPreparer(registry, dao.ParticipantRepo, dao.BoardRepo)
-
+func CreateBoardDelegate(dao *dao.ExpensiaDao) *BoardDelegate {
 	return &BoardDelegate{
-		CreateBoard: MakeDelegateWithResult(
-			registry,
-			"create_board",
-			services.CreateBoardUCaseImpl{Repo: dao.BoardRepo}.CreateAndReturnBoard,
-		),
-		AddParticipantToBoard: MakeDelegateNoResult(
-			registry,
-			"add_participant_to_board",
-			services.AddParticipantUCaseImpl{Repo: dao.BoardParticipantRepo}.AddParticipantsToBoard,
-		),
-		GetBoardsByTgId: MakeDelegateWithResult(
-			registry,
-			"get_boards",
-			services.GetBoardUCaseImpl{Repo: dao.BoardRepo}.GetAllBoards,
-		),
+		CreateBoard: func(in usecases.CreateBoardInput) (*domain.Board, error) {
+			prepared, err := prepare.PrepareCreateBoard(in, dao.ParticipantRepo)
+			if err != nil {
+				return nil, err
+			}
+			return services.CreateBoardUCaseImpl{Repo: dao.BoardRepo}.CreateAndReturnBoard(prepared)
+		},
+		AddParticipantToBoard: func(in usecases.AddParticipantsInput) error {
+			prepared, err := prepare.PrepareAddParticipants(in, dao.ParticipantRepo, dao.BoardRepo)
+			if err != nil {
+				return err
+			}
+			return services.AddParticipantUCaseImpl{Repo: dao.BoardParticipantRepo}.AddParticipantsToBoard(prepared)
+		},
+		GetBoardsByTgId: func(tgUserId int64) ([]*domain.Board, error) {
+			id, err := prepare.PrepareGetBoards(tgUserId, dao.ParticipantRepo)
+			if err != nil {
+				return nil, err
+			}
+			return services.GetBoardUCaseImpl{Repo: dao.BoardRepo}.GetAllBoards(id)
+		},
 	}
 }

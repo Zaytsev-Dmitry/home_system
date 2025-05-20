@@ -4,7 +4,6 @@ import (
 	"expensia/api/openapi"
 	"expensia/configs"
 	"expensia/internal/app/ports/out/dao"
-	"expensia/internal/app/prepare"
 	"expensia/internal/infrastructure/transport/http/handler"
 	"github.com/Zaytsev-Dmitry/configkit"
 	"github.com/gin-gonic/gin"
@@ -20,10 +19,8 @@ func main() {
 	dao, db := dao.Create(appConfig)
 	defer db.Close()
 
-	//инициализирую prepareRegistry
-	registry := prepare.NewPrepareRegistry()
 	//инициализирую апи
-	router, apiInterface := gin.Default(), handler.NewExpensiaApi(dao, registry)
+	router, apiInterface := gin.Default(), handler.NewExpensiaApi(dao)
 
 	//устанавливаю роут под swagger ui
 	openapi.Load(router)
