@@ -14,6 +14,7 @@ func PrepareCreateBoard(in usecases.CreateBoardInput, repo repository.Participan
 	return in, nil
 }
 
+// TODO подумать как улучшить
 func PrepareAddParticipants(in usecases.AddParticipantsInput, partRepo repository.ParticipantRepository, boardRepo repository.BoardRepository) (usecases.AddParticipantsInput, error) {
 	if _, err := boardRepo.GetById(in.BoardID); err != nil {
 		return usecases.AddParticipantsInput{}, err
