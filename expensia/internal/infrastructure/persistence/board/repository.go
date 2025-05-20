@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"expensia/internal/app/domain"
-	"expensia/internal/app/ports/out/dao/repository"
+	"expensia/internal/app/usecases"
 	apikit "github.com/Zaytsev-Dmitry/apikit/custom_errors"
 	"github.com/Zaytsev-Dmitry/dbkit"
 	"github.com/Zaytsev-Dmitry/dbkit/custom_error"
@@ -31,7 +31,7 @@ func (b BoardRepositorySqlx) GetAllByTgUserId(ownerId int64) ([]*domain.Board, *
 	)
 }
 
-func (b BoardRepositorySqlx) SaveAndFlush(req repository.CreateBoardUCaseIn) (*domain.Board, error) {
+func (b BoardRepositorySqlx) SaveAndFlush(req usecases.CreateBoardInput) (*domain.Board, error) {
 	query, err := dbkit.ExecuteQuery[domain.Board](
 		true,
 		"QueryRowx",

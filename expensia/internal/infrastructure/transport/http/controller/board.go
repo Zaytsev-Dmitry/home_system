@@ -5,8 +5,8 @@ import (
 	"expensia/internal/app/domain"
 	"expensia/internal/app/ports/in/delegate"
 	"expensia/internal/app/ports/out/dao"
-	"expensia/internal/app/ports/out/dao/repository"
 	"expensia/internal/app/prepare"
+	"expensia/internal/app/usecases"
 	"expensia/internal/infrastructure/transport/http/presenter"
 	apikitHandler "github.com/Zaytsev-Dmitry/apikit/handlers"
 	"github.com/gin-gonic/gin"
@@ -27,7 +27,7 @@ func (bc BoardController) GetAllBoards(context *gin.Context, params openapi.GetA
 func (bc BoardController) CreateBoard(context *gin.Context, params openapi.CreateBoardParams) {
 	apikitHandler.HandleResponse(context, func() (*domain.Board, error) {
 		return bc.delegate.CreateBoard(
-			repository.CreateBoardUCaseIn{
+			usecases.CreateBoardInput{
 				TgUserId: params.TgUserId,
 				Name:     params.Name,
 				Currency: string(params.Currency),
@@ -41,7 +41,7 @@ func (bc BoardController) AddParticipantToBoard(context *gin.Context, params ope
 		context,
 		func() error {
 			return bc.delegate.AddParticipantToBoard(
-				repository.AddParticipantsInput{
+				usecases.AddParticipantsInput{
 					ParticipantTgUserIDs: params.ParticipantTgUserIdList,
 					BoardID:              params.BoardId,
 					BoardOwnerTgUserID:   params.TgUserId,

@@ -2,9 +2,14 @@ package usecases
 
 import (
 	"expensia/internal/app/domain"
-	"expensia/internal/app/ports/out/dao/repository"
 )
 
 type CreateBoardUCase interface {
-	CreateAndReturnBoard(req repository.CreateBoardUCaseIn) (*domain.Board, error)
+	CreateAndReturnBoard(req CreateBoardInput) (*domain.Board, error)
+}
+type CreateBoardInput struct {
+	TgUserId int64
+	OwnerId  int64
+	Name     string
+	Currency string
 }

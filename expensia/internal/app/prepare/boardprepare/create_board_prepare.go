@@ -3,16 +3,17 @@ package boardprepare
 import (
 	"expensia/internal/app/ports/out/dao/repository"
 	"expensia/internal/app/prepare"
+	"expensia/internal/app/usecases"
 )
 
 type CreateBoardPreparer struct {
 	ParticipantRepo repository.ParticipantRepository
 }
 
-func (p CreateBoardPreparer) Prepare(input repository.CreateBoardUCaseIn) (repository.CreateBoardUCaseIn, error) {
+func (p CreateBoardPreparer) Prepare(input usecases.CreateBoardInput) (usecases.CreateBoardInput, error) {
 	id, err := p.ParticipantRepo.GetIdByTgUserId(input.TgUserId)
 	if err != nil {
-		return repository.CreateBoardUCaseIn{}, err
+		return usecases.CreateBoardInput{}, err
 	}
 	input.OwnerId = id
 	return input, nil

@@ -1,7 +1,13 @@
 package usecases
 
-import "expensia/internal/app/ports/out/dao/repository"
-
 type AddParticipantUCase interface {
-	AddParticipantsToBoard(req repository.AddParticipantsInput) error
+	AddParticipantsToBoard(req AddParticipantsInput) error
+}
+
+type AddParticipantsInput struct {
+	ParticipantTgUserIDs []int64
+	BoardID              int64
+	BoardOwnerTgUserID   int64
+	//prepared data
+	ParticipantsDB []int64
 }

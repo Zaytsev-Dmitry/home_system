@@ -3,15 +3,15 @@ package delegate
 import (
 	"expensia/internal/app/domain"
 	"expensia/internal/app/ports/out/dao"
-	"expensia/internal/app/ports/out/dao/repository"
 	"expensia/internal/app/prepare"
 	"expensia/internal/app/prepare/boardprepare"
 	"expensia/internal/app/services"
+	"expensia/internal/app/usecases"
 )
 
 type BoardDelegate struct {
-	CreateBoard           func(repository.CreateBoardUCaseIn) (*domain.Board, error)
-	AddParticipantToBoard func(repository.AddParticipantsInput) error
+	CreateBoard           func(input usecases.CreateBoardInput) (*domain.Board, error)
+	AddParticipantToBoard func(usecases.AddParticipantsInput) error
 	GetBoardsByTgId       func(int64) ([]*domain.Board, error)
 }
 
